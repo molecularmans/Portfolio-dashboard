@@ -3,29 +3,19 @@ import streamlit.components.v1 as components
 
 
 def get_tradingview_symbol(ticker: str) -> str:
-    """티커를 TradingView 형식의 심볼(거래소:티커)로 변환"""
+    """티커를 TradingView 형식 심볼로 변환 (거래소 불일치 에러 완전 방지)"""
     ticker_clean = ticker.strip().upper()
 
     # 한국 주식 (6자리 숫자)
     if ticker_clean.isdigit() and len(ticker_clean) == 6:
         return f"KRX:{ticker_clean}"
 
-    # 뉴욕증권거래소(NYSE) 상장 주요 종목
-    nyse_tickers = {
-        "EME", "ORCL", "RTX", "STRL", "TSM", "PLTR", "BABA", "NIO", "SPOT",
-        "UBER", "RBLX", "SNOW", "NET", "DIS", "KO", "PFE", "VST", "DE", "CAT",
-        "IBM", "JPM", "V", "MA", "WMT", "UNH", "HD", "PG", "CVX", "XOM", "LLY"
-    }
-    if ticker_clean in nyse_tickers:
-        return f"NYSE:{ticker_clean}"
+    # 이미 거래소 접두사가 붙어있는 경우
+    if ":" in ticker_clean:
+        return ticker_clean
 
-    # 아멕스(AMEX) ETF
-    amex_tickers = {"SPY", "IVV", "VOO", "DIA", "IWM", "QQQ"}
-    if ticker_clean in amex_tickers:
-        return f"AMEX:{ticker_clean}"
-
-    # 기본 나스닥
-    return f"NASDAQ:{ticker_clean}"
+    # 미국 주식은 순수 티커만 넘겨주면 TradingView 위젯이 NASDAQ, NYSE, AMEX를 전자동 매칭!
+    return ticker_clean
 
 
 def render_tradingview_mini_chart(ticker: str, timeframe: str = "일봉", height: int = 320):
@@ -84,7 +74,7 @@ def render_tradingview_mini_chart(ticker: str, timeframe: str = "일봉", height
                 "toolbar_bg": "#0f172a",
                 "enable_publishing": false,
                 "hide_top_toolbar": false,
-                "hide_side_toolbar": true, /* 미니 그리드에서는 측면 툴바 숨김 */
+                "hide_side_toolbar": true,
                 "allow_symbol_change": false,
                 "save_image": false,
                 "studies": {studies_json},
@@ -172,7 +162,7 @@ def render_tradingview_chart(ticker: str, timeframe: str = "일봉", settings: d
                 "toolbar_bg": "#1e222d",
                 "enable_publishing": false,
                 "allow_symbol_change": true,
-                "hide_side_toolbar": false, /* 추세선, 피보나치 등 좌측 풀 툴바 활성화 */
+                "hide_side_toolbar": false,
                 "withdateranges": true,
                 "save_image": true,
                 "studies": {studies_json},
