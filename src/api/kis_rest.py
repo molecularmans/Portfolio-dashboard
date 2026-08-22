@@ -7,9 +7,20 @@ import requests
 
 from .kis_auth import KISAuth
 
+# 미국 주요 거래소 매핑
+US_EXCHANGE_MAP = {
+    # NYSE 상장 종목
+    "EME": "NYS", "ORCL": "NYS", "RTX": "NYS", "STRL": "NYS", "TSM": "NYS",
+    "PLTR": "NYS", "BABA": "NYS", "NIO": "NYS", "SPOT": "NYS", "UBER": "NYS",
+    "RBLX": "NYS", "SNOW": "NYS", "NET": "NYS", "DIS": "NYS", "KO": "NYS",
+    "PFE": "NYS", "VST": "NYS", "DE": "NYS", "CAT": "NYS", "IBM": "NYS",
+    # AMEX 상장 종목
+    "SPY": "AMS", "IVV": "AMS", "VOO": "AMS", "DIA": "AMS", "IWM": "AMS",
+}
+
 
 class KISClient:
-    """한국투자증권(KIS) REST API 클라이언트 (계좌별 독립 AppKey/Secret 완벽 지원)"""
+    """한국투자증권(KIS) REST API 클라이언트 (거래소 자동 탐색 및 최신 시세 수집)"""
 
     def __init__(self, auth: KISAuth = None):
         self.auth = auth or KISAuth()
@@ -19,11 +30,13 @@ class KISClient:
         return self.auth.is_configured
 
     # ==========================================
-    # 1. 미국 주식 기간별 시세 (일봉 / 주봉 / 월봉)
+    # 1. 미국 주식 기간별 시세 (거래소 자동 탐색)
     # ==========================================
-    def get_us_ohlcv(self, ticker: str, timeframe: str = "D", count: int = 250, exchange: str = "NAS") -> pd.DataFrame:
+    def get_us_ohlcv(self, ticker: str, timeframe: str = "D", count: int = 250) -> pd.DataFrame:
+        """미국 주식 일/주/월봉 데이터 조회 (HHDFS76240000 - NAS, NYS, AMS 자동 탐색)"""
+        ticker_clean = ticker.upper().strip()
         if not self.is_configured():
-            return self._generate_mock_ohlcv(ticker, timeframe=timeframe, count=count)
+            return self._generate_mock_ohlcv(ticker_clean, timeframe=timeframe, count=count)
 
         gubn_map = {"D": "0", "W": "1", "M": "2"}
         gubn = gubn_map.get(timeframe.upper(), "0")
@@ -31,67 +44,77 @@ class KISClient:
         endpoint = f"{self.base_url}/uapi/overseas-price/v1/quotations/dailyprice"
         headers = self.auth.get_common_headers(tr_id="HHDFS76240000", account_idx=1)
 
-        all_records = []
-        last_date = ""
+        # 1순위: 매핑된 거래소, 없으면 NAS -> NYS -> AMS 순서로 시도
+        preferred_ex = US_EXCHANGE_MAP.get(ticker_clean, "NAS")
+        ex_candidates = [preferred_ex] + [e for e in ["NAS", "NYS", "AMS"] if e != preferred_ex]
 
-        iterations = (count + 99) // 100
-        for _ in range(iterations):
-            params = {
-                "AUTH": "",
-                "EXCD": exchange,
-                "SYMB": ticker.upper(),
-                "GUBN": gubn,
-                "BYMD": last_date,
-                "MODP": "1",
-            }
+        for excd in ex_candidates:
+            all_records = []
+            last_date = ""
+            iterations = (count + 99) // 100
 
-            try:
-                res = requests.get(endpoint, headers=headers, params=params, timeout=10)
-                data = res.json()
+            success = False
+            for _ in range(iterations):
+                params = {
+                    "AUTH": "",
+                    "EXCD": excd,
+                    "SYMB": ticker_clean,
+                    "GUBN": gubn,
+                    "BYMD": last_date,
+                    "MODP": "1",
+                }
 
-                if res.status_code != 200 or data.get("rt_cd") != "0":
+                try:
+                    res = requests.get(endpoint, headers=headers, params=params, timeout=8)
+                    data = res.json()
+
+                    if res.status_code != 200 or data.get("rt_cd") != "0":
+                        break
+
+                    output2 = data.get("output2", [])
+                    if not output2:
+                        break
+
+                    for row in output2:
+                        date_str = row.get("xymd", "")
+                        if not date_str:
+                            continue
+
+                        all_records.append({
+                            "date": pd.to_datetime(date_str, format="%Y%m%d"),
+                            "open": float(row.get("open", 0)),
+                            "high": float(row.get("high", 0)),
+                            "low": float(row.get("low", 0)),
+                            "close": float(row.get("clos", 0)),
+                            "volume": float(row.get("tvol", 0)),
+                        })
+
+                    last_item = output2[-1]
+                    last_date = last_item.get("xymd", "")
+                    success = True
+
+                    if len(all_records) >= count:
+                        break
+
+                    time.sleep(0.1)
+
+                except Exception:
                     break
 
-                output2 = data.get("output2", [])
-                if not output2:
-                    break
+            if success and len(all_records) >= 5:
+                df = pd.DataFrame(all_records).drop_duplicates(subset=["date"]).sort_values("date").reset_index(drop=True)
+                return df.tail(count)
 
-                for row in output2:
-                    date_str = row.get("xymd", "")
-                    if not date_str:
-                        continue
-
-                    all_records.append({
-                        "date": pd.to_datetime(date_str, format="%Y%m%d"),
-                        "open": float(row.get("open", 0)),
-                        "high": float(row.get("high", 0)),
-                        "low": float(row.get("low", 0)),
-                        "close": float(row.get("clos", 0)),
-                        "volume": float(row.get("tvol", 0)),
-                    })
-
-                last_item = output2[-1]
-                last_date = last_item.get("xymd", "")
-                time.sleep(0.15)
-
-                if len(all_records) >= count:
-                    break
-
-            except Exception:
-                break
-
-        if not all_records:
-            return self._generate_mock_ohlcv(ticker, timeframe=timeframe, count=count)
-
-        df = pd.DataFrame(all_records).drop_duplicates(subset=["date"]).sort_values("date").reset_index(drop=True)
-        return df.tail(count)
+        # 모든 거래소 탐색 실패 시에만 fallback
+        return self._generate_mock_ohlcv(ticker_clean, timeframe=timeframe, count=count)
 
     # ==========================================
-    # 2. 국내 주식 기간별 시세 (일봉 / 주봉 / 월봉)
+    # 2. 국내 주식 기간별 시세
     # ==========================================
     def get_kr_ohlcv(self, ticker: str, timeframe: str = "D", count: int = 250) -> pd.DataFrame:
+        ticker_clean = ticker.strip()
         if not self.is_configured():
-            return self._generate_mock_ohlcv(ticker, timeframe=timeframe, count=count)
+            return self._generate_mock_ohlcv(ticker_clean, timeframe=timeframe, count=count)
 
         endpoint = f"{self.base_url}/uapi/domestic-stock/v1/quotations/inquire-daily-price"
         headers = self.auth.get_common_headers(tr_id="FHKST01010400", account_idx=1)
@@ -102,7 +125,7 @@ class KISClient:
 
         params = {
             "FID_COND_MRKT_DIV_CODE": "J",
-            "FID_INPUT_ISCD": ticker,
+            "FID_INPUT_ISCD": ticker_clean,
             "FID_INPUT_DATE_1": start_date,
             "FID_INPUT_DATE_2": end_date,
             "FID_PERIOD_DIV_CODE": timeframe.upper(),
@@ -110,11 +133,11 @@ class KISClient:
         }
 
         try:
-            res = requests.get(endpoint, headers=headers, params=params, timeout=10)
+            res = requests.get(endpoint, headers=headers, params=params, timeout=8)
             data = res.json()
 
             if res.status_code != 200 or data.get("rt_cd") != "0":
-                return self._generate_mock_ohlcv(ticker, timeframe=timeframe, count=count)
+                return self._generate_mock_ohlcv(ticker_clean, timeframe=timeframe, count=count)
 
             records = []
             for row in data.get("output2", []):
@@ -131,19 +154,18 @@ class KISClient:
                 })
 
             if not records:
-                return self._generate_mock_ohlcv(ticker, timeframe=timeframe, count=count)
+                return self._generate_mock_ohlcv(ticker_clean, timeframe=timeframe, count=count)
 
             df = pd.DataFrame(records).drop_duplicates(subset=["date"]).sort_values("date").reset_index(drop=True)
             return df.tail(count)
 
         except Exception:
-            return self._generate_mock_ohlcv(ticker, timeframe=timeframe, count=count)
+            return self._generate_mock_ohlcv(ticker_clean, timeframe=timeframe, count=count)
 
     # ==========================================
     # 3. 해외주식 잔고 조회 (계좌별 독립 토큰/헤더 호출)
     # ==========================================
     def get_overseas_balance(self, account_idx: int = 1) -> list:
-        """특정 계좌의 독립 인증정보로 해외주식 잔고 조회"""
         acc = next((a for a in self.auth.accounts if a["idx"] == account_idx), None)
         if not acc:
             acc = self.auth.accounts[0] if self.auth.accounts else None
@@ -199,7 +221,6 @@ class KISClient:
         return list(items_dict.values())
 
     def get_combined_balance(self) -> list:
-        """등록된 모든 계좌를 순회하여 각 계좌의 독립 인증정보로 조회 후 자동 합산"""
         accounts = self.auth.get_accounts_list()
         if not accounts:
             return self.get_overseas_balance(1)
@@ -212,7 +233,6 @@ class KISClient:
                 if tk not in combined_map:
                     combined_map[tk] = it.copy()
                 else:
-                    # 동일 종목 합산 (가중평균 평단가 및 수량 합산)
                     prev = combined_map[tk]
                     total_qty = prev["qty"] + it["qty"]
                     tot_buy = (prev["qty"] * prev["avg_price"]) + (it["qty"] * it["avg_price"])
@@ -234,7 +254,7 @@ class KISClient:
         return list(combined_map.values())
 
     # ==========================================
-    # 4. Mock Data Generator
+    # 4. Mock Data Generator (최신 일자 기준 생성)
     # ==========================================
     def _generate_mock_ohlcv(self, ticker: str, timeframe: str = "D", count: int = 250) -> pd.DataFrame:
         seed = sum(ord(c) for c in ticker) + (10 if timeframe == "W" else (20 if timeframe == "M" else 0))
@@ -257,7 +277,7 @@ class KISClient:
         base_price_map = {
             "NVDA": 130.0, "AAPL": 225.0, "MSFT": 415.0, "GOOGL": 165.0,
             "AMZN": 185.0, "TSLA": 210.0, "ORCL": 140.0, "MRVL": 75.0,
-            "BOTZ": 36.0,
+            "BOTZ": 36.0, "MU": 105.0, "HOOD": 22.0, "EME": 380.0, "COHR": 85.0,
         }
         start_price = base_price_map.get(ticker.upper(), 100.0)
 
@@ -286,6 +306,6 @@ class KISClient:
 
     def _get_mock_portfolio(self) -> list:
         return [
-            {"ticker": "NVDA", "name": "NVIDIA", "qty": 45, "avg_price": 115.50, "current_price": 132.80, "profit_rate": 14.98, "eval_amount": 5976.0},
-            {"ticker": "GOOGL", "name": "Alphabet Class A", "qty": 37, "avg_price": 154.20, "current_price": 168.40, "profit_rate": 9.21, "eval_amount": 6230.8},
+            {"ticker": "GOOGL", "name": "알파벳 A", "qty": 37, "avg_price": 237.94, "current_price": 344.82, "profit_rate": 44.92, "eval_amount": 12758.34},
+            {"ticker": "BOTZ", "name": "Global X Robotics & AI", "qty": 32, "avg_price": 37.58, "current_price": 36.04, "profit_rate": -4.10, "eval_amount": 1153.28},
         ]

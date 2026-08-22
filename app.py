@@ -121,7 +121,13 @@ def load_and_calc_stock_data(ticker: str, db: StockDB, client: KISClient, force_
     if not force_refresh:
         df = db.get_prices(ticker, timeframe=tf_code)
 
-    if df.empty or len(df) < min_required or force_refresh:
+    need_fetch = df.empty or len(df) < min_required or force_refresh
+    if not need_fetch and not df.empty and tf_code == "D":
+        latest_d = pd.to_datetime(df.iloc[-1]["date"])
+        if (pd.Timestamp.now() - latest_d).days > 4:
+            need_fetch = True
+
+    if need_fetch:
         if ticker.isdigit() and len(ticker) == 6:
             df = client.get_kr_ohlcv(ticker, timeframe=tf_code, count=count_target)
         else:
