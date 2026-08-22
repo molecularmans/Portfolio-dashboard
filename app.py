@@ -8,65 +8,84 @@ from src.ui.charts import create_mini_chart, create_detail_chart, CHART_CONFIG
 from src.ui.tradingview import render_tradingview_chart
 from src.ui.sidebar import render_sidebar
 
-# 1. Streamlit 페이지 기본 설정 (와이드 모드, 이모지 제거)
+# 1. Streamlit 페이지 기본 설정
 st.set_page_config(
     page_title="Personal Stock Terminal",
     layout="wide",
     initial_sidebar_state="expanded",
 )
 
-# 커스텀 스타일 (폰트 크기 최적화 및 잘림 방지, 이모지 없는 미니멀 룩)
+# 커스텀 스타일 (상단 여백 균형 확보 및 메트릭 카드 완벽 정렬)
 st.markdown("""
 <style>
-    /* 상단 기본 여백 축소 */
+    /* 상단 헤더와의 자연스러운 여백 확보 */
     .block-container {
-        padding-top: 1.2rem;
-        padding-bottom: 2rem;
+        padding-top: 3.8rem !important;
+        padding-bottom: 2.5rem !important;
+        padding-left: 2rem !important;
+        padding-right: 2rem !important;
     }
-    /* 메트릭 카드 폰트 크기 및 줄바꿈 최적화 (숫자 잘림 100% 방지) */
+    
+    /* 메트릭 카드 스타일 */
     [data-testid="stMetric"] {
-        background-color: rgba(255, 255, 255, 0.03);
-        border: 1px solid rgba(255, 255, 255, 0.08);
-        border-radius: 6px;
-        padding: 6px 10px;
+        background-color: rgba(255, 255, 255, 0.04);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        border-radius: 8px;
+        padding: 8px 12px;
         min-width: 0;
+        height: 100%;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+    }
+    [data-testid="stMetricLabel"] {
+        font-size: 0.82rem !important;
+        font-weight: 500 !important;
+        color: #cbd5e1 !important;
+        margin-bottom: 4px !important;
+        white-space: nowrap !important;
+        overflow: hidden;
+        text-overflow: ellipsis;
     }
     [data-testid="stMetricValue"] {
-        font-size: 1.05rem !important;
+        font-size: 1.1rem !important;
         font-weight: 600 !important;
+        color: #f8fafc !important;
         line-height: 1.2 !important;
         white-space: nowrap !important;
     }
-    [data-testid="stMetricLabel"] {
-        font-size: 0.78rem !important;
-        color: #9e9e9e !important;
-        margin-bottom: 2px !important;
-        white-space: nowrap !important;
-    }
     [data-testid="stMetricDelta"] {
-        font-size: 0.75rem !important;
+        font-size: 0.78rem !important;
         line-height: 1.1 !important;
+        margin-top: 2px !important;
     }
+
+    /* 총 평가금액 전용 박스 */
     .total-eval-box {
-        background: linear-gradient(135deg, rgba(30, 41, 59, 0.8) 0%, rgba(15, 23, 42, 0.9) 100%);
-        border: 1px solid rgba(56, 189, 248, 0.3);
+        background: linear-gradient(135deg, rgba(30, 41, 59, 0.9) 0%, rgba(15, 23, 42, 0.95) 100%);
+        border: 1.5px solid rgba(56, 189, 248, 0.4);
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25);
         border-radius: 8px;
-        padding: 8px 16px;
+        padding: 8px 14px;
+        height: 100%;
         display: flex;
         flex-direction: column;
         justify-content: center;
     }
     .total-eval-label {
-        font-size: 0.78rem;
+        font-size: 0.8rem;
         color: #94a3b8;
         font-weight: 500;
+        margin-bottom: 3px;
     }
     .total-eval-val {
-        font-size: 1.35rem;
+        font-size: 1.25rem;
         font-weight: 700;
         color: #38bdf8;
-        letter-spacing: -0.5px;
+        letter-spacing: -0.3px;
+        white-space: nowrap;
     }
+    
     .positive-text {
         color: #26a69a;
         font-weight: 600;
@@ -78,7 +97,7 @@ st.markdown("""
     .stButton>button {
         border-radius: 4px;
         font-size: 0.82rem;
-        padding: 2px 8px;
+        padding: 3px 10px;
     }
 </style>
 """, unsafe_allow_html=True)
@@ -163,12 +182,11 @@ def main():
         tickers = watchlist_df["ticker"].tolist() if not watchlist_df.empty else []
 
     # ==========================================
-    # 상단 요약 바 (총 평가금액 잘림 방지 + 컴팩트 카드)
+    # 상단 요약 바 (안정적인 상단 여백 & 완벽한 폰트/높이 정렬)
     # ==========================================
     if is_portfolio_mode and portfolio_items:
         total_eval = sum(item["eval_amount"] for item in portfolio_items)
         
-        # 총 평가금액 전용 박스와 종목 리스트 분리 배치
         c_total, c_items = st.columns([1.6, 8.4])
         with c_total:
             st.markdown(f"""
@@ -179,7 +197,6 @@ def main():
             """, unsafe_allow_html=True)
 
         with c_items:
-            # 종목별 메트릭 카드 렌더링 (최대 10개씩 배치)
             num_show = min(len(portfolio_items), 10)
             item_cols = st.columns(num_show)
             for i in range(num_show):
