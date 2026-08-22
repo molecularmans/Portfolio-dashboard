@@ -10,33 +10,107 @@ def get_tradingview_symbol(ticker: str) -> str:
     if ticker_clean.isdigit() and len(ticker_clean) == 6:
         return f"KRX:{ticker_clean}"
 
-    # 미국 주식 주요 거래소 매핑
-    nyse_tickers = {"ORCL", "TSM", "BABA", "NIO", "PLTR", "SPOT", "UBER", "RBLX", "SNOW", "NET", "DIS", "KO", "PFE", "RTX", "VST", "EME"}
+    # 뉴욕증권거래소(NYSE) 상장 주요 종목
+    nyse_tickers = {
+        "EME", "ORCL", "RTX", "STRL", "TSM", "PLTR", "BABA", "NIO", "SPOT",
+        "UBER", "RBLX", "SNOW", "NET", "DIS", "KO", "PFE", "VST", "DE", "CAT",
+        "IBM", "JPM", "V", "MA", "WMT", "UNH", "HD", "PG", "CVX", "XOM", "LLY"
+    }
     if ticker_clean in nyse_tickers:
         return f"NYSE:{ticker_clean}"
+
+    # 아멕스(AMEX) ETF
+    amex_tickers = {"SPY", "IVV", "VOO", "DIA", "IWM", "QQQ"}
+    if ticker_clean in amex_tickers:
+        return f"AMEX:{ticker_clean}"
 
     # 기본 나스닥
     return f"NASDAQ:{ticker_clean}"
 
 
+def render_tradingview_mini_chart(ticker: str, timeframe: str = "일봉", height: int = 320):
+    """
+    멀티 차트 그리드(3열)용 TradingView 실시간 컴팩트 캔들 차트
+    - 트레이딩뷰 공식 글로벌 실시간 데이터피드로 100% 정확한 캔들/종가 표시
+    - 5 EMA, 20 MA, 50 MA, 200 MA 및 거래량 기본 탑재
+    """
+    tv_symbol = get_tradingview_symbol(ticker)
+
+    interval_map = {"일봉": "D", "주봉": "W", "월봉": "M"}
+    interval = interval_map.get(timeframe, "D")
+
+    studies = [
+        {"id": "MAExp@tv-basicstudies", "inputs": {"length": 5}},
+        {"id": "MASimple@tv-basicstudies", "inputs": {"length": 20}},
+        {"id": "MASimple@tv-basicstudies", "inputs": {"length": 50}},
+        {"id": "MASimple@tv-basicstudies", "inputs": {"length": 200}},
+    ]
+    studies_json = json.dumps(studies)
+
+    html_code = f"""
+    <!DOCTYPE html>
+    <html>
+    <head>
+        <meta charset="utf-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <style>
+            html, body {{
+                margin: 0;
+                padding: 0;
+                width: 100%;
+                height: 100%;
+                background-color: #0f172a;
+                overflow: hidden;
+                border-radius: 8px;
+            }}
+            #tv_mini_container_{ticker} {{
+                width: 100%;
+                height: 100%;
+            }}
+        </style>
+    </head>
+    <body>
+        <div id="tv_mini_container_{ticker}"></div>
+        <script type="text/javascript" src="https://s3.tradingview.com/tv.js"></script>
+        <script type="text/javascript">
+            new TradingView.widget({{
+                "autosize": true,
+                "symbol": "{tv_symbol}",
+                "interval": "{interval}",
+                "timezone": "Asia/Seoul",
+                "theme": "dark",
+                "style": "1",
+                "locale": "kr",
+                "toolbar_bg": "#0f172a",
+                "enable_publishing": false,
+                "hide_top_toolbar": false,
+                "hide_side_toolbar": true, /* 미니 그리드에서는 측면 툴바 숨김 */
+                "allow_symbol_change": false,
+                "save_image": false,
+                "studies": {studies_json},
+                "container_id": "tv_mini_container_{ticker}"
+            }});
+        </script>
+    </body>
+    </html>
+    """
+
+    components.html(html_code, height=height)
+
+
 def render_tradingview_chart(ticker: str, timeframe: str = "일봉", settings: dict = None, height: int = 750):
     """
-    트레이딩뷰(TradingView) 공식 Advanced Real-Time Chart Widget 렌더링
-    - 사이드바에서 선택한 이동평균선(5 EMA, 10, 20, 30, 50, 150, 200 MA) 및 보조지표(RSI, MACD, Stoch) 자동 탑재
+    상세 분석용 TradingView 풀버전 프로 차트 (추세선, 피보나치, 수평선, 플로팅 도구 풀탑재)
     """
     if settings is None:
         settings = {}
 
     tv_symbol = get_tradingview_symbol(ticker)
 
-    # 타임프레임 매핑 (D: 일, W: 주, M: 월)
     interval_map = {"일봉": "D", "주봉": "W", "월봉": "M"}
     interval = interval_map.get(timeframe, "D")
 
-    # 기본 활성화할 studies 구성
     studies_list = []
-
-    # 1. 이동평균선 (설정에 맞춰 추가)
     if settings.get("show_ema5", True):
         studies_list.append({"id": "MAExp@tv-basicstudies", "inputs": {"length": 5}})
     if settings.get("show_ma20", True):
@@ -52,7 +126,6 @@ def render_tradingview_chart(ticker: str, timeframe: str = "일봉", settings: d
     if settings.get("show_ma150", False):
         studies_list.append({"id": "MASimple@tv-basicstudies", "inputs": {"length": 150}})
 
-    # 2. 보조지표
     sub_inds = settings.get("selected_sub_indicators", ["Stochastic", "RSI"])
     if "RSI" in sub_inds:
         studies_list.append("RSI@tv-basicstudies")
@@ -99,7 +172,7 @@ def render_tradingview_chart(ticker: str, timeframe: str = "일봉", settings: d
                 "toolbar_bg": "#1e222d",
                 "enable_publishing": false,
                 "allow_symbol_change": true,
-                "hide_side_toolbar": false, /* 좌측 정품 드로잉 툴바 활성화 */
+                "hide_side_toolbar": false, /* 추세선, 피보나치 등 좌측 풀 툴바 활성화 */
                 "withdateranges": true,
                 "save_image": true,
                 "studies": {studies_json},

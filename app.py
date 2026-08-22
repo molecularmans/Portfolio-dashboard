@@ -4,8 +4,8 @@ import pandas as pd
 from src.db.database import StockDB
 from src.api.kis_rest import KISClient
 from src.indicators.technicals import calc_indicators
-from src.ui.charts import create_mini_chart, create_detail_chart, CHART_CONFIG
-from src.ui.tradingview import render_tradingview_chart
+from src.ui.charts import create_detail_chart, CHART_CONFIG
+from src.ui.tradingview import render_tradingview_chart, render_tradingview_mini_chart
 from src.ui.sidebar import render_sidebar
 
 # 1. Streamlit 페이지 기본 설정
@@ -15,7 +15,7 @@ st.set_page_config(
     initial_sidebar_state="expanded",
 )
 
-# 커스텀 스타일 (상단 여백 균형 확보 및 메트릭 카드 완벽 정렬)
+# 커스텀 스타일 (상단 여백 및 메트릭 카드)
 st.markdown("""
 <style>
     .block-container {
@@ -107,39 +107,6 @@ def init_services():
     return db, client
 
 
-def load_and_calc_stock_data(ticker: str, db: StockDB, client: KISClient, force_refresh: bool = False, timeframe: str = "일봉") -> pd.DataFrame:
-    ticker = ticker.upper().strip()
-    tf_map = {"일봉": "D", "주봉": "W", "월봉": "M"}
-    tf_code = tf_map.get(timeframe, "D")
-    count_target = 300 if tf_code == "D" else (200 if tf_code == "W" else 120)
-
-    df = pd.DataFrame()
-    if not force_refresh:
-        df = db.get_prices(ticker, timeframe=tf_code)
-
-    # 캐시 유효성 엄격 검증:
-    # 1) 데이터가 비어있거나
-    # 2) 일봉인데 최신 데이터가 최근 3영업일(주말 제외) 이전이거나
-    # 3) 강제 새로고침인 경우 KIS API로 실시간 최신 시세를 수집하여 DB에 저장
-    need_fetch = df.empty or len(df) < 20 or force_refresh
-    if not need_fetch and not df.empty and tf_code == "D":
-        latest_d = pd.to_datetime(df.iloc[-1]["date"])
-        # 최신 일자가 2026년 8월 데이터가 아니면 (과거 Mock 캐시 등) 즉시 새로고침
-        if (pd.Timestamp.now() - latest_d).days > 3:
-            need_fetch = True
-
-    if need_fetch:
-        if ticker.isdigit() and len(ticker) == 6:
-            df = client.get_kr_ohlcv(ticker, timeframe=tf_code, count=count_target)
-        else:
-            df = client.get_us_ohlcv(ticker, timeframe=tf_code, count=count_target)
-
-        if not df.empty:
-            db.save_prices(ticker, tf_code, df)
-
-    return calc_indicators(df)
-
-
 def main():
     db, client = init_services()
 
@@ -151,8 +118,6 @@ def main():
 
     # 좌측 사이드바 렌더링
     settings = render_sidebar(db, client)
-    force_refresh = st.session_state.get("force_refresh", False)
-    st.session_state["force_refresh"] = False
     timeframe = settings.get("timeframe", "일봉")
 
     # 대상 티커 목록 및 포트폴리오 결정
@@ -189,7 +154,7 @@ def main():
         tickers = watchlist_df["ticker"].tolist() if not watchlist_df.empty else []
 
     # ==========================================
-    # 상단 요약 바 (총 평가금액 잘림 방지 + 컴팩트 카드)
+    # 상단 요약 바 (총 평가금액 및 실시간 보유종목)
     # ==========================================
     portfolio_map = {it["ticker"]: it for it in portfolio_items}
 
@@ -235,72 +200,28 @@ def main():
         detail_settings = settings.copy()
         detail_settings["timeframe"] = detail_tf
 
-        # 데이터 로드 및 계산
-        with st.spinner(f"{sel_ticker} 데이터 불러오는 중..."):
-            df = load_and_calc_stock_data(sel_ticker, db, client, force_refresh, timeframe=detail_tf)
+        # 상단 핵심 메트릭 (잔고 실시간 데이터 우선 연동)
+        if sel_ticker in portfolio_map:
+            it_p = portfolio_map[sel_ticker]
+            c1, c2, c3 = st.columns(3)
+            c1.metric("현재가", f"${it_p['current_price']:,.2f}", f"{it_p['profit_rate']:+.2f}%")
+            c2.metric("보유 수량", f"{int(it_p['qty'])}주")
+            c3.metric("평가 금액", f"${it_p['eval_amount']:,.2f}")
 
-        if not df.empty and len(df) >= 5:
-            latest = df.iloc[-1]
-            # 실시간 현재가와 등락률
-            cur_price = latest["close"]
-            pct_1d = latest.get("pct_change_1d", 0)
-
-            # 포트폴리오에 있는 종목이면 잔고 실시간 현재가와 손익률 우선 표시
-            if sel_ticker in portfolio_map:
-                cur_price = portfolio_map[sel_ticker]["current_price"]
-                pct_1d = portfolio_map[sel_ticker]["profit_rate"]
-
-            # 핵심 메트릭 카드
-            c1, c2, c3, c4 = st.columns(4)
-            c1.metric("현재가", f"${cur_price:,.2f}", f"{pct_1d:+.2f}%")
-            c2.metric(f"RVOL ({detail_tf} 20기간 대비)", f"{latest.get('rvol', 1.0):.2f}x")
-            c3.metric("최고가 대비 이격도", f"{latest.get('dist_52w_high', 0):+.2f}%")
-            c4.metric("RSI (14)", f"{latest.get('rsi_14', 50):.1f}")
-
-            # 이동평균선 현황 카드
-            with st.expander(f"{detail_tf} 기준 7대 이동평균선 수치 요약", expanded=False):
-                m_c1, m_c2, m_c3, m_c4, m_c5, m_c6, m_c7 = st.columns(7)
-                m_c1.metric("5 EMA", f"${latest.get('ema_5', 0):,.2f}")
-                m_c2.metric("10 MA", f"${latest.get('sma_10', 0):,.2f}")
-                m_c3.metric("20 MA", f"${latest.get('sma_20', 0):,.2f}")
-                m_c4.metric("30 MA", f"${latest.get('sma_30', 0):,.2f}")
-                m_c5.metric("50 MA", f"${latest.get('sma_50', 0):,.2f}")
-                m_c6.metric("150 MA", f"${latest.get('sma_150', 0):,.2f}")
-                m_c7.metric("200 MA", f"${latest.get('sma_200', 0):,.2f}")
-
-        # 차트 보기 모드 탭
-        chart_tab1, chart_tab2 = st.tabs(["트레이딩뷰 프로 차트 (추세선/HTS 풀도구)", "멀티 서브플롯 분석 차트"])
-
-        with chart_tab1:
-            st.caption("트레이딩뷰 좌측 툴바에서 추세선, 수평선, 피보나치, 채널 등을 마우스로 직접 긋고, 클릭하여 복사/삭제/색상변경을 자유롭게 사용할 수 있습니다. (자동 저장 지원)")
-            render_tradingview_chart(sel_ticker, timeframe=detail_tf, settings=detail_settings, height=750)
-
-        with chart_tab2:
-            detail_fig = create_detail_chart(df, sel_ticker, detail_settings)
-            st.plotly_chart(detail_fig, use_container_width=True, config=CHART_CONFIG)
-
-        if not df.empty:
-            with st.expander(f"최근 10개 {detail_tf} 지표 데이터"):
-                display_cols = [
-                    "date", "open", "high", "low", "close", "volume",
-                    "ema_5", "sma_10", "sma_20", "sma_30", "sma_50", "sma_150", "sma_200",
-                    "rvol", "rsi_14", "stoch_k", "williams_r", "macd_line"
-                ]
-                existing_cols = [c for c in display_cols if c in df.columns]
-                st.dataframe(df[existing_cols].tail(10).sort_values("date", ascending=False), use_container_width=True)
-
+        st.caption("트레이딩뷰 좌측 툴바에서 추세선, 수평선, 피보나치, 채널 등을 마우스로 직접 긋고, 클릭하여 복사/삭제/색상변경을 자유롭게 사용할 수 있습니다. (자동 저장 지원)")
+        render_tradingview_chart(sel_ticker, timeframe=detail_tf, settings=detail_settings, height=750)
         return
 
     # ==========================================
-    # VIEW 모드 2: 멀티 차트 그리드 요약 뷰
+    # VIEW 모드 2: 멀티 차트 그리드 (트레이딩뷰 실시간 정품 캔들 엔진 탑재)
     # ==========================================
     st.markdown(f"##### {view_mode} ({len(tickers)} 종목) · {timeframe}")
 
     if not tickers:
-        st.info("해당 포트폴리오/그룹에 등록된 종목이 없습니다. 좌측에서 다른 모드를 선택해보세요.")
+        st.info("해당 포트폴리오/그룹에 등록된 종목이 없습니다. 좌측 메뉴에서 종목을 추가해보세요.")
         return
 
-    # 3열 반응형 그리드 레이아웃
+    # 3열 반응형 그리드 레이아웃 (트레이딩뷰 캔들스틱 + 이평선 실시간 위젯)
     NUM_COLS = 3
     rows = [tickers[i:i + NUM_COLS] for i in range(0, len(tickers), NUM_COLS)]
 
@@ -308,42 +229,26 @@ def main():
         cols = st.columns(NUM_COLS)
         for idx, ticker in enumerate(row):
             with cols[idx]:
-                df = load_and_calc_stock_data(ticker, db, client, force_refresh, timeframe=timeframe)
-                if df.empty or len(df) < 5:
-                    st.warning(f"{ticker} 데이터 없음")
-                    continue
-
-                latest = df.iloc[-1]
-                
-                # 종목 헤더에 표시할 현재가 및 등락률:
-                # 포트폴리오 모드이면 실제 계좌 잔고의 실시간 현재가와 평가손익률을 정확히 표시!
-                if ticker in portfolio_map:
-                    it_p = portfolio_map[ticker]
-                    show_price = it_p["current_price"]
-                    show_delta = it_p["profit_rate"]
-                    delta_label = f"{show_delta:+.2f}%"
-                else:
-                    show_price = latest["close"]
-                    show_delta = latest.get("pct_change_1d", 0)
-                    delta_label = f"{show_delta:+.2f}%"
-
-                color_class = "positive-text" if show_delta >= 0 else "negative-text"
-                sign = "+" if show_delta >= 0 else ""
-                rvol = latest.get("rvol", 1.0)
-
                 # 종목 상단 헤더 & 자세히 보기 버튼
                 head_col1, head_col2 = st.columns([3.2, 1.8])
                 with head_col1:
-                    st.markdown(f"**{ticker}** &nbsp; <span class='{color_class}'>${show_price:,.2f} ({sign}{show_delta:.2f}%)</span>", unsafe_allow_html=True)
-                    st.caption(f"RVOL: **{rvol:.2f}x** | 52W: **{latest.get('dist_52w_high', 0):+.1f}%**")
+                    if ticker in portfolio_map:
+                        it_p = portfolio_map[ticker]
+                        show_price = it_p["current_price"]
+                        show_delta = it_p["profit_rate"]
+                        color_class = "positive-text" if show_delta >= 0 else "negative-text"
+                        sign = "+" if show_delta >= 0 else ""
+                        st.markdown(f"**{ticker}** &nbsp; <span class='{color_class}'>${show_price:,.2f} ({sign}{show_delta:.2f}%)</span>", unsafe_allow_html=True)
+                    else:
+                        st.markdown(f"**{ticker}**", unsafe_allow_html=True)
+
                 with head_col2:
                     if st.button("자세히 보기", key=f"btn_zoom_{ticker}", use_container_width=True):
                         st.session_state.selected_ticker = ticker
                         st.rerun()
 
-                # 미니 차트 렌더링
-                mini_fig = create_mini_chart(df, ticker, settings)
-                st.plotly_chart(mini_fig, use_container_width=True, key=f"chart_{ticker}", config=CHART_CONFIG)
+                # 트레이딩뷰 실시간 정품 컴팩트 캔들 차트 렌더링 (5, 20, 50, 200 이평선 & 거래량 탑재)
+                render_tradingview_mini_chart(ticker, timeframe=timeframe, height=330)
 
         st.markdown("<hr style='margin: 8px 0; border: none; border-top: 1px solid rgba(255,255,255,0.05);'>", unsafe_allow_html=True)
 
