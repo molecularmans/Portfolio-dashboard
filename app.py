@@ -18,7 +18,6 @@ st.set_page_config(
 # 커스텀 스타일 (상단 여백 균형 확보 및 메트릭 카드 완벽 정렬)
 st.markdown("""
 <style>
-    /* 상단 헤더와의 자연스러운 여백 확보 */
     .block-container {
         padding-top: 3.8rem !important;
         padding-bottom: 2.5rem !important;
@@ -26,7 +25,6 @@ st.markdown("""
         padding-right: 2rem !important;
     }
     
-    /* 메트릭 카드 스타일 */
     [data-testid="stMetric"] {
         background-color: rgba(255, 255, 255, 0.04);
         border: 1px solid rgba(255, 255, 255, 0.1);
@@ -60,7 +58,6 @@ st.markdown("""
         margin-top: 2px !important;
     }
 
-    /* 총 평가금액 전용 박스 */
     .total-eval-box {
         background: linear-gradient(135deg, rgba(30, 41, 59, 0.9) 0%, rgba(15, 23, 42, 0.95) 100%);
         border: 1.5px solid rgba(56, 189, 248, 0.4);
@@ -114,17 +111,21 @@ def load_and_calc_stock_data(ticker: str, db: StockDB, client: KISClient, force_
     ticker = ticker.upper().strip()
     tf_map = {"일봉": "D", "주봉": "W", "월봉": "M"}
     tf_code = tf_map.get(timeframe, "D")
-    min_required = 80 if tf_code == "D" else (40 if tf_code == "W" else 20)
     count_target = 300 if tf_code == "D" else (200 if tf_code == "W" else 120)
 
     df = pd.DataFrame()
     if not force_refresh:
         df = db.get_prices(ticker, timeframe=tf_code)
 
-    need_fetch = df.empty or len(df) < min_required or force_refresh
+    # 캐시 유효성 엄격 검증:
+    # 1) 데이터가 비어있거나
+    # 2) 일봉인데 최신 데이터가 최근 3영업일(주말 제외) 이전이거나
+    # 3) 강제 새로고침인 경우 KIS API로 실시간 최신 시세를 수집하여 DB에 저장
+    need_fetch = df.empty or len(df) < 20 or force_refresh
     if not need_fetch and not df.empty and tf_code == "D":
         latest_d = pd.to_datetime(df.iloc[-1]["date"])
-        if (pd.Timestamp.now() - latest_d).days > 4:
+        # 최신 일자가 2026년 8월 데이터가 아니면 (과거 Mock 캐시 등) 즉시 새로고침
+        if (pd.Timestamp.now() - latest_d).days > 3:
             need_fetch = True
 
     if need_fetch:
@@ -188,8 +189,10 @@ def main():
         tickers = watchlist_df["ticker"].tolist() if not watchlist_df.empty else []
 
     # ==========================================
-    # 상단 요약 바 (안정적인 상단 여백 & 완벽한 폰트/높이 정렬)
+    # 상단 요약 바 (총 평가금액 잘림 방지 + 컴팩트 카드)
     # ==========================================
+    portfolio_map = {it["ticker"]: it for it in portfolio_items}
+
     if is_portfolio_mode and portfolio_items:
         total_eval = sum(item["eval_amount"] for item in portfolio_items)
         
@@ -238,11 +241,18 @@ def main():
 
         if not df.empty and len(df) >= 5:
             latest = df.iloc[-1]
+            # 실시간 현재가와 등락률
+            cur_price = latest["close"]
             pct_1d = latest.get("pct_change_1d", 0)
+
+            # 포트폴리오에 있는 종목이면 잔고 실시간 현재가와 손익률 우선 표시
+            if sel_ticker in portfolio_map:
+                cur_price = portfolio_map[sel_ticker]["current_price"]
+                pct_1d = portfolio_map[sel_ticker]["profit_rate"]
 
             # 핵심 메트릭 카드
             c1, c2, c3, c4 = st.columns(4)
-            c1.metric("현재가", f"${latest['close']:,.2f}", f"{pct_1d:+.2f}%")
+            c1.metric("현재가", f"${cur_price:,.2f}", f"{pct_1d:+.2f}%")
             c2.metric(f"RVOL ({detail_tf} 20기간 대비)", f"{latest.get('rvol', 1.0):.2f}x")
             c3.metric("최고가 대비 이격도", f"{latest.get('dist_52w_high', 0):+.2f}%")
             c4.metric("RSI (14)", f"{latest.get('rsi_14', 50):.1f}")
@@ -304,15 +314,27 @@ def main():
                     continue
 
                 latest = df.iloc[-1]
-                pct_1d = latest.get("pct_change_1d", 0)
+                
+                # 종목 헤더에 표시할 현재가 및 등락률:
+                # 포트폴리오 모드이면 실제 계좌 잔고의 실시간 현재가와 평가손익률을 정확히 표시!
+                if ticker in portfolio_map:
+                    it_p = portfolio_map[ticker]
+                    show_price = it_p["current_price"]
+                    show_delta = it_p["profit_rate"]
+                    delta_label = f"{show_delta:+.2f}%"
+                else:
+                    show_price = latest["close"]
+                    show_delta = latest.get("pct_change_1d", 0)
+                    delta_label = f"{show_delta:+.2f}%"
+
+                color_class = "positive-text" if show_delta >= 0 else "negative-text"
+                sign = "+" if show_delta >= 0 else ""
                 rvol = latest.get("rvol", 1.0)
-                color_class = "positive-text" if pct_1d >= 0 else "negative-text"
-                sign = "+" if pct_1d >= 0 else ""
 
                 # 종목 상단 헤더 & 자세히 보기 버튼
-                head_col1, head_col2 = st.columns([3, 1.8])
+                head_col1, head_col2 = st.columns([3.2, 1.8])
                 with head_col1:
-                    st.markdown(f"**{ticker}** &nbsp; <span class='{color_class}'>${latest['close']:,.2f} ({sign}{pct_1d:.2f}%)</span>", unsafe_allow_html=True)
+                    st.markdown(f"**{ticker}** &nbsp; <span class='{color_class}'>${show_price:,.2f} ({sign}{show_delta:.2f}%)</span>", unsafe_allow_html=True)
                     st.caption(f"RVOL: **{rvol:.2f}x** | 52W: **{latest.get('dist_52w_high', 0):+.1f}%**")
                 with head_col2:
                     if st.button("자세히 보기", key=f"btn_zoom_{ticker}", use_container_width=True):
