@@ -20,7 +20,7 @@ DEFAULT_MA_FLAGS = {
 
 
 class StockDB:
-    """SQLite 기반 초경량 로컬 캐시 및 설정 데이터베이스 (설정 영구 저장 지원)"""
+    """SQLite 기반 로컬 캐시 및 설정 데이터베이스 (그룹 순서 변경 & 설정 영구 저장 지원)"""
 
     def __init__(self, db_path: str = DB_PATH):
         os.makedirs(os.path.dirname(db_path), exist_ok=True)
@@ -33,7 +33,7 @@ class StockDB:
         return con
 
     def _init_tables(self):
-        """기본 테이블 스키마 초기화"""
+        """기본 테이블 스키마 초기화 및 마이그레이션"""
         with self._get_connection() as con:
             cur = con.cursor()
             cur.execute("""
@@ -62,9 +62,18 @@ class StockDB:
             cur.execute("""
                 CREATE TABLE IF NOT EXISTS custom_groups (
                     group_name TEXT PRIMARY KEY,
+                    sort_order INTEGER DEFAULT 0,
                     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
                 )
             """)
+
+            cur.execute("PRAGMA table_info(custom_groups)")
+            cols = [row[1] for row in cur.fetchall()]
+            if "sort_order" not in cols:
+                try:
+                    cur.execute("ALTER TABLE custom_groups ADD COLUMN sort_order INTEGER DEFAULT 0")
+                except Exception:
+                    pass
 
             cur.execute("""
                 CREATE TABLE IF NOT EXISTS watchlist (
@@ -95,9 +104,9 @@ class StockDB:
             cur.execute("SELECT COUNT(*) FROM custom_groups")
             grp_count = cur.fetchone()[0]
             if grp_count == 0:
-                cur.execute("INSERT OR IGNORE INTO custom_groups (group_name) VALUES ('빅테크/AI')")
-                cur.execute("INSERT OR IGNORE INTO custom_groups (group_name) VALUES ('반도체')")
-                cur.execute("INSERT OR IGNORE INTO custom_groups (group_name) VALUES ('클라우드/SaaS')")
+                cur.execute("INSERT OR IGNORE INTO custom_groups (group_name, sort_order) VALUES ('빅테크/AI', 0)")
+                cur.execute("INSERT OR IGNORE INTO custom_groups (group_name, sort_order) VALUES ('반도체', 1)")
+                cur.execute("INSERT OR IGNORE INTO custom_groups (group_name, sort_order) VALUES ('클라우드/SaaS', 2)")
 
             # 기본 관심종목 데이터 초기화
             cur.execute("SELECT COUNT(*) FROM watchlist")
@@ -235,18 +244,46 @@ class StockDB:
             con.commit()
 
     # ==========================================
-    # 그룹 관리 CRUD
+    # 그룹 관리 CRUD (순서 변경 지원)
     # ==========================================
     def get_groups(self) -> list:
         with self._get_connection() as con:
-            df = pd.read_sql_query("SELECT group_name FROM custom_groups ORDER BY created_at ASC", con)
+            df = pd.read_sql_query("SELECT group_name FROM custom_groups ORDER BY sort_order ASC, created_at ASC", con)
             return df["group_name"].tolist() if not df.empty else ["빅테크/AI", "반도체", "클라우드/SaaS"]
 
     def add_group(self, group_name: str):
         with self._get_connection() as con:
             cur = con.cursor()
-            cur.execute("INSERT OR IGNORE INTO custom_groups (group_name) VALUES (?)", [group_name.strip()])
+            cur.execute("SELECT COALESCE(MAX(sort_order), 0) + 1 FROM custom_groups")
+            next_order = cur.fetchone()[0]
+            cur.execute("INSERT OR IGNORE INTO custom_groups (group_name, sort_order) VALUES (?, ?)", [group_name.strip(), next_order])
             con.commit()
+
+    def reorder_groups(self, ordered_groups: list):
+        """사용자가 지정한 순서대로 sort_order 업데이트"""
+        with self._get_connection() as con:
+            cur = con.cursor()
+            for idx, gname in enumerate(ordered_groups):
+                cur.execute("UPDATE custom_groups SET sort_order = ? WHERE group_name = ?", [idx, gname.strip()])
+            con.commit()
+
+    def move_group_up(self, group_name: str):
+        """그룹 순서를 한 칸 위로 이동"""
+        groups = self.get_groups()
+        if group_name in groups:
+            idx = groups.index(group_name)
+            if idx > 0:
+                groups[idx], groups[idx - 1] = groups[idx - 1], groups[idx]
+                self.reorder_groups(groups)
+
+    def move_group_down(self, group_name: str):
+        """그룹 순서를 한 칸 아래로 이동"""
+        groups = self.get_groups()
+        if group_name in groups:
+            idx = groups.index(group_name)
+            if idx < len(groups) - 1:
+                groups[idx], groups[idx + 1] = groups[idx + 1], groups[idx]
+                self.reorder_groups(groups)
 
     def rename_group(self, old_name: str, new_name: str):
         with self._get_connection() as con:

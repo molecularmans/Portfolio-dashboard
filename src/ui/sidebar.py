@@ -4,7 +4,7 @@ from src.api.kis_rest import KISClient
 
 
 def render_sidebar(db: StockDB, client: KISClient) -> dict:
-    """좌측 사이드바 메뉴 렌더링 (이동평균선 선택 설정 영구 저장 지원)"""
+    """좌측 사이드바 메뉴 렌더링 (그룹 순서 변경 & 이동평균선 영구 저장 지원)"""
     with st.sidebar:
         st.subheader("Terminal Controller")
 
@@ -78,9 +78,29 @@ def render_sidebar(db: StockDB, client: KISClient) -> dict:
                                 st.toast(f"{t} 삭제 완료")
                                 st.rerun()
 
-            # 탭 2: 그룹 관리
+            # 탭 2: 그룹 관리 (순서 변경 추가)
             with tab_grp:
-                st.markdown("**1) 새 그룹 생성**")
+                st.markdown("**1) 그룹 순서 변경 (위/아래 이동)**")
+                for i, gname in enumerate(groups):
+                    c_name, c_up, c_down = st.columns([3.5, 1, 1])
+                    c_name.markdown(f"`{i + 1}` **{gname}**")
+                    if i > 0:
+                        if c_up.button("▲", key=f"btn_up_{gname}", help=f"{gname} 위로"):
+                            db.move_group_up(gname)
+                            st.rerun()
+                    else:
+                        c_up.write("")
+
+                    if i < len(groups) - 1:
+                        if c_down.button("▼", key=f"btn_down_{gname}", help=f"{gname} 아래로"):
+                            db.move_group_down(gname)
+                            st.rerun()
+                    else:
+                        c_down.write("")
+
+                st.divider()
+
+                st.markdown("**2) 새 그룹 생성**")
                 g_col1, g_col2 = st.columns([3, 1])
                 new_gname = g_col1.text_input("새 그룹명", placeholder="예: 바이오, 배당주", label_visibility="collapsed").strip()
                 if g_col2.button("생성", use_container_width=True) and new_gname:
@@ -90,7 +110,7 @@ def render_sidebar(db: StockDB, client: KISClient) -> dict:
 
                 st.divider()
 
-                st.markdown("**2) 그룹명 변경**")
+                st.markdown("**3) 그룹명 변경**")
                 target_rename_grp = st.selectbox("변경할 그룹 선택", options=groups, key="sel_rename_grp")
                 r_col1, r_col2 = st.columns([3, 1])
                 renamed_title = r_col1.text_input("새 이름", value=target_rename_grp, label_visibility="collapsed").strip()
@@ -101,7 +121,7 @@ def render_sidebar(db: StockDB, client: KISClient) -> dict:
 
                 st.divider()
 
-                st.markdown("**3) 그룹 삭제**")
+                st.markdown("**4) 그룹 삭제**")
                 del_grp = st.selectbox("삭제할 그룹 선택", options=groups, key="sel_del_grp")
                 if st.button(f"'{del_grp}' 그룹 삭제", use_container_width=True):
                     db.delete_group(del_grp)
