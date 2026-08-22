@@ -1,5 +1,6 @@
 import os
 import uuid
+import json
 import sqlite3
 import pandas as pd
 from datetime import datetime
@@ -7,9 +8,19 @@ from datetime import datetime
 DB_DIR = os.path.join(os.path.dirname(__file__), "..", "..", "data")
 DB_PATH = os.path.join(DB_DIR, "stock_cache.db")
 
+DEFAULT_MA_FLAGS = {
+    "show_ema5": True,
+    "show_ma10": False,
+    "show_ma20": True,
+    "show_ma30": False,
+    "show_ma50": True,
+    "show_ma150": False,
+    "show_ma200": True,
+}
+
 
 class StockDB:
-    """SQLite 기반 초경량 로컬 캐시 및 상태 데이터베이스 (모든 클라우드/OS 100% 완벽 호환)"""
+    """SQLite 기반 초경량 로컬 캐시 및 설정 데이터베이스 (설정 영구 저장 지원)"""
 
     def __init__(self, db_path: str = DB_PATH):
         os.makedirs(os.path.dirname(db_path), exist_ok=True)
@@ -37,6 +48,14 @@ class StockDB:
                     volume REAL,
                     updated_at TIMESTAMP,
                     PRIMARY KEY (ticker, timeframe, date)
+                )
+            """)
+
+            cur.execute("""
+                CREATE TABLE IF NOT EXISTS user_settings (
+                    key TEXT PRIMARY KEY,
+                    value TEXT,
+                    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
                 )
             """)
 
@@ -99,6 +118,37 @@ class StockDB:
                     "INSERT OR IGNORE INTO watchlist (ticker, name, group_name) VALUES (?, ?, ?)",
                     default_items,
                 )
+            con.commit()
+
+    # ==========================================
+    # 이동평균선 선택 설정 영구 저장
+    # ==========================================
+    def get_ma_settings(self) -> dict:
+        """저장된 이동평균선 설정 로드"""
+        with self._get_connection() as con:
+            cur = con.cursor()
+            cur.execute("SELECT value FROM user_settings WHERE key = 'ma_flags'")
+            row = cur.fetchone()
+            if row and row[0]:
+                try:
+                    loaded = json.loads(row[0])
+                    merged = DEFAULT_MA_FLAGS.copy()
+                    merged.update(loaded)
+                    return merged
+                except Exception:
+                    pass
+        return DEFAULT_MA_FLAGS.copy()
+
+    def save_ma_settings(self, ma_flags: dict):
+        """이동평균선 선택 설정 영구 저장"""
+        val_str = json.dumps(ma_flags)
+        with self._get_connection() as con:
+            cur = con.cursor()
+            cur.execute("""
+                INSERT INTO user_settings (key, value, updated_at)
+                VALUES ('ma_flags', ?, CURRENT_TIMESTAMP)
+                ON CONFLICT(key) DO UPDATE SET value = excluded.value, updated_at = CURRENT_TIMESTAMP
+            """, [val_str])
             con.commit()
 
     # ==========================================

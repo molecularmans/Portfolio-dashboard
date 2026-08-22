@@ -4,7 +4,7 @@ from src.api.kis_rest import KISClient
 
 
 def render_sidebar(db: StockDB, client: KISClient) -> dict:
-    """좌측 사이드바 메뉴 렌더링 (이모지 제거 및 미니멀 룩)"""
+    """좌측 사이드바 메뉴 렌더링 (이동평균선 선택 설정 영구 저장 지원)"""
     with st.sidebar:
         st.subheader("Terminal Controller")
 
@@ -110,16 +110,31 @@ def render_sidebar(db: StockDB, client: KISClient) -> dict:
 
         st.divider()
 
-        # 5. 차트 이동평균선 다중 선택
+        # 5. 이동평균선 설정 (영구 저장 연동)
         st.subheader("이동평균선 설정")
-        col_m1, col_m2 = st.columns(2)
-        show_ema5 = col_m1.checkbox("5 EMA", value=True)
-        show_ma10 = col_m2.checkbox("10 MA", value=False)
-        show_ma20 = col_m1.checkbox("20 MA", value=True)
-        show_ma30 = col_m2.checkbox("30 MA", value=False)
-        show_ma50 = col_m1.checkbox("50 MA", value=True)
-        show_ma150 = col_m2.checkbox("150 MA", value=False)
-        show_ma200 = col_m1.checkbox("200 MA", value=True)
+        saved_ma = db.get_ma_settings()
+
+        show_ema5 = st.checkbox("5 EMA", value=saved_ma.get("show_ema5", True), key="chk_ema5")
+        show_ma10 = st.checkbox("10 MA", value=saved_ma.get("show_ma10", False), key="chk_ma10")
+        show_ma20 = st.checkbox("20 MA", value=saved_ma.get("show_ma20", True), key="chk_ma20")
+        show_ma30 = st.checkbox("30 MA", value=saved_ma.get("show_ma30", False), key="chk_ma30")
+        show_ma50 = st.checkbox("50 MA", value=saved_ma.get("show_ma50", True), key="chk_ma50")
+        show_ma150 = st.checkbox("150 MA", value=saved_ma.get("show_ma150", False), key="chk_ma150")
+        show_ma200 = st.checkbox("200 MA", value=saved_ma.get("show_ma200", True), key="chk_ma200")
+
+        current_ma = {
+            "show_ema5": show_ema5,
+            "show_ma10": show_ma10,
+            "show_ma20": show_ma20,
+            "show_ma30": show_ma30,
+            "show_ma50": show_ma50,
+            "show_ma150": show_ma150,
+            "show_ma200": show_ma200,
+        }
+
+        # 변경 시 DB 자동 영구 저장
+        if current_ma != saved_ma:
+            db.save_ma_settings(current_ma)
 
         st.divider()
 
@@ -150,6 +165,7 @@ def render_sidebar(db: StockDB, client: KISClient) -> dict:
             "show_ma50": show_ma50,
             "show_ma150": show_ma150,
             "show_ma200": show_ma200,
+            "ma_flags": current_ma,
             "selected_sub_indicators": selected_sub_indicators,
         }
 

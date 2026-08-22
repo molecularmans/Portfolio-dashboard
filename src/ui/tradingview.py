@@ -18,24 +18,55 @@ def get_tradingview_symbol(ticker: str) -> str:
     return ticker_clean
 
 
-def render_tradingview_mini_chart(ticker: str, timeframe: str = "일봉", height: int = 320):
+def build_tv_studies(ma_flags: dict = None, sub_indicators: list = None):
+    """사용자가 사이드바에서 선택한 이동평균선 및 보조지표 목록을 TradingView studies 구조로 동적 변환"""
+    studies_list = []
+
+    if ma_flags:
+        if ma_flags.get("show_ema5", True):
+            studies_list.append({"id": "MAExp@tv-basicstudies", "inputs": {"length": 5}})
+        if ma_flags.get("show_ma10", False):
+            studies_list.append({"id": "MASimple@tv-basicstudies", "inputs": {"length": 10}})
+        if ma_flags.get("show_ma20", True):
+            studies_list.append({"id": "MASimple@tv-basicstudies", "inputs": {"length": 20}})
+        if ma_flags.get("show_ma30", False):
+            studies_list.append({"id": "MASimple@tv-basicstudies", "inputs": {"length": 30}})
+        if ma_flags.get("show_ma50", True):
+            studies_list.append({"id": "MASimple@tv-basicstudies", "inputs": {"length": 50}})
+        if ma_flags.get("show_ma150", False):
+            studies_list.append({"id": "MASimple@tv-basicstudies", "inputs": {"length": 150}})
+        if ma_flags.get("show_ma200", True):
+            studies_list.append({"id": "MASimple@tv-basicstudies", "inputs": {"length": 200}})
+    else:
+        studies_list = [
+            {"id": "MAExp@tv-basicstudies", "inputs": {"length": 5}},
+            {"id": "MASimple@tv-basicstudies", "inputs": {"length": 20}},
+            {"id": "MASimple@tv-basicstudies", "inputs": {"length": 50}},
+            {"id": "MASimple@tv-basicstudies", "inputs": {"length": 200}},
+        ]
+
+    if sub_indicators:
+        if "RSI" in sub_indicators:
+            studies_list.append("RSI@tv-basicstudies")
+        if "Stochastic" in sub_indicators:
+            studies_list.append("StochasticRSI@tv-basicstudies")
+        if "MACD" in sub_indicators:
+            studies_list.append("MACD@tv-basicstudies")
+
+    return studies_list
+
+
+def render_tradingview_mini_chart(ticker: str, timeframe: str = "일봉", ma_flags: dict = None, height: int = 320):
     """
-    멀티 차트 그리드(3열)용 TradingView 실시간 컴팩트 캔들 차트
-    - 트레이딩뷰 공식 글로벌 실시간 데이터피드로 100% 정확한 캔들/종가 표시
-    - 5 EMA, 20 MA, 50 MA, 200 MA 및 거래량 기본 탑재
+    멀티 차트 그리드(3열)용 TradingView 실시간 컴팩트 캔들 차트 (사용자 선택 이평선 동적 주입)
     """
     tv_symbol = get_tradingview_symbol(ticker)
 
     interval_map = {"일봉": "D", "주봉": "W", "월봉": "M"}
     interval = interval_map.get(timeframe, "D")
 
-    studies = [
-        {"id": "MAExp@tv-basicstudies", "inputs": {"length": 5}},
-        {"id": "MASimple@tv-basicstudies", "inputs": {"length": 20}},
-        {"id": "MASimple@tv-basicstudies", "inputs": {"length": 50}},
-        {"id": "MASimple@tv-basicstudies", "inputs": {"length": 200}},
-    ]
-    studies_json = json.dumps(studies)
+    studies_list = build_tv_studies(ma_flags=ma_flags)
+    studies_json = json.dumps(studies_list)
 
     html_code = f"""
     <!DOCTYPE html>
@@ -90,7 +121,7 @@ def render_tradingview_mini_chart(ticker: str, timeframe: str = "일봉", height
 
 def render_tradingview_chart(ticker: str, timeframe: str = "일봉", settings: dict = None, height: int = 750):
     """
-    상세 분석용 TradingView 풀버전 프로 차트 (추세선, 피보나치, 수평선, 플로팅 도구 풀탑재)
+    상세 분석용 TradingView 풀버전 프로 차트 (추세선, 피보나치, 수평선, 사용자 선택 이평선 동적 반영)
     """
     if settings is None:
         settings = {}
@@ -100,30 +131,9 @@ def render_tradingview_chart(ticker: str, timeframe: str = "일봉", settings: d
     interval_map = {"일봉": "D", "주봉": "W", "월봉": "M"}
     interval = interval_map.get(timeframe, "D")
 
-    studies_list = []
-    if settings.get("show_ema5", True):
-        studies_list.append({"id": "MAExp@tv-basicstudies", "inputs": {"length": 5}})
-    if settings.get("show_ma20", True):
-        studies_list.append({"id": "MASimple@tv-basicstudies", "inputs": {"length": 20}})
-    if settings.get("show_ma50", True):
-        studies_list.append({"id": "MASimple@tv-basicstudies", "inputs": {"length": 50}})
-    if settings.get("show_ma200", True):
-        studies_list.append({"id": "MASimple@tv-basicstudies", "inputs": {"length": 200}})
-    if settings.get("show_ma10", False):
-        studies_list.append({"id": "MASimple@tv-basicstudies", "inputs": {"length": 10}})
-    if settings.get("show_ma30", False):
-        studies_list.append({"id": "MASimple@tv-basicstudies", "inputs": {"length": 30}})
-    if settings.get("show_ma150", False):
-        studies_list.append({"id": "MASimple@tv-basicstudies", "inputs": {"length": 150}})
-
+    ma_flags = settings.get("ma_flags")
     sub_inds = settings.get("selected_sub_indicators", ["Stochastic", "RSI"])
-    if "RSI" in sub_inds:
-        studies_list.append("RSI@tv-basicstudies")
-    if "Stochastic" in sub_inds:
-        studies_list.append("StochasticRSI@tv-basicstudies")
-    if "MACD" in sub_inds:
-        studies_list.append("MACD@tv-basicstudies")
-
+    studies_list = build_tv_studies(ma_flags=ma_flags, sub_indicators=sub_inds)
     studies_json = json.dumps(studies_list)
 
     html_code = f"""
