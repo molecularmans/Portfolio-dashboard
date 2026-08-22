@@ -273,6 +273,13 @@ class StockDB:
                 ])
             con.commit()
 
+    def clear_all_prices(self):
+        """과거 시세 캐시 일괄 초기화"""
+        with self._get_connection() as con:
+            cur = con.cursor()
+            cur.execute("DELETE FROM stock_prices")
+            con.commit()
+
     def get_prices(self, ticker: str, timeframe: str = "D", limit: int = 500) -> pd.DataFrame:
         ticker = ticker.upper().strip()
         timeframe = timeframe.upper().strip()

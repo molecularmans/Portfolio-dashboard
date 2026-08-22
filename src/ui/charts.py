@@ -3,10 +3,10 @@ from plotly.subplots import make_subplots
 import pandas as pd
 
 
-# Plotly 모드바 설정 (불필요한 도구 제거 및 확대/축소/리셋 유지)
+# Plotly 모드바 설정
 CHART_CONFIG = {
     "scrollZoom": True,
-    "displayModeBar": True,
+    "displayModeBar": "hover",  # 마우스 올렸을 때만 반투명 표시 (평소에는 캔들 가림 없음)
     "displaylogo": False,
     "modeBarButtonsToRemove": [
         "lasso2d",
@@ -64,7 +64,7 @@ def add_moving_averages_to_fig(fig, df: pd.DataFrame, settings: dict, x_col: str
 
 
 def create_mini_chart(df: pd.DataFrame, ticker: str, settings: dict = None) -> go.Figure:
-    """멀티 차트 그리드용 컴팩트 캔들스틱 (YY.MM.DD 포맷 및 깔끔한 눈금)"""
+    """멀티 차트 그리드용 컴팩트 캔들스틱 (상단 짤림 완전 방지 및 넉넉한 여백)"""
     if settings is None:
         settings = {}
 
@@ -72,7 +72,6 @@ def create_mini_chart(df: pd.DataFrame, ticker: str, settings: dict = None) -> g
     tail_count = 50 if tf == "월봉" else (65 if tf == "주봉" else 75)
     plot_df = df.tail(tail_count).copy()
 
-    # 날짜를 YY.MM.DD 형식으로 포맷팅
     if "date" in plot_df.columns:
         if not pd.api.types.is_datetime64_any_dtype(plot_df["date"]):
             plot_df["date"] = pd.to_datetime(plot_df["date"])
@@ -80,12 +79,19 @@ def create_mini_chart(df: pd.DataFrame, ticker: str, settings: dict = None) -> g
     else:
         plot_df["date_str"] = [str(i) for i in range(len(plot_df))]
 
+    # Y축 범위에 6% 상하 여백을 두어 캔들 고점이 맨 위에 바짝 붙거나 잘리지 않도록 계산
+    high_max = plot_df["high"].max() if "high" in plot_df.columns else plot_df["close"].max()
+    low_min = plot_df["low"].min() if "low" in plot_df.columns else plot_df["close"].min()
+    price_range = high_max - low_min if high_max > low_min else high_max * 0.1
+    y_upper = high_max + (price_range * 0.08)
+    y_lower = max(0.01, low_min - (price_range * 0.05))
+
     fig = make_subplots(
         rows=2,
         cols=1,
         shared_xaxes=True,
         vertical_spacing=0.03,
-        row_heights=[0.75, 0.25],
+        row_heights=[0.72, 0.28],
     )
 
     # 1. 캔들스틱
@@ -123,8 +129,8 @@ def create_mini_chart(df: pd.DataFrame, ticker: str, settings: dict = None) -> g
     )
 
     fig.update_layout(
-        height=260,
-        margin=dict(l=5, r=5, t=5, b=5),
+        height=270,
+        margin=dict(l=8, r=38, t=20, b=20),  # 상단 t=20 마진으로 짤림 방지
         xaxis=dict(type="category", rangeslider=dict(visible=False), showgrid=False, showticklabels=False),
         xaxis2=dict(
             type="category",
@@ -133,7 +139,13 @@ def create_mini_chart(df: pd.DataFrame, ticker: str, settings: dict = None) -> g
             nticks=4,
             tickangle=0,
         ),
-        yaxis=dict(side="right", showgrid=True, gridcolor="rgba(128,128,128,0.15)", tickfont=dict(size=8, color="#94a3b8")),
+        yaxis=dict(
+            side="right",
+            range=[y_lower, y_upper],  # 상단 8% 여유 여백으로 캔들 고점 완벽 보존
+            showgrid=True,
+            gridcolor="rgba(128,128,128,0.15)",
+            tickfont=dict(size=8.5, color="#94a3b8"),
+        ),
         yaxis2=dict(side="right", showgrid=False, showticklabels=False),
         plot_bgcolor="rgba(0,0,0,0)",
         paper_bgcolor="rgba(0,0,0,0)",
@@ -145,7 +157,7 @@ def create_mini_chart(df: pd.DataFrame, ticker: str, settings: dict = None) -> g
 
 
 def create_detail_chart(df: pd.DataFrame, ticker: str, settings: dict = None) -> go.Figure:
-    """대형 서브플롯 상세 차트 (YY.MM.DD 날짜 포맷팅)"""
+    """대형 서브플롯 상세 차트"""
     if settings is None:
         settings = {}
 
@@ -159,6 +171,12 @@ def create_detail_chart(df: pd.DataFrame, ticker: str, settings: dict = None) ->
         plot_df["date_str"] = plot_df["date"].dt.strftime("%y.%m.%d")
     else:
         plot_df["date_str"] = [str(i) for i in range(len(plot_df))]
+
+    high_max = plot_df["high"].max() if "high" in plot_df.columns else plot_df["close"].max()
+    low_min = plot_df["low"].min() if "low" in plot_df.columns else plot_df["close"].min()
+    price_range = high_max - low_min if high_max > low_min else high_max * 0.1
+    y_upper = high_max + (price_range * 0.08)
+    y_lower = max(0.01, low_min - (price_range * 0.05))
 
     sub_indicators = settings.get("selected_sub_indicators", ["Stochastic", "RSI"])
     num_subs = len(sub_indicators)
@@ -251,7 +269,7 @@ def create_detail_chart(df: pd.DataFrame, ticker: str, settings: dict = None) ->
 
     fig.update_layout(
         height=total_height,
-        margin=dict(l=20, r=20, t=40, b=20),
+        margin=dict(l=20, r=30, t=40, b=20),
         plot_bgcolor="rgba(0,0,0,0)",
         paper_bgcolor="rgba(0,0,0,0)",
         hovermode="x unified",
@@ -264,5 +282,6 @@ def create_detail_chart(df: pd.DataFrame, ticker: str, settings: dict = None) ->
         fig.update_layout({axis_name: dict(type="category", rangeslider=dict(visible=False), nticks=6, tickangle=0)})
 
     fig.update_yaxes(side="right", gridcolor="rgba(128,128,128,0.15)")
+    fig.update_yaxes(range=[y_lower, y_upper], row=1, col=1)
 
     return fig

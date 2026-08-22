@@ -136,6 +136,7 @@ def render_sidebar(db: StockDB, client: KISClient) -> dict:
 
         # 7. 시세 새로고침
         if st.button("시세 데이터 새로고침", use_container_width=True):
+            db.clear_all_prices()
             st.session_state["force_refresh"] = True
             st.rerun()
 
