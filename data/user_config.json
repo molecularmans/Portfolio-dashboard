@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-08-25 14:36:21",
+  "updated_at": "2026-08-25 14:36:33",
   "groups": [
     {
       "group_name": "빅테크/AI",
@@ -66,6 +66,11 @@
       "ticker": "BOTZ",
       "name": "Global X Robotics & AI",
       "group_name": "빅테크/AI"
+    },
+    {
+      "ticker": "TWST",
+      "name": "",
+      "group_name": "주도주후보"
     },
     {
       "ticker": "ORCL",
