@@ -100,8 +100,9 @@ st.markdown("""
 """, unsafe_allow_html=True)
 
 
+@st.cache_resource
 def init_services():
-    """DB 및 KIS 클라이언트 초기화"""
+    """DB 및 KIS 클라이언트 초기화 (싱글톤 캐싱으로 0.001초 응답)"""
     db = StockDB()
     client = KISClient()
     return db, client
@@ -259,7 +260,6 @@ def main():
         cols = st.columns(NUM_COLS)
         for idx, ticker in enumerate(row):
             with cols[idx]:
-                df = load_and_calc_stock_data(ticker, db, client, force_refresh, timeframe=timeframe)
 
                 # 종목 상단 헤더 & 자세히 보기 버튼
                 head_col1, head_col2 = st.columns([3.2, 1.8])

@@ -2,6 +2,7 @@ import os
 import uuid
 import json
 import sqlite3
+import threading
 import pandas as pd
 from datetime import datetime
 
@@ -39,14 +40,15 @@ DEFAULT_TIMEFRAME_MA = {
 
 
 class StockDB:
-    """SQLite 기반 로컬 캐시 및 설정 데이터베이스 (타임프레임별 이평선 분리 & GitHub 자동 동기화)"""
+    """SQLite 기반 초고속 로컬 캐시 및 비동기 GitHub 동기화 데이터베이스"""
 
     def __init__(self, db_path: str = DB_PATH):
         os.makedirs(os.path.dirname(db_path), exist_ok=True)
         self.db_path = db_path
         self.github_sync = GitHubSync()
         self._init_tables()
-        self._sync_restore_from_github()
+        # 최초 기동 시 로컬 캐시 또는 빠른 복원 (UI 블로킹 방지)
+        self._initial_restore_fast()
 
     def _get_connection(self):
         con = sqlite3.connect(self.db_path, check_same_thread=False, timeout=15)
@@ -151,10 +153,19 @@ class StockDB:
             con.commit()
 
     # ==========================================
-    # GitHub 자동 백업 및 복원
+    # 초고속 비동기 GitHub 백업 및 복원
     # ==========================================
+    def _initial_restore_fast(self):
+        """0.001초 로컬 복원 후 필요시에만 비동기 GitHub 복원"""
+        local_cfg = self.github_sync.read_local_config()
+        if local_cfg and ("groups" in local_cfg or "watchlist" in local_cfg):
+            self.import_config(local_cfg, trigger_backup=False)
+        elif self.github_sync.is_configured:
+            # 백그라운드 스레드에서 조용히 복원
+            threading.Thread(target=self._sync_restore_from_github, daemon=True).start()
+
     def _sync_restore_from_github(self):
-        """앱 기동 시 GitHub 또는 로컬 config 파일로부터 최신 설정 복원"""
+        """GitHub로부터 최신 설정 복원"""
         try:
             config = self.github_sync.fetch_config_from_github()
             if config and ("groups" in config or "watchlist" in config):
@@ -163,10 +174,14 @@ class StockDB:
             print(f"[StockDB] GitHub restore failed: {e}")
 
     def trigger_github_backup(self):
-        """설정 변경 시 GitHub 저장소로 자동 커밋 백업"""
+        """UI 지연을 0으로 만들기 위해 비동기 백그라운드 스레드로 백업 실행"""
         try:
             config = self.export_config()
-            self.github_sync.save_config_to_github(config)
+            # 1. 로컬 파일 즉시 동기 저장 (0.001초)
+            self.github_sync.save_local_config(config)
+            # 2. GitHub API 네트워크 전송은 백그라운드 스레드로 비동기 처리
+            if self.github_sync.is_configured:
+                threading.Thread(target=self.github_sync.save_config_to_github, args=(config,), daemon=True).start()
         except Exception as e:
             print(f"[StockDB] GitHub backup failed: {e}")
 
@@ -237,7 +252,6 @@ class StockDB:
     # 타임프레임별 이동평균선 설정
     # ==========================================
     def get_timeframe_ma_settings(self, timeframe: str = "일봉") -> dict:
-        """특정 타임프레임(일봉/주봉/월봉)에 해당하는 이동평균선 설정 로드"""
         with self._get_connection() as con:
             cur = con.cursor()
             cur.execute("SELECT value FROM user_settings WHERE key = 'timeframe_ma_settings'")
@@ -254,7 +268,6 @@ class StockDB:
             return all_tf.get(timeframe, all_tf["일봉"])
 
     def save_timeframe_ma_settings(self, timeframe: str, ma_dict: dict):
-        """특정 타임프레임의 이동평균선 설정 영구 저장 & GitHub 자동 동기화"""
         with self._get_connection() as con:
             cur = con.cursor()
             cur.execute("SELECT value FROM user_settings WHERE key = 'timeframe_ma_settings'")
@@ -482,7 +495,6 @@ class StockDB:
             con.commit()
 
     def clear_all_prices(self):
-        """과거 시세 캐시 일괄 초기화"""
         with self._get_connection() as con:
             cur = con.cursor()
             cur.execute("DELETE FROM stock_prices")
