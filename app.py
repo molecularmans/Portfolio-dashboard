@@ -5,7 +5,7 @@ from src.db.database import StockDB
 from src.api.kis_rest import KISClient
 from src.indicators.technicals import calc_indicators
 from src.ui.charts import create_detail_chart, CHART_CONFIG
-from src.ui.tradingview import render_tradingview_chart, render_lightweight_candlestick_chart
+from src.ui.tradingview import render_tradingview_chart, render_tradingview_mini_chart
 from src.ui.sidebar import render_sidebar
 
 # 1. Streamlit 페이지 기본 설정
@@ -279,8 +279,8 @@ def main():
                         st.session_state.selected_ticker = ticker
                         st.rerun()
 
-                # TradingView Lightweight 엔진 (4대 고유 색상 100% 개별 렌더링 & 52주선 보장)
-                render_lightweight_candlestick_chart(df, ticker, timeframe=timeframe, height=335)
+                # 트레이딩뷰 정품 실시간 캔들 위젯 (주기별 4대 이평선 자동 주입)
+                render_tradingview_mini_chart(ticker, timeframe=timeframe, height=330)
 
         st.markdown("<hr style='margin: 8px 0; border: none; border-top: 1px solid rgba(255,255,255,0.05);'>", unsafe_allow_html=True)
 
