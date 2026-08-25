@@ -107,6 +107,34 @@ def init_services():
     return db, client
 
 
+def load_and_calc_stock_data(ticker: str, db: StockDB, client: KISClient, force_refresh: bool = False, timeframe: str = "일봉") -> pd.DataFrame:
+    ticker = ticker.upper().strip()
+    tf_map = {"일봉": "D", "주봉": "W", "월봉": "M"}
+    tf_code = tf_map.get(timeframe, "D")
+    count_target = 300 if tf_code == "D" else (200 if tf_code == "W" else 120)
+
+    df = pd.DataFrame()
+    if not force_refresh:
+        df = db.get_prices(ticker, timeframe=tf_code)
+
+    need_fetch = df.empty or len(df) < 20 or force_refresh
+    if not need_fetch and not df.empty and tf_code == "D":
+        latest_d = pd.to_datetime(df.iloc[-1]["date"])
+        if (pd.Timestamp.now() - latest_d).days > 3:
+            need_fetch = True
+
+    if need_fetch:
+        if ticker.isdigit() and len(ticker) == 6:
+            df = client.get_kr_ohlcv(ticker, timeframe=tf_code, count=count_target)
+        else:
+            df = client.get_us_ohlcv(ticker, timeframe=tf_code, count=count_target)
+
+        if not df.empty:
+            db.save_prices(ticker, tf_code, df)
+
+    return calc_indicators(df)
+
+
 def main():
     db, client = init_services()
 
@@ -118,6 +146,8 @@ def main():
 
     # 좌측 사이드바 렌더링
     settings = render_sidebar(db, client)
+    force_refresh = st.session_state.get("force_refresh", False)
+    st.session_state["force_refresh"] = False
     timeframe = settings.get("timeframe", "일봉")
 
     # 대상 티커 목록 및 포트폴리오 결정
