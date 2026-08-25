@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-08-25 22:15:00",
+  "updated_at": "2026-08-25 13:38:53",
   "groups": [
     {
       "group_name": "빅테크/AI",
@@ -12,9 +12,18 @@
     {
       "group_name": "클라우드/SaaS",
       "sort_order": 2
+    },
+    {
+      "group_name": "전력",
+      "sort_order": 3
     }
   ],
   "watchlist": [
+    {
+      "ticker": "MRVL",
+      "name": "Marvell Tech",
+      "group_name": "반도체"
+    },
     {
       "ticker": "NVDA",
       "name": "NVIDIA",
@@ -54,20 +63,116 @@
       "ticker": "ORCL",
       "name": "Oracle",
       "group_name": "클라우드/SaaS"
-    },
-    {
-      "ticker": "MRVL",
-      "name": "Marvell Tech",
-      "group_name": "반도체"
     }
   ],
-  "ma_flags": {
-    "show_ema5": true,
-    "show_ma10": false,
-    "show_ma20": true,
-    "show_ma30": false,
-    "show_ma50": true,
-    "show_ma150": false,
-    "show_ma200": true
+  "timeframe_ma_settings": {
+    "일봉": {
+      "show_d_ema5": {
+        "enabled": true,
+        "length": 5,
+        "type": "EMA",
+        "label": "5 EMA"
+      },
+      "show_d_ma10": {
+        "enabled": false,
+        "length": 10,
+        "type": "SMA",
+        "label": "10 MA"
+      },
+      "show_d_ma20": {
+        "enabled": true,
+        "length": 20,
+        "type": "SMA",
+        "label": "20 MA"
+      },
+      "show_d_ma30": {
+        "enabled": false,
+        "length": 30,
+        "type": "SMA",
+        "label": "30 MA"
+      },
+      "show_d_ma50": {
+        "enabled": true,
+        "length": 50,
+        "type": "SMA",
+        "label": "50 MA"
+      },
+      "show_d_ma150": {
+        "enabled": false,
+        "length": 150,
+        "type": "SMA",
+        "label": "150 MA"
+      },
+      "show_d_ma200": {
+        "enabled": true,
+        "length": 200,
+        "type": "SMA",
+        "label": "200 MA"
+      }
+    },
+    "주봉": {
+      "show_w_ma4": {
+        "enabled": true,
+        "length": 4,
+        "type": "SMA",
+        "label": "4주 MA (1달)"
+      },
+      "show_w_ma10": {
+        "enabled": false,
+        "length": 10,
+        "type": "SMA",
+        "label": "10주 MA"
+      },
+      "show_w_ma13": {
+        "enabled": true,
+        "length": 13,
+        "type": "SMA",
+        "label": "13주 MA (1분기)"
+      },
+      "show_w_ma26": {
+        "enabled": true,
+        "length": 26,
+        "type": "SMA",
+        "label": "26주 MA (반기)"
+      },
+      "show_w_ma40": {
+        "enabled": false,
+        "length": 40,
+        "type": "SMA",
+        "label": "40주 MA"
+      },
+      "show_w_ma52": {
+        "enabled": true,
+        "length": 52,
+        "type": "SMA",
+        "label": "52주 MA (1년)"
+      }
+    },
+    "월봉": {
+      "show_m_ma6": {
+        "enabled": true,
+        "length": 6,
+        "type": "SMA",
+        "label": "6월 MA (반기)"
+      },
+      "show_m_ma12": {
+        "enabled": true,
+        "length": 12,
+        "type": "SMA",
+        "label": "12월 MA (1년)"
+      },
+      "show_m_ma24": {
+        "enabled": true,
+        "length": 24,
+        "type": "SMA",
+        "label": "24월 MA (2년)"
+      },
+      "show_m_ma60": {
+        "enabled": true,
+        "length": 60,
+        "type": "SMA",
+        "label": "60월 MA (5년)"
+      }
+    }
   }
 }
