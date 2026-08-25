@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-08-25 15:17:48",
+  "updated_at": "2026-08-25 15:19:54",
   "groups": [
     {
       "group_name": "빅테크/AI",
@@ -30,6 +30,11 @@
     {
       "ticker": "MRVL",
       "name": "Marvell Tech",
+      "group_name": "반도체"
+    },
+    {
+      "ticker": "CRDO",
+      "name": "",
       "group_name": "반도체"
     },
     {
