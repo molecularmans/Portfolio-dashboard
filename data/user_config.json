@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-08-25 15:14:22",
+  "updated_at": "2026-08-25 15:14:41",
   "groups": [
     {
       "group_name": "빅테크/AI",
@@ -74,6 +74,11 @@
     },
     {
       "ticker": "GKOS",
+      "name": "",
+      "group_name": "주도주후보"
+    },
+    {
+      "ticker": "MOG-A",
       "name": "",
       "group_name": "주도주후보"
     },
