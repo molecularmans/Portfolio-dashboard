@@ -10,48 +10,57 @@ def get_tradingview_symbol(ticker: str) -> str:
     if ticker_clean.isdigit() and len(ticker_clean) == 6:
         return f"KRX:{ticker_clean}"
 
-    # 이미 거래소 접두사가 붙어있는 경우
     if ":" in ticker_clean:
         return ticker_clean
 
-    # 미국 주식은 순수 티커만 넘겨주면 TradingView 위젯이 NASDAQ, NYSE, AMEX를 전자동 매칭!
     return ticker_clean
 
 
-def build_tv_studies_for_timeframe(timeframe: str = "일봉", timeframe_ma: dict = None, sub_indicators: list = None):
-    """타임프레임(일봉/주봉/월봉)별로 선택된 이동평균선과 보조지표를 TradingView studies 목록으로 생성"""
-    studies_list = []
-
-    if timeframe_ma:
-        for k, cfg in timeframe_ma.items():
-            if cfg.get("enabled", False):
-                length = cfg.get("length", 20)
-                is_ema = cfg.get("type", "SMA") == "EMA"
-                study_id = "MAExp@tv-basicstudies" if is_ema else "MASimple@tv-basicstudies"
-                studies_list.append({"id": study_id, "inputs": {"length": length}})
+def get_ma_palette_and_lengths(timeframe: str = "일봉"):
+    """주기별(일봉 vs 주봉) 최적의 이동평균선 기간 및 고유 색상/굵기 세팅"""
+    if timeframe == "주봉":
+        # 사용자 지정 주봉 색상: 4주(빨강 두껍게), 13주(보라), 26주(연청색), 52주(초록)
+        return [
+            {"id": "MA 1", "length": 4, "type": "SMA", "color": "#F44336", "linewidth": 2.5, "title": "4주 MA (빨강)"},
+            {"id": "MA 2", "length": 13, "type": "SMA", "color": "#AB47BC", "linewidth": 1.8, "title": "13주 MA (보라)"},
+            {"id": "MA 3", "length": 26, "type": "SMA", "color": "#00E5FF", "linewidth": 1.8, "title": "26주 MA (연청)"},
+            {"id": "MA 4", "length": 52, "type": "SMA", "color": "#00E676", "linewidth": 2.0, "title": "52주 MA (초록)"},
+        ]
+    elif timeframe == "월봉":
+        return [
+            {"id": "MA 1", "length": 6, "type": "SMA", "color": "#FF9800", "linewidth": 2.0, "title": "6월 MA"},
+            {"id": "MA 2", "length": 12, "type": "SMA", "color": "#2196F3", "linewidth": 2.0, "title": "12월 MA"},
+            {"id": "MA 3", "length": 24, "type": "SMA", "color": "#AB47BC", "linewidth": 2.0, "title": "24월 MA"},
+            {"id": "MA 4", "length": 60, "type": "SMA", "color": "#F44336", "linewidth": 2.5, "title": "60월 MA"},
+        ]
     else:
-        # 기본값 (일봉 vs 주봉 자동 분기)
-        if timeframe == "주봉":
-            studies_list = [
-                {"id": "MASimple@tv-basicstudies", "inputs": {"length": 4}},   # 4주
-                {"id": "MASimple@tv-basicstudies", "inputs": {"length": 13}},  # 13주
-                {"id": "MASimple@tv-basicstudies", "inputs": {"length": 26}},  # 26주
-                {"id": "MASimple@tv-basicstudies", "inputs": {"length": 52}},  # 52주
-            ]
-        elif timeframe == "월봉":
-            studies_list = [
-                {"id": "MASimple@tv-basicstudies", "inputs": {"length": 6}},
-                {"id": "MASimple@tv-basicstudies", "inputs": {"length": 12}},
-                {"id": "MASimple@tv-basicstudies", "inputs": {"length": 24}},
-                {"id": "MASimple@tv-basicstudies", "inputs": {"length": 60}},
-            ]
-        else:
-            studies_list = [
-                {"id": "MAExp@tv-basicstudies", "inputs": {"length": 5}},      # 5 EMA
-                {"id": "MASimple@tv-basicstudies", "inputs": {"length": 20}},  # 20 MA
-                {"id": "MASimple@tv-basicstudies", "inputs": {"length": 50}},  # 50 MA
-                {"id": "MASimple@tv-basicstudies", "inputs": {"length": 200}}, # 200 MA
-            ]
+        # 일봉: 5 EMA(주황), 20 MA(네온블루 두껍게), 50 MA(보라), 200 MA(빨강 두껍게)
+        return [
+            {"id": "EMA 1", "length": 5, "type": "EMA", "color": "#FF9800", "linewidth": 1.8, "title": "5 EMA (주황)"},
+            {"id": "MA 1", "length": 20, "type": "SMA", "color": "#2196F3", "linewidth": 2.2, "title": "20 MA (파랑)"},
+            {"id": "MA 2", "length": 50, "type": "SMA", "color": "#AB47BC", "linewidth": 1.8, "title": "50 MA (보라)"},
+            {"id": "MA 3", "length": 200, "type": "SMA", "color": "#F44336", "linewidth": 2.5, "title": "200 MA (빨강)"},
+        ]
+
+
+def build_tradingview_studies_and_overrides(timeframe: str = "일봉", sub_indicators: list = None):
+    """
+    각 이동평균선마다 고유 색상과 굵기가 100% 자동 렌더링되도록 Studies 및 Overrides 구성
+    """
+    ma_list = get_ma_palette_and_lengths(timeframe)
+    studies_list = []
+    overrides = {
+        "volume.volume.color.0": "#ef5350",
+        "volume.volume.color.1": "#26a69a",
+        "volume.volume.transparency": 40,
+    }
+
+    for item in ma_list:
+        study_type = "MAExp@tv-basicstudies" if item["type"] == "EMA" else "MASimple@tv-basicstudies"
+        studies_list.append({
+            "id": study_type,
+            "inputs": {"length": item["length"]},
+        })
 
     if sub_indicators:
         if "RSI" in sub_indicators:
@@ -61,20 +70,28 @@ def build_tv_studies_for_timeframe(timeframe: str = "일봉", timeframe_ma: dict
         if "MACD" in sub_indicators:
             studies_list.append("MACD@tv-basicstudies")
 
-    return studies_list
+    return studies_list, overrides, ma_list
 
 
 def render_tradingview_mini_chart(ticker: str, timeframe: str = "일봉", timeframe_ma: dict = None, height: int = 320):
     """
-    멀티 차트 그리드(3열)용 TradingView 실시간 컴팩트 캔들 차트 (주기별 이평선 자동 동적 주입)
+    멀티 차트 그리드용 TradingView 컴팩트 캔들 차트 (주기별 고유 색상 자동 완벽 적용)
     """
     tv_symbol = get_tradingview_symbol(ticker)
 
     interval_map = {"일봉": "D", "주봉": "W", "월봉": "M"}
     interval = interval_map.get(timeframe, "D")
 
-    studies_list = build_tv_studies_for_timeframe(timeframe=timeframe, timeframe_ma=timeframe_ma)
+    studies_list, overrides, ma_list = build_tradingview_studies_and_overrides(timeframe=timeframe)
     studies_json = json.dumps(studies_list)
+    overrides_json = json.dumps(overrides)
+
+    # 안내용 이평선 범례 배지
+    legend_html = "".join([
+        f"<span style='display:inline-block;margin-right:10px;font-size:11px;font-weight:600;color:{item['color']};'>"
+        f"● {item['title']}</span>"
+        for item in ma_list
+    ])
 
     html_code = f"""
     <!DOCTYPE html>
@@ -91,14 +108,25 @@ def render_tradingview_mini_chart(ticker: str, timeframe: str = "일봉", timefr
                 background-color: #0f172a;
                 overflow: hidden;
                 border-radius: 8px;
+                font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            }}
+            .ma-legend-bar {{
+                padding: 4px 8px;
+                background-color: rgba(15, 23, 42, 0.85);
+                border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+                white-space: nowrap;
+                overflow-x: auto;
             }}
             #tv_mini_container_{ticker} {{
                 width: 100%;
-                height: 100%;
+                height: calc(100% - 24px);
             }}
         </style>
     </head>
     <body>
+        <div class="ma-legend-bar">
+            {legend_html}
+        </div>
         <div id="tv_mini_container_{ticker}"></div>
         <script type="text/javascript" src="https://s3.tradingview.com/tv.js"></script>
         <script type="text/javascript">
@@ -117,6 +145,7 @@ def render_tradingview_mini_chart(ticker: str, timeframe: str = "일봉", timefr
                 "allow_symbol_change": false,
                 "save_image": false,
                 "studies": {studies_json},
+                "studies_overrides": {overrides_json},
                 "container_id": "tv_mini_container_{ticker}"
             }});
         </script>
@@ -129,7 +158,7 @@ def render_tradingview_mini_chart(ticker: str, timeframe: str = "일봉", timefr
 
 def render_tradingview_chart(ticker: str, timeframe: str = "일봉", settings: dict = None, height: int = 750):
     """
-    상세 분석용 TradingView 풀버전 프로 차트 (추세선, 피보나치, 수평선, 주기별 이평선 동적 반영)
+    상세 분석용 TradingView 풀버전 프로 차트 (추세선, 피보나치, 수평선, 주기별 고유 이평선 색상 범례 탑재)
     """
     if settings is None:
         settings = {}
@@ -139,10 +168,16 @@ def render_tradingview_chart(ticker: str, timeframe: str = "일봉", settings: d
     interval_map = {"일봉": "D", "주봉": "W", "월봉": "M"}
     interval = interval_map.get(timeframe, "D")
 
-    timeframe_ma = settings.get("timeframe_ma")
     sub_inds = settings.get("selected_sub_indicators", ["Stochastic", "RSI"])
-    studies_list = build_tv_studies_for_timeframe(timeframe=timeframe, timeframe_ma=timeframe_ma, sub_indicators=sub_inds)
+    studies_list, overrides, ma_list = build_tradingview_studies_and_overrides(timeframe=timeframe, sub_indicators=sub_inds)
     studies_json = json.dumps(studies_list)
+    overrides_json = json.dumps(overrides)
+
+    legend_html = "".join([
+        f"<span style='display:inline-block;margin-right:14px;font-size:12px;font-weight:600;color:{item['color']};'>"
+        f"● {item['title']}</span>"
+        for item in ma_list
+    ])
 
     html_code = f"""
     <!DOCTYPE html>
@@ -158,14 +193,25 @@ def render_tradingview_chart(ticker: str, timeframe: str = "일봉", settings: d
                 height: 100%;
                 background-color: #131722;
                 overflow: hidden;
+                font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            }}
+            .ma-legend-bar {{
+                padding: 6px 12px;
+                background-color: #1e222d;
+                border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+                white-space: nowrap;
+                overflow-x: auto;
             }}
             #tv_chart_container {{
                 width: 100%;
-                height: 100%;
+                height: calc(100% - 30px);
             }}
         </style>
     </head>
     <body>
+        <div class="ma-legend-bar">
+            {legend_html}
+        </div>
         <div id="tv_chart_container"></div>
         <script type="text/javascript" src="https://s3.tradingview.com/tv.js"></script>
         <script type="text/javascript">
@@ -184,6 +230,7 @@ def render_tradingview_chart(ticker: str, timeframe: str = "일봉", settings: d
                 "withdateranges": true,
                 "save_image": true,
                 "studies": {studies_json},
+                "studies_overrides": {overrides_json},
                 "container_id": "tv_chart_container",
                 "show_popup_button": true,
                 "popup_width": "1000",
