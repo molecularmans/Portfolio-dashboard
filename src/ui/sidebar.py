@@ -4,7 +4,7 @@ from src.api.kis_rest import KISClient
 
 
 def render_sidebar(db: StockDB, client: KISClient) -> dict:
-    """좌측 사이드바 메뉴 렌더링 (그룹 순서 변경 & 이동평균선 영구 저장 지원)"""
+    """좌측 사이드바 메뉴 렌더링 (타임프레임별 이평선 분리 & 그룹 순서 & GitHub 영구 저장)"""
     with st.sidebar:
         st.subheader("Terminal Controller")
 
@@ -78,7 +78,7 @@ def render_sidebar(db: StockDB, client: KISClient) -> dict:
                                 st.toast(f"{t} 삭제 완료")
                                 st.rerun()
 
-            # 탭 2: 그룹 관리 (순서 변경 추가)
+            # 탭 2: 그룹 관리 (순서 변경)
             with tab_grp:
                 st.markdown("**1) 그룹 순서 변경 (위/아래 이동)**")
                 for i, gname in enumerate(groups):
@@ -130,31 +130,26 @@ def render_sidebar(db: StockDB, client: KISClient) -> dict:
 
         st.divider()
 
-        # 5. 이동평균선 설정 (영구 저장 연동)
-        st.subheader("이동평균선 설정")
-        saved_ma = db.get_ma_settings()
+        # 5. 타임프레임별 이동평균선 설정 (일봉 vs 주봉 vs 월봉 분리)
+        st.subheader(f"이동평균선 설정 ({timeframe})")
+        saved_tf_ma = db.get_timeframe_ma_settings(timeframe=timeframe)
+        current_tf_ma = {}
+        changed = False
 
-        show_ema5 = st.checkbox("5 EMA", value=saved_ma.get("show_ema5", True), key="chk_ema5")
-        show_ma10 = st.checkbox("10 MA", value=saved_ma.get("show_ma10", False), key="chk_ma10")
-        show_ma20 = st.checkbox("20 MA", value=saved_ma.get("show_ma20", True), key="chk_ma20")
-        show_ma30 = st.checkbox("30 MA", value=saved_ma.get("show_ma30", False), key="chk_ma30")
-        show_ma50 = st.checkbox("50 MA", value=saved_ma.get("show_ma50", True), key="chk_ma50")
-        show_ma150 = st.checkbox("150 MA", value=saved_ma.get("show_ma150", False), key="chk_ma150")
-        show_ma200 = st.checkbox("200 MA", value=saved_ma.get("show_ma200", True), key="chk_ma200")
+        for k, cfg in saved_tf_ma.items():
+            label = cfg.get("label", k)
+            default_val = cfg.get("enabled", True)
+            is_checked = st.checkbox(label, value=default_val, key=f"chk_{timeframe}_{k}")
+            
+            cfg_copy = cfg.copy()
+            cfg_copy["enabled"] = is_checked
+            current_tf_ma[k] = cfg_copy
+            
+            if is_checked != default_val:
+                changed = True
 
-        current_ma = {
-            "show_ema5": show_ema5,
-            "show_ma10": show_ma10,
-            "show_ma20": show_ma20,
-            "show_ma30": show_ma30,
-            "show_ma50": show_ma50,
-            "show_ma150": show_ma150,
-            "show_ma200": show_ma200,
-        }
-
-        # 변경 시 DB 자동 영구 저장
-        if current_ma != saved_ma:
-            db.save_ma_settings(current_ma)
+        if changed:
+            db.save_timeframe_ma_settings(timeframe, current_tf_ma)
 
         st.divider()
 
@@ -199,14 +194,7 @@ def render_sidebar(db: StockDB, client: KISClient) -> dict:
         settings = {
             "view_mode": view_mode,
             "timeframe": timeframe,
-            "show_ema5": show_ema5,
-            "show_ma10": show_ma10,
-            "show_ma20": show_ma20,
-            "show_ma30": show_ma30,
-            "show_ma50": show_ma50,
-            "show_ma150": show_ma150,
-            "show_ma200": show_ma200,
-            "ma_flags": current_ma,
+            "timeframe_ma": current_tf_ma,
             "selected_sub_indicators": selected_sub_indicators,
         }
 

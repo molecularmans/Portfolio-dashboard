@@ -247,8 +247,8 @@ def main():
                         st.session_state.selected_ticker = ticker
                         st.rerun()
 
-                # 트레이딩뷰 실시간 정품 컴팩트 캔들 차트 (사용자 선택 이평선 동적 반영)
-                render_tradingview_mini_chart(ticker, timeframe=timeframe, ma_flags=settings.get("ma_flags"), height=330)
+                # 트레이딩뷰 실시간 정품 컴팩트 캔들 차트 (주기별 이평선 동적 반영)
+                render_tradingview_mini_chart(ticker, timeframe=timeframe, timeframe_ma=settings.get("timeframe_ma"), height=330)
 
         st.markdown("<hr style='margin: 8px 0; border: none; border-top: 1px solid rgba(255,255,255,0.05);'>", unsafe_allow_html=True)
 

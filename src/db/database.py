@@ -10,19 +10,36 @@ from src.db.github_sync import GitHubSync
 DB_DIR = os.path.join(os.path.dirname(__file__), "..", "..", "data")
 DB_PATH = os.path.join(DB_DIR, "stock_cache.db")
 
-DEFAULT_MA_FLAGS = {
-    "show_ema5": True,
-    "show_ma10": False,
-    "show_ma20": True,
-    "show_ma30": False,
-    "show_ma50": True,
-    "show_ma150": False,
-    "show_ma200": True,
+# 타임프레임별 기본 이동평균선 프리셋
+DEFAULT_TIMEFRAME_MA = {
+    "일봉": {
+        "show_d_ema5": {"enabled": True, "length": 5, "type": "EMA", "label": "5 EMA"},
+        "show_d_ma10": {"enabled": False, "length": 10, "type": "SMA", "label": "10 MA"},
+        "show_d_ma20": {"enabled": True, "length": 20, "type": "SMA", "label": "20 MA"},
+        "show_d_ma30": {"enabled": False, "length": 30, "type": "SMA", "label": "30 MA"},
+        "show_d_ma50": {"enabled": True, "length": 50, "type": "SMA", "label": "50 MA"},
+        "show_d_ma150": {"enabled": False, "length": 150, "type": "SMA", "label": "150 MA"},
+        "show_d_ma200": {"enabled": True, "length": 200, "type": "SMA", "label": "200 MA"},
+    },
+    "주봉": {
+        "show_w_ma4": {"enabled": True, "length": 4, "type": "SMA", "label": "4주 MA (1달)"},
+        "show_w_ma10": {"enabled": False, "length": 10, "type": "SMA", "label": "10주 MA"},
+        "show_w_ma13": {"enabled": True, "length": 13, "type": "SMA", "label": "13주 MA (1분기)"},
+        "show_w_ma26": {"enabled": True, "length": 26, "type": "SMA", "label": "26주 MA (반기)"},
+        "show_w_ma40": {"enabled": False, "length": 40, "type": "SMA", "label": "40주 MA"},
+        "show_w_ma52": {"enabled": True, "length": 52, "type": "SMA", "label": "52주 MA (1년)"},
+    },
+    "월봉": {
+        "show_m_ma6": {"enabled": True, "length": 6, "type": "SMA", "label": "6월 MA (반기)"},
+        "show_m_ma12": {"enabled": True, "length": 12, "type": "SMA", "label": "12월 MA (1년)"},
+        "show_m_ma24": {"enabled": True, "length": 24, "type": "SMA", "label": "24월 MA (2년)"},
+        "show_m_ma60": {"enabled": True, "length": 60, "type": "SMA", "label": "60월 MA (5년)"},
+    },
 }
 
 
 class StockDB:
-    """SQLite 기반 로컬 캐시 및 설정 데이터베이스 (GitHub 자동 동기화 & 영구 보존 지원)"""
+    """SQLite 기반 로컬 캐시 및 설정 데이터베이스 (타임프레임별 이평선 분리 & GitHub 자동 동기화)"""
 
     def __init__(self, db_path: str = DB_PATH):
         os.makedirs(os.path.dirname(db_path), exist_ok=True)
@@ -134,7 +151,7 @@ class StockDB:
             con.commit()
 
     # ==========================================
-    # GitHub 자동 백업 및 복원 엔진
+    # GitHub 자동 백업 및 복원
     # ==========================================
     def _sync_restore_from_github(self):
         """앱 기동 시 GitHub 또는 로컬 config 파일로부터 최신 설정 복원"""
@@ -154,7 +171,7 @@ class StockDB:
             print(f"[StockDB] GitHub backup failed: {e}")
 
     def export_config(self) -> dict:
-        """현재 DB의 모든 그룹, 관심종목, 이동평균선 설정을 딕셔너리로 추출"""
+        """현재 DB의 모든 그룹, 관심종목, 타임프레임별 이동평균선 설정을 딕셔너리로 추출"""
         with self._get_connection() as con:
             df_groups = pd.read_sql_query("SELECT group_name, sort_order FROM custom_groups ORDER BY sort_order ASC, created_at ASC", con)
             groups = df_groups.to_dict(orient="records")
@@ -162,13 +179,16 @@ class StockDB:
             df_wl = pd.read_sql_query("SELECT ticker, name, group_name FROM watchlist ORDER BY group_name, created_at ASC", con)
             watchlist = df_wl.to_dict(orient="records")
 
-            ma_flags = self.get_ma_settings()
+            cur = con.cursor()
+            cur.execute("SELECT value FROM user_settings WHERE key = 'timeframe_ma_settings'")
+            row = cur.fetchone()
+            tf_ma = json.loads(row[0]) if row and row[0] else DEFAULT_TIMEFRAME_MA
 
             return {
                 "updated_at": datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
                 "groups": groups,
                 "watchlist": watchlist,
-                "ma_flags": ma_flags,
+                "timeframe_ma_settings": tf_ma,
             }
 
     def import_config(self, config: dict, trigger_backup: bool = True):
@@ -199,12 +219,12 @@ class StockDB:
                         if ticker:
                             cur.execute("INSERT OR REPLACE INTO watchlist (ticker, name, group_name) VALUES (?, ?, ?)", [ticker, name, group_name])
 
-            # 3. 이동평균선 설정 복원
-            if "ma_flags" in config and config["ma_flags"]:
-                val_str = json.dumps(config["ma_flags"])
+            # 3. 타임프레임별 이동평균선 설정 복원
+            if "timeframe_ma_settings" in config and config["timeframe_ma_settings"]:
+                val_str = json.dumps(config["timeframe_ma_settings"])
                 cur.execute("""
                     INSERT INTO user_settings (key, value, updated_at)
-                    VALUES ('ma_flags', ?, CURRENT_TIMESTAMP)
+                    VALUES ('timeframe_ma_settings', ?, CURRENT_TIMESTAMP)
                     ON CONFLICT(key) DO UPDATE SET value = excluded.value, updated_at = CURRENT_TIMESTAMP
                 """, [val_str])
 
@@ -214,39 +234,52 @@ class StockDB:
             self.trigger_github_backup()
 
     # ==========================================
-    # 이동평균선 선택 설정
+    # 타임프레임별 이동평균선 설정
     # ==========================================
-    def get_ma_settings(self) -> dict:
-        """저장된 이동평균선 설정 로드"""
+    def get_timeframe_ma_settings(self, timeframe: str = "일봉") -> dict:
+        """특정 타임프레임(일봉/주봉/월봉)에 해당하는 이동평균선 설정 로드"""
         with self._get_connection() as con:
             cur = con.cursor()
-            cur.execute("SELECT value FROM user_settings WHERE key = 'ma_flags'")
+            cur.execute("SELECT value FROM user_settings WHERE key = 'timeframe_ma_settings'")
             row = cur.fetchone()
+            all_tf = DEFAULT_TIMEFRAME_MA.copy()
             if row and row[0]:
                 try:
                     loaded = json.loads(row[0])
-                    merged = DEFAULT_MA_FLAGS.copy()
-                    merged.update(loaded)
-                    return merged
+                    for tf_k in ["일봉", "주봉", "월봉"]:
+                        if tf_k in loaded:
+                            all_tf[tf_k].update(loaded[tf_k])
                 except Exception:
                     pass
-        return DEFAULT_MA_FLAGS.copy()
+            return all_tf.get(timeframe, all_tf["일봉"])
 
-    def save_ma_settings(self, ma_flags: dict):
-        """이동평균선 선택 설정 영구 저장 & GitHub 자동 동기화"""
-        val_str = json.dumps(ma_flags)
+    def save_timeframe_ma_settings(self, timeframe: str, ma_dict: dict):
+        """특정 타임프레임의 이동평균선 설정 영구 저장 & GitHub 자동 동기화"""
         with self._get_connection() as con:
             cur = con.cursor()
+            cur.execute("SELECT value FROM user_settings WHERE key = 'timeframe_ma_settings'")
+            row = cur.fetchone()
+            all_tf = DEFAULT_TIMEFRAME_MA.copy()
+            if row and row[0]:
+                try:
+                    all_tf.update(json.loads(row[0]))
+                except Exception:
+                    pass
+
+            all_tf[timeframe] = ma_dict
+            val_str = json.dumps(all_tf)
+
             cur.execute("""
                 INSERT INTO user_settings (key, value, updated_at)
-                VALUES ('ma_flags', ?, CURRENT_TIMESTAMP)
+                VALUES ('timeframe_ma_settings', ?, CURRENT_TIMESTAMP)
                 ON CONFLICT(key) DO UPDATE SET value = excluded.value, updated_at = CURRENT_TIMESTAMP
             """, [val_str])
             con.commit()
+
         self.trigger_github_backup()
 
     # ==========================================
-    # 그룹 관리 CRUD (순서 변경 및 GitHub 자동 동기화)
+    # 그룹 관리 CRUD
     # ==========================================
     def get_groups(self) -> list:
         with self._get_connection() as con:
@@ -263,7 +296,6 @@ class StockDB:
         self.trigger_github_backup()
 
     def reorder_groups(self, ordered_groups: list):
-        """사용자가 지정한 순서대로 sort_order 업데이트 & GitHub 자동 동기화"""
         with self._get_connection() as con:
             cur = con.cursor()
             for idx, gname in enumerate(ordered_groups):
@@ -272,7 +304,6 @@ class StockDB:
         self.trigger_github_backup()
 
     def move_group_up(self, group_name: str):
-        """그룹 순서를 한 칸 위로 이동"""
         groups = self.get_groups()
         if group_name in groups:
             idx = groups.index(group_name)
@@ -281,7 +312,6 @@ class StockDB:
                 self.reorder_groups(groups)
 
     def move_group_down(self, group_name: str):
-        """그룹 순서를 한 칸 아래로 이동"""
         groups = self.get_groups()
         if group_name in groups:
             idx = groups.index(group_name)
@@ -306,7 +336,7 @@ class StockDB:
         self.trigger_github_backup()
 
     # ==========================================
-    # 관심종목 CRUD (GitHub 자동 동기화)
+    # 관심종목 CRUD
     # ==========================================
     def get_watchlist(self, group_name: str = None) -> pd.DataFrame:
         with self._get_connection() as con:
