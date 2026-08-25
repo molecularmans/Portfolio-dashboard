@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-08-25 15:20:46",
+  "updated_at": "2026-08-25 15:22:05",
   "groups": [
     {
       "group_name": "빅테크/AI",
@@ -44,6 +44,11 @@
     },
     {
       "ticker": "ON",
+      "name": "",
+      "group_name": "반도체"
+    },
+    {
+      "ticker": "CBRS",
       "name": "",
       "group_name": "반도체"
     },
