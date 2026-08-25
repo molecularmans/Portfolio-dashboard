@@ -9,15 +9,17 @@ DEFAULT_REPO = "molecularmans/Portfolio-dashboard"
 
 
 def get_github_env_val(key: str, default: str = "") -> str:
-    """환경변수 또는 Streamlit Secrets에서 값 읽기"""
+    """환경변수(.env) 또는 Streamlit Cloud Secrets에서 대소문자 구분 없이 안전하게 값 읽기"""
     val = os.getenv(key, "")
     if val:
         return val
 
     try:
         import streamlit as st
-        if hasattr(st, "secrets") and key in st.secrets:
-            return str(st.secrets[key])
+        if hasattr(st, "secrets"):
+            for s_key in st.secrets.keys():
+                if s_key.lower() == key.lower():
+                    return str(st.secrets[s_key]).strip()
     except Exception:
         pass
 
@@ -25,16 +27,22 @@ def get_github_env_val(key: str, default: str = "") -> str:
 
 
 class GitHubSync:
-    """GitHub 저장소를 통한 사용자 설정(그룹, 관심종목, 이평선) 영구 동기화 엔진"""
+    """GitHub 저장소를 통한 사용자 설정(그룹, 관심종목, 이평선) 실시간 영구 동기화 엔진"""
 
     def __init__(self):
-        self.token = get_github_env_val("GITHUB_TOKEN", "").strip()
-        self.repo = get_github_env_val("GITHUB_REPO", DEFAULT_REPO).strip()
         self.api_base = "https://api.github.com"
 
     @property
+    def token(self) -> str:
+        return get_github_env_val("GITHUB_TOKEN", "").strip()
+
+    @property
+    def repo(self) -> str:
+        return get_github_env_val("GITHUB_REPO", DEFAULT_REPO).strip()
+
+    @property
     def is_configured(self) -> bool:
-        return bool(self.token and self.repo)
+        return bool(self.token and len(self.token) > 10 and self.repo)
 
     def get_headers(self) -> dict:
         return {
@@ -46,7 +54,6 @@ class GitHubSync:
     def fetch_config_from_github(self) -> dict:
         """GitHub 저장소에서 user_config.json 읽어오기"""
         if not self.is_configured:
-            # 토큰이 없으면 로컬 파일에서 읽기 시도
             return self.read_local_config()
 
         url = f"{self.api_base}/repos/{self.repo}/contents/{CONFIG_PATH}"
@@ -57,7 +64,6 @@ class GitHubSync:
                 content_b64 = data.get("content", "")
                 decoded = base64.b64decode(content_b64).decode("utf-8")
                 config = json.loads(decoded)
-                # 로컬에도 캐싱
                 self.save_local_config(config)
                 return config
             elif res.status_code == 404:
@@ -69,7 +75,6 @@ class GitHubSync:
 
     def save_config_to_github(self, config_dict: dict) -> bool:
         """GitHub 저장소에 user_config.json 자동 커밋 & 푸시"""
-        # 1. 로컬에 먼저 안전하게 저장
         self.save_local_config(config_dict)
 
         if not self.is_configured:
@@ -78,7 +83,6 @@ class GitHubSync:
         url = f"{self.api_base}/repos/{self.repo}/contents/{CONFIG_PATH}"
         headers = self.get_headers()
 
-        # 기존 파일의 SHA 해시값 확인 (PUT 요청에 필요)
         sha = None
         try:
             get_res = requests.get(url, headers=headers, timeout=5)
