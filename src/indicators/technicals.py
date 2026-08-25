@@ -48,27 +48,33 @@ def calc_macd(series: pd.Series, fast: int = 12, slow: int = 26, signal: int = 9
 
 
 def calc_indicators(df: pd.DataFrame) -> pd.DataFrame:
-    """모든 주요 기술 지표 및 이동평균(5, 10, 20, 30, 50, 150, 200)을 일괄 산출"""
-    if df.empty or len(df) < 5:
+    """모든 주요 기술 지표 및 이동평균(일봉/주봉 전용)을 일괄 산출"""
+    if df.empty or len(df) < 2:
         return df
 
     res = df.copy()
     res = res.sort_values("date").reset_index(drop=True)
 
-    # 1. 이동평균선
+    # 1. 일봉 기준 이동평균선
     res["ema_5"] = res["close"].ewm(span=5, adjust=False).mean()
-    res["sma_10"] = res["close"].rolling(window=10).mean()
-    res["sma_20"] = res["close"].rolling(window=20).mean()
-    res["sma_30"] = res["close"].rolling(window=30).mean()
-    res["sma_50"] = res["close"].rolling(window=50).mean()
-    res["sma_150"] = res["close"].rolling(window=150, min_periods=10).mean()
-    res["sma_200"] = res["close"].rolling(window=200, min_periods=20).mean()
+    res["sma_10"] = res["close"].rolling(window=10, min_periods=1).mean()
+    res["sma_20"] = res["close"].rolling(window=20, min_periods=1).mean()
+    res["sma_30"] = res["close"].rolling(window=30, min_periods=1).mean()
+    res["sma_50"] = res["close"].rolling(window=50, min_periods=1).mean()
+    res["sma_150"] = res["close"].rolling(window=150, min_periods=1).mean()
+    res["sma_200"] = res["close"].rolling(window=200, min_periods=1).mean()
 
-    # 2. 거래량 & RVOL (20기간 평균 거래량 대비 비율)
-    res["vol_ma20"] = res["volume"].rolling(window=20, min_periods=5).mean()
+    # 2. 주봉 기준 이동평균선 (4주, 13주, 26주, 52주)
+    res["ma_4"] = res["close"].rolling(window=4, min_periods=1).mean()
+    res["ma_13"] = res["close"].rolling(window=13, min_periods=1).mean()
+    res["ma_26"] = res["close"].rolling(window=26, min_periods=1).mean()
+    res["ma_52"] = res["close"].rolling(window=52, min_periods=1).mean()
+
+    # 3. 거래량 & RVOL
+    res["vol_ma20"] = res["volume"].rolling(window=20, min_periods=1).mean()
     res["rvol"] = res["volume"] / (res["vol_ma20"] + 1e-9)
 
-    # 3. 오실레이터 (RSI, Stochastic, Williams %R, MACD)
+    # 4. 오실레이터
     res["rsi_14"] = calc_rsi(res["close"], 14)
     stoch_k, stoch_d = calc_stochastic(res, 14, 3, 3)
     res["stoch_k"] = stoch_k
@@ -80,42 +86,13 @@ def calc_indicators(df: pd.DataFrame) -> pd.DataFrame:
     res["macd_signal"] = sig_line
     res["macd_hist"] = hist
 
-    # 4. 52주(최고가) 및 이격도
-    res["high_52w"] = res["high"].rolling(window=min(250, len(res)), min_periods=10).max()
+    # 5. 52주 최고가 대비 이격도
+    res["high_52w"] = res["high"].rolling(window=min(250, len(res)), min_periods=1).max()
     res["dist_52w_high"] = ((res["close"] - res["high_52w"]) / res["high_52w"]) * 100
 
-    # 5. 기간별 수익률 (%)
+    # 6. 기간별 수익률 (%)
     res["pct_change_1d"] = res["close"].pct_change(1) * 100
     res["pct_change_1w"] = res["close"].pct_change(5) * 100 if len(res) >= 5 else 0
     res["pct_change_1m"] = res["close"].pct_change(20) * 100 if len(res) >= 20 else 0
 
     return res
-
-
-def resample_ohlcv(df: pd.DataFrame, timeframe: str = "일봉") -> pd.DataFrame:
-    """
-    일봉 OHLCV 데이터를 주봉(Weekly) 또는 월봉(Monthly)으로 완벽 리샘플링
-    - timeframe: '일봉' | '주봉' | '월봉'
-    """
-    if df.empty or timeframe == "일봉":
-        return calc_indicators(df)
-
-    df_work = df.copy()
-    if not pd.api.types.is_datetime64_any_dtype(df_work["date"]):
-        df_work["date"] = pd.to_datetime(df_work["date"])
-
-    df_work = df_work.set_index("date").sort_index()
-
-    # 리샘플 규칙: 주봉(W-FRI), 월봉(ME)
-    rule = "W-FRI" if timeframe == "주봉" else "ME"
-
-    resampled = df_work.resample(rule).agg({
-        "open": "first",
-        "high": "max",
-        "low": "min",
-        "close": "last",
-        "volume": "sum",
-    }).dropna().reset_index()
-
-    # 리샘플링된 캔들에 대해 기술 지표 다시 계산
-    return calc_indicators(resampled)
