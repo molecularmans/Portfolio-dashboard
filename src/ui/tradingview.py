@@ -16,51 +16,90 @@ def get_tradingview_symbol(ticker: str) -> str:
     return ticker_clean
 
 
-def get_ma_palette_and_lengths(timeframe: str = "일봉"):
-    """주기별(일봉 vs 주봉) 최적의 이동평균선 기간 및 고유 색상/굵기 세팅"""
-    if timeframe == "주봉":
-        # 사용자 지정 주봉 색상: 4주(빨강 두껍게), 13주(보라), 26주(연청색), 52주(초록)
-        return [
-            {"id": "MA 1", "length": 4, "type": "SMA", "color": "#F44336", "linewidth": 2.5, "title": "4주 MA (빨강)"},
-            {"id": "MA 2", "length": 13, "type": "SMA", "color": "#AB47BC", "linewidth": 1.8, "title": "13주 MA (보라)"},
-            {"id": "MA 3", "length": 26, "type": "SMA", "color": "#00E5FF", "linewidth": 1.8, "title": "26주 MA (연청)"},
-            {"id": "MA 4", "length": 52, "type": "SMA", "color": "#00E676", "linewidth": 2.0, "title": "52주 MA (초록)"},
-        ]
-    elif timeframe == "월봉":
-        return [
-            {"id": "MA 1", "length": 6, "type": "SMA", "color": "#FF9800", "linewidth": 2.0, "title": "6월 MA"},
-            {"id": "MA 2", "length": 12, "type": "SMA", "color": "#2196F3", "linewidth": 2.0, "title": "12월 MA"},
-            {"id": "MA 3", "length": 24, "type": "SMA", "color": "#AB47BC", "linewidth": 2.0, "title": "24월 MA"},
-            {"id": "MA 4", "length": 60, "type": "SMA", "color": "#F44336", "linewidth": 2.5, "title": "60월 MA"},
-        ]
-    else:
-        # 일봉: 5 EMA(주황), 20 MA(네온블루 두껍게), 50 MA(보라), 200 MA(빨강 두껍게)
-        return [
-            {"id": "EMA 1", "length": 5, "type": "EMA", "color": "#FF9800", "linewidth": 1.8, "title": "5 EMA (주황)"},
-            {"id": "MA 1", "length": 20, "type": "SMA", "color": "#2196F3", "linewidth": 2.2, "title": "20 MA (파랑)"},
-            {"id": "MA 2", "length": 50, "type": "SMA", "color": "#AB47BC", "linewidth": 1.8, "title": "50 MA (보라)"},
-            {"id": "MA 3", "length": 200, "type": "SMA", "color": "#F44336", "linewidth": 2.5, "title": "200 MA (빨강)"},
-        ]
-
-
 def build_tradingview_studies_and_overrides(timeframe: str = "일봉", sub_indicators: list = None):
     """
-    각 이동평균선마다 고유 색상과 굵기가 100% 자동 렌더링되도록 Studies 및 Overrides 구성
+    트레이딩뷰 엔진에서 4대 이평선이 각각 독립된 고유 색상(빨강, 보라, 연청, 초록)으로 100% 렌더링되도록
+    서로 다른 Study ID와 1:1 studies_overrides 매핑 적용
     """
-    ma_list = get_ma_palette_and_lengths(timeframe)
-    studies_list = []
-    overrides = {
-        "volume.volume.color.0": "#ef5350",
-        "volume.volume.color.1": "#26a69a",
-        "volume.volume.transparency": 40,
-    }
-
-    for item in ma_list:
-        study_type = "MAExp@tv-basicstudies" if item["type"] == "EMA" else "MASimple@tv-basicstudies"
-        studies_list.append({
-            "id": study_type,
-            "inputs": {"length": item["length"]},
-        })
+    if timeframe == "주봉":
+        # 주봉 4대 이평선: 4주(빨강 두껍게), 13주(보라), 26주(연청), 52주(초록)
+        studies_list = [
+            {"id": "MAExp@tv-basicstudies", "inputs": {"length": 4}},       # 4주 (EMA 기반)
+            {"id": "MASimple@tv-basicstudies", "inputs": {"length": 13}},    # 13주 (SMA)
+            {"id": "MAWeighted@tv-basicstudies", "inputs": {"length": 26}},  # 26주 (WMA)
+            {"id": "MASmoothed@tv-basicstudies", "inputs": {"length": 52}},  # 52주 (SMMA)
+        ]
+        overrides = {
+            "volume.volume.color.0": "#ef5350",
+            "volume.volume.color.1": "#26a69a",
+            "volume.volume.transparency": 40,
+            # 4주선: 빨간색 (약간 두껍게)
+            "moving average exponential.plot.color": "#F44336",
+            "moving average exponential.plot.linewidth": 3,
+            # 13주선: 보라색
+            "moving average.plot.color": "#AB47BC",
+            "moving average.plot.linewidth": 2,
+            # 26주선: 연청색 (Sky Blue)
+            "moving average weighted.plot.color": "#00E5FF",
+            "moving average weighted.plot.linewidth": 2,
+            # 52주선: 초록색
+            "moving average smoothed.plot.color": "#00E676",
+            "moving average smoothed.plot.linewidth": 2,
+        }
+        ma_legend = [
+            {"title": "4주 MA (빨강)", "color": "#F44336"},
+            {"title": "13주 MA (보라)", "color": "#AB47BC"},
+            {"title": "26주 MA (연청)", "color": "#00E5FF"},
+            {"title": "52주 MA (초록)", "color": "#00E676"},
+        ]
+    elif timeframe == "월봉":
+        studies_list = [
+            {"id": "MAExp@tv-basicstudies", "inputs": {"length": 6}},
+            {"id": "MASimple@tv-basicstudies", "inputs": {"length": 12}},
+            {"id": "MAWeighted@tv-basicstudies", "inputs": {"length": 24}},
+            {"id": "MASmoothed@tv-basicstudies", "inputs": {"length": 60}},
+        ]
+        overrides = {
+            "volume.volume.color.0": "#ef5350",
+            "volume.volume.color.1": "#26a69a",
+            "moving average exponential.plot.color": "#FF9800",
+            "moving average.plot.color": "#2196F3",
+            "moving average weighted.plot.color": "#AB47BC",
+            "moving average smoothed.plot.color": "#F44336",
+        }
+        ma_legend = [
+            {"title": "6월 MA (주황)", "color": "#FF9800"},
+            {"title": "12월 MA (파랑)", "color": "#2196F3"},
+            {"title": "24월 MA (보라)", "color": "#AB47BC"},
+            {"title": "60월 MA (빨강)", "color": "#F44336"},
+        ]
+    else:
+        # 일봉: 5 EMA(주황), 20 MA(파랑), 50 MA(보라), 200 MA(빨강)
+        studies_list = [
+            {"id": "MAExp@tv-basicstudies", "inputs": {"length": 5}},
+            {"id": "MASimple@tv-basicstudies", "inputs": {"length": 20}},
+            {"id": "MAWeighted@tv-basicstudies", "inputs": {"length": 50}},
+            {"id": "MASmoothed@tv-basicstudies", "inputs": {"length": 200}},
+        ]
+        overrides = {
+            "volume.volume.color.0": "#ef5350",
+            "volume.volume.color.1": "#26a69a",
+            "volume.volume.transparency": 40,
+            "moving average exponential.plot.color": "#FF9800",
+            "moving average exponential.plot.linewidth": 2,
+            "moving average.plot.color": "#2196F3",
+            "moving average.plot.linewidth": 2,
+            "moving average weighted.plot.color": "#AB47BC",
+            "moving average weighted.plot.linewidth": 2,
+            "moving average smoothed.plot.color": "#F44336",
+            "moving average smoothed.plot.linewidth": 3,
+        }
+        ma_legend = [
+            {"title": "5 EMA (주황)", "color": "#FF9800"},
+            {"title": "20 MA (파랑)", "color": "#2196F3"},
+            {"title": "50 MA (보라)", "color": "#AB47BC"},
+            {"title": "200 MA (빨강)", "color": "#F44336"},
+        ]
 
     if sub_indicators:
         if "RSI" in sub_indicators:
@@ -70,27 +109,26 @@ def build_tradingview_studies_and_overrides(timeframe: str = "일봉", sub_indic
         if "MACD" in sub_indicators:
             studies_list.append("MACD@tv-basicstudies")
 
-    return studies_list, overrides, ma_list
+    return studies_list, overrides, ma_legend
 
 
 def render_tradingview_mini_chart(ticker: str, timeframe: str = "일봉", timeframe_ma: dict = None, height: int = 320):
     """
-    멀티 차트 그리드용 TradingView 컴팩트 캔들 차트 (주기별 고유 색상 자동 완벽 적용)
+    멀티 차트 그리드용 TradingView 컴팩트 캔들 차트 (주기별 4대 고유 색상 100% 개별 렌더링)
     """
     tv_symbol = get_tradingview_symbol(ticker)
 
     interval_map = {"일봉": "D", "주봉": "W", "월봉": "M"}
     interval = interval_map.get(timeframe, "D")
 
-    studies_list, overrides, ma_list = build_tradingview_studies_and_overrides(timeframe=timeframe)
+    studies_list, overrides, ma_legend = build_tradingview_studies_and_overrides(timeframe=timeframe)
     studies_json = json.dumps(studies_list)
     overrides_json = json.dumps(overrides)
 
-    # 안내용 이평선 범례 배지
     legend_html = "".join([
         f"<span style='display:inline-block;margin-right:10px;font-size:11px;font-weight:600;color:{item['color']};'>"
         f"● {item['title']}</span>"
-        for item in ma_list
+        for item in ma_legend
     ])
 
     html_code = f"""
@@ -158,7 +196,7 @@ def render_tradingview_mini_chart(ticker: str, timeframe: str = "일봉", timefr
 
 def render_tradingview_chart(ticker: str, timeframe: str = "일봉", settings: dict = None, height: int = 750):
     """
-    상세 분석용 TradingView 풀버전 프로 차트 (추세선, 피보나치, 수평선, 주기별 고유 이평선 색상 범례 탑재)
+    상세 분석용 TradingView 풀버전 프로 차트 (주기별 4대 고유 색상 100% 개별 렌더링)
     """
     if settings is None:
         settings = {}
@@ -169,14 +207,14 @@ def render_tradingview_chart(ticker: str, timeframe: str = "일봉", settings: d
     interval = interval_map.get(timeframe, "D")
 
     sub_inds = settings.get("selected_sub_indicators", ["Stochastic", "RSI"])
-    studies_list, overrides, ma_list = build_tradingview_studies_and_overrides(timeframe=timeframe, sub_indicators=sub_inds)
+    studies_list, overrides, ma_legend = build_tradingview_studies_and_overrides(timeframe=timeframe, sub_indicators=sub_inds)
     studies_json = json.dumps(studies_list)
     overrides_json = json.dumps(overrides)
 
     legend_html = "".join([
         f"<span style='display:inline-block;margin-right:14px;font-size:12px;font-weight:600;color:{item['color']};'>"
         f"● {item['title']}</span>"
-        for item in ma_list
+        for item in ma_legend
     ])
 
     html_code = f"""
