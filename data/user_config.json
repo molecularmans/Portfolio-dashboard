@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-08-25 13:39:04",
+  "updated_at": "2026-08-25 13:59:24",
   "groups": [
     {
       "group_name": "빅테크/AI",
@@ -146,7 +146,7 @@
         "label": "40주 MA"
       },
       "show_w_ma52": {
-        "enabled": true,
+        "enabled": false,
         "length": 52,
         "type": "SMA",
         "label": "52주 MA (1년)"
