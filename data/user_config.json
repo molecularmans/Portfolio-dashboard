@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-08-25 14:37:05",
+  "updated_at": "2026-08-25 15:13:45",
   "groups": [
     {
       "group_name": "빅테크/AI",
@@ -69,11 +69,6 @@
     },
     {
       "ticker": "TWST",
-      "name": "",
-      "group_name": "주도주후보"
-    },
-    {
-      "ticker": "MOG-A",
       "name": "",
       "group_name": "주도주후보"
     },
