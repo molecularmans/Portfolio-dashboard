@@ -2,11 +2,12 @@
 .env
 .env.local
 
-# 토큰 및 로컬 캐시 DB
-data/
+# 토큰 및 로컬 캐시 DB (user_config.json만 허용)
+data/*.db
+data/*token*.json
+!data/user_config.json
 *.duckdb
 *.duckdb.wal
-kis_token.json
 
 # Python 캐시
 __pycache__/

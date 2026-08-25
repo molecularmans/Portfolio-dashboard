@@ -1,0 +1,73 @@
+{
+  "updated_at": "2026-08-25 22:15:00",
+  "groups": [
+    {
+      "group_name": "빅테크/AI",
+      "sort_order": 0
+    },
+    {
+      "group_name": "반도체",
+      "sort_order": 1
+    },
+    {
+      "group_name": "클라우드/SaaS",
+      "sort_order": 2
+    }
+  ],
+  "watchlist": [
+    {
+      "ticker": "NVDA",
+      "name": "NVIDIA",
+      "group_name": "빅테크/AI"
+    },
+    {
+      "ticker": "AAPL",
+      "name": "Apple",
+      "group_name": "빅테크/AI"
+    },
+    {
+      "ticker": "MSFT",
+      "name": "Microsoft",
+      "group_name": "빅테크/AI"
+    },
+    {
+      "ticker": "GOOGL",
+      "name": "Alphabet",
+      "group_name": "빅테크/AI"
+    },
+    {
+      "ticker": "AMZN",
+      "name": "Amazon",
+      "group_name": "빅테크/AI"
+    },
+    {
+      "ticker": "TSLA",
+      "name": "Tesla",
+      "group_name": "빅테크/AI"
+    },
+    {
+      "ticker": "BOTZ",
+      "name": "Global X Robotics & AI",
+      "group_name": "빅테크/AI"
+    },
+    {
+      "ticker": "ORCL",
+      "name": "Oracle",
+      "group_name": "클라우드/SaaS"
+    },
+    {
+      "ticker": "MRVL",
+      "name": "Marvell Tech",
+      "group_name": "반도체"
+    }
+  ],
+  "ma_flags": {
+    "show_ema5": true,
+    "show_ma10": false,
+    "show_ma20": true,
+    "show_ma30": false,
+    "show_ma50": true,
+    "show_ma150": false,
+    "show_ma200": true
+  }
+}

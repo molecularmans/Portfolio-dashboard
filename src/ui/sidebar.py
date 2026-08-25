@@ -169,7 +169,28 @@ def render_sidebar(db: StockDB, client: KISClient) -> dict:
 
         st.divider()
 
-        # 7. 시세 새로고침
+        # 7. 클라우드 영구 저장 (GitHub 동기화)
+        st.subheader("클라우드 영구 저장")
+        if db.github_sync.is_configured:
+            st.caption("✅ GitHub 자동 동기화 활성화됨 (슬립 모드 복원 지원)")
+        else:
+            st.caption("⚠️ GitHub 토큰 미등록 (로컬 저장 중)")
+            with st.expander("영구 동기화 토큰 등록 안내"):
+                st.caption("Streamlit Secrets 또는 `.env`에 `GITHUB_TOKEN`을 등록하면 슬립 모드 후에도 100% 자동 복원됩니다.")
+
+        c_sync1, c_sync2 = st.columns(2)
+        if c_sync1.button("즉시 백업", use_container_width=True, help="현재 그룹/종목/설정을 GitHub에 백업"):
+            db.trigger_github_backup()
+            st.toast("GitHub 백업 완료!")
+
+        if c_sync2.button("클라우드 복원", use_container_width=True, help="GitHub에서 최신 설정 불러오기"):
+            db._sync_restore_from_github()
+            st.toast("클라우드 설정 복원 완료!")
+            st.rerun()
+
+        st.divider()
+
+        # 8. 시세 새로고침
         if st.button("시세 데이터 새로고침", use_container_width=True):
             db.clear_all_prices()
             st.session_state["force_refresh"] = True

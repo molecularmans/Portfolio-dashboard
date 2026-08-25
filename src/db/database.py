@@ -5,6 +5,8 @@ import sqlite3
 import pandas as pd
 from datetime import datetime
 
+from src.db.github_sync import GitHubSync
+
 DB_DIR = os.path.join(os.path.dirname(__file__), "..", "..", "data")
 DB_PATH = os.path.join(DB_DIR, "stock_cache.db")
 
@@ -20,12 +22,14 @@ DEFAULT_MA_FLAGS = {
 
 
 class StockDB:
-    """SQLite 기반 로컬 캐시 및 설정 데이터베이스 (그룹 순서 변경 & 설정 영구 저장 지원)"""
+    """SQLite 기반 로컬 캐시 및 설정 데이터베이스 (GitHub 자동 동기화 & 영구 보존 지원)"""
 
     def __init__(self, db_path: str = DB_PATH):
         os.makedirs(os.path.dirname(db_path), exist_ok=True)
         self.db_path = db_path
+        self.github_sync = GitHubSync()
         self._init_tables()
+        self._sync_restore_from_github()
 
     def _get_connection(self):
         con = sqlite3.connect(self.db_path, check_same_thread=False, timeout=15)
@@ -130,7 +134,87 @@ class StockDB:
             con.commit()
 
     # ==========================================
-    # 이동평균선 선택 설정 영구 저장
+    # GitHub 자동 백업 및 복원 엔진
+    # ==========================================
+    def _sync_restore_from_github(self):
+        """앱 기동 시 GitHub 또는 로컬 config 파일로부터 최신 설정 복원"""
+        try:
+            config = self.github_sync.fetch_config_from_github()
+            if config and ("groups" in config or "watchlist" in config):
+                self.import_config(config, trigger_backup=False)
+        except Exception as e:
+            print(f"[StockDB] GitHub restore failed: {e}")
+
+    def trigger_github_backup(self):
+        """설정 변경 시 GitHub 저장소로 자동 커밋 백업"""
+        try:
+            config = self.export_config()
+            self.github_sync.save_config_to_github(config)
+        except Exception as e:
+            print(f"[StockDB] GitHub backup failed: {e}")
+
+    def export_config(self) -> dict:
+        """현재 DB의 모든 그룹, 관심종목, 이동평균선 설정을 딕셔너리로 추출"""
+        with self._get_connection() as con:
+            df_groups = pd.read_sql_query("SELECT group_name, sort_order FROM custom_groups ORDER BY sort_order ASC, created_at ASC", con)
+            groups = df_groups.to_dict(orient="records")
+
+            df_wl = pd.read_sql_query("SELECT ticker, name, group_name FROM watchlist ORDER BY group_name, created_at ASC", con)
+            watchlist = df_wl.to_dict(orient="records")
+
+            ma_flags = self.get_ma_settings()
+
+            return {
+                "updated_at": datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
+                "groups": groups,
+                "watchlist": watchlist,
+                "ma_flags": ma_flags,
+            }
+
+    def import_config(self, config: dict, trigger_backup: bool = True):
+        """설정 딕셔너리를 DB에 덮어써서 복원"""
+        if not config:
+            return
+
+        with self._get_connection() as con:
+            cur = con.cursor()
+
+            # 1. 그룹 복원
+            if "groups" in config and config["groups"]:
+                cur.execute("DELETE FROM custom_groups")
+                for idx, g in enumerate(config["groups"]):
+                    gname = g.get("group_name", "") if isinstance(g, dict) else str(g)
+                    order = g.get("sort_order", idx) if isinstance(g, dict) else idx
+                    if gname:
+                        cur.execute("INSERT OR REPLACE INTO custom_groups (group_name, sort_order) VALUES (?, ?)", [gname.strip(), order])
+
+            # 2. 관심종목 복원
+            if "watchlist" in config and config["watchlist"]:
+                cur.execute("DELETE FROM watchlist")
+                for w in config["watchlist"]:
+                    if isinstance(w, dict):
+                        ticker = w.get("ticker", "").strip().upper()
+                        name = w.get("name", "")
+                        group_name = w.get("group_name", "빅테크/AI")
+                        if ticker:
+                            cur.execute("INSERT OR REPLACE INTO watchlist (ticker, name, group_name) VALUES (?, ?, ?)", [ticker, name, group_name])
+
+            # 3. 이동평균선 설정 복원
+            if "ma_flags" in config and config["ma_flags"]:
+                val_str = json.dumps(config["ma_flags"])
+                cur.execute("""
+                    INSERT INTO user_settings (key, value, updated_at)
+                    VALUES ('ma_flags', ?, CURRENT_TIMESTAMP)
+                    ON CONFLICT(key) DO UPDATE SET value = excluded.value, updated_at = CURRENT_TIMESTAMP
+                """, [val_str])
+
+            con.commit()
+
+        if trigger_backup:
+            self.trigger_github_backup()
+
+    # ==========================================
+    # 이동평균선 선택 설정
     # ==========================================
     def get_ma_settings(self) -> dict:
         """저장된 이동평균선 설정 로드"""
@@ -149,7 +233,7 @@ class StockDB:
         return DEFAULT_MA_FLAGS.copy()
 
     def save_ma_settings(self, ma_flags: dict):
-        """이동평균선 선택 설정 영구 저장"""
+        """이동평균선 선택 설정 영구 저장 & GitHub 자동 동기화"""
         val_str = json.dumps(ma_flags)
         with self._get_connection() as con:
             cur = con.cursor()
@@ -159,6 +243,94 @@ class StockDB:
                 ON CONFLICT(key) DO UPDATE SET value = excluded.value, updated_at = CURRENT_TIMESTAMP
             """, [val_str])
             con.commit()
+        self.trigger_github_backup()
+
+    # ==========================================
+    # 그룹 관리 CRUD (순서 변경 및 GitHub 자동 동기화)
+    # ==========================================
+    def get_groups(self) -> list:
+        with self._get_connection() as con:
+            df = pd.read_sql_query("SELECT group_name FROM custom_groups ORDER BY sort_order ASC, created_at ASC", con)
+            return df["group_name"].tolist() if not df.empty else ["빅테크/AI", "반도체", "클라우드/SaaS"]
+
+    def add_group(self, group_name: str):
+        with self._get_connection() as con:
+            cur = con.cursor()
+            cur.execute("SELECT COALESCE(MAX(sort_order), 0) + 1 FROM custom_groups")
+            next_order = cur.fetchone()[0]
+            cur.execute("INSERT OR IGNORE INTO custom_groups (group_name, sort_order) VALUES (?, ?)", [group_name.strip(), next_order])
+            con.commit()
+        self.trigger_github_backup()
+
+    def reorder_groups(self, ordered_groups: list):
+        """사용자가 지정한 순서대로 sort_order 업데이트 & GitHub 자동 동기화"""
+        with self._get_connection() as con:
+            cur = con.cursor()
+            for idx, gname in enumerate(ordered_groups):
+                cur.execute("UPDATE custom_groups SET sort_order = ? WHERE group_name = ?", [idx, gname.strip()])
+            con.commit()
+        self.trigger_github_backup()
+
+    def move_group_up(self, group_name: str):
+        """그룹 순서를 한 칸 위로 이동"""
+        groups = self.get_groups()
+        if group_name in groups:
+            idx = groups.index(group_name)
+            if idx > 0:
+                groups[idx], groups[idx - 1] = groups[idx - 1], groups[idx]
+                self.reorder_groups(groups)
+
+    def move_group_down(self, group_name: str):
+        """그룹 순서를 한 칸 아래로 이동"""
+        groups = self.get_groups()
+        if group_name in groups:
+            idx = groups.index(group_name)
+            if idx < len(groups) - 1:
+                groups[idx], groups[idx + 1] = groups[idx + 1], groups[idx]
+                self.reorder_groups(groups)
+
+    def rename_group(self, old_name: str, new_name: str):
+        with self._get_connection() as con:
+            cur = con.cursor()
+            cur.execute("UPDATE custom_groups SET group_name = ? WHERE group_name = ?", [new_name.strip(), old_name.strip()])
+            cur.execute("UPDATE watchlist SET group_name = ? WHERE group_name = ?", [new_name.strip(), old_name.strip()])
+            con.commit()
+        self.trigger_github_backup()
+
+    def delete_group(self, group_name: str, fallback_group: str = "빅테크/AI"):
+        with self._get_connection() as con:
+            cur = con.cursor()
+            cur.execute("UPDATE watchlist SET group_name = ? WHERE group_name = ?", [fallback_group, group_name.strip()])
+            cur.execute("DELETE FROM custom_groups WHERE group_name = ?", [group_name.strip()])
+            con.commit()
+        self.trigger_github_backup()
+
+    # ==========================================
+    # 관심종목 CRUD (GitHub 자동 동기화)
+    # ==========================================
+    def get_watchlist(self, group_name: str = None) -> pd.DataFrame:
+        with self._get_connection() as con:
+            if group_name and group_name != "전체 관심종목":
+                return pd.read_sql_query("SELECT * FROM watchlist WHERE group_name = ? ORDER BY created_at ASC", con, params=[group_name])
+            return pd.read_sql_query("SELECT * FROM watchlist ORDER BY group_name, created_at ASC", con)
+
+    def add_watchlist_item(self, ticker: str, name: str = "", group_name: str = "빅테크/AI"):
+        with self._get_connection() as con:
+            cur = con.cursor()
+            cur.execute("""
+                INSERT INTO watchlist (ticker, name, group_name) 
+                VALUES (?, ?, ?)
+                ON CONFLICT(ticker) DO UPDATE SET group_name = excluded.group_name
+            """, [ticker.upper().strip(), name, group_name])
+            con.commit()
+        self.trigger_github_backup()
+
+    def remove_watchlist_item(self, ticker: str):
+        with self._get_connection() as con:
+            cur = con.cursor()
+            cur.execute("DELETE FROM watchlist WHERE ticker = ?", [ticker.upper().strip()])
+            con.commit()
+        self.trigger_github_backup()
 
     # ==========================================
     # 영구 추세선 / 지지·저항선 CRUD
@@ -241,87 +413,6 @@ class StockDB:
                 cur.execute("DELETE FROM trendlines WHERE ticker = ? AND timeframe = ?", [ticker.upper().strip(), timeframe])
             else:
                 cur.execute("DELETE FROM trendlines WHERE ticker = ?", [ticker.upper().strip()])
-            con.commit()
-
-    # ==========================================
-    # 그룹 관리 CRUD (순서 변경 지원)
-    # ==========================================
-    def get_groups(self) -> list:
-        with self._get_connection() as con:
-            df = pd.read_sql_query("SELECT group_name FROM custom_groups ORDER BY sort_order ASC, created_at ASC", con)
-            return df["group_name"].tolist() if not df.empty else ["빅테크/AI", "반도체", "클라우드/SaaS"]
-
-    def add_group(self, group_name: str):
-        with self._get_connection() as con:
-            cur = con.cursor()
-            cur.execute("SELECT COALESCE(MAX(sort_order), 0) + 1 FROM custom_groups")
-            next_order = cur.fetchone()[0]
-            cur.execute("INSERT OR IGNORE INTO custom_groups (group_name, sort_order) VALUES (?, ?)", [group_name.strip(), next_order])
-            con.commit()
-
-    def reorder_groups(self, ordered_groups: list):
-        """사용자가 지정한 순서대로 sort_order 업데이트"""
-        with self._get_connection() as con:
-            cur = con.cursor()
-            for idx, gname in enumerate(ordered_groups):
-                cur.execute("UPDATE custom_groups SET sort_order = ? WHERE group_name = ?", [idx, gname.strip()])
-            con.commit()
-
-    def move_group_up(self, group_name: str):
-        """그룹 순서를 한 칸 위로 이동"""
-        groups = self.get_groups()
-        if group_name in groups:
-            idx = groups.index(group_name)
-            if idx > 0:
-                groups[idx], groups[idx - 1] = groups[idx - 1], groups[idx]
-                self.reorder_groups(groups)
-
-    def move_group_down(self, group_name: str):
-        """그룹 순서를 한 칸 아래로 이동"""
-        groups = self.get_groups()
-        if group_name in groups:
-            idx = groups.index(group_name)
-            if idx < len(groups) - 1:
-                groups[idx], groups[idx + 1] = groups[idx + 1], groups[idx]
-                self.reorder_groups(groups)
-
-    def rename_group(self, old_name: str, new_name: str):
-        with self._get_connection() as con:
-            cur = con.cursor()
-            cur.execute("UPDATE custom_groups SET group_name = ? WHERE group_name = ?", [new_name.strip(), old_name.strip()])
-            cur.execute("UPDATE watchlist SET group_name = ? WHERE group_name = ?", [new_name.strip(), old_name.strip()])
-            con.commit()
-
-    def delete_group(self, group_name: str, fallback_group: str = "빅테크/AI"):
-        with self._get_connection() as con:
-            cur = con.cursor()
-            cur.execute("UPDATE watchlist SET group_name = ? WHERE group_name = ?", [fallback_group, group_name.strip()])
-            cur.execute("DELETE FROM custom_groups WHERE group_name = ?", [group_name.strip()])
-            con.commit()
-
-    # ==========================================
-    # 관심종목 CRUD
-    # ==========================================
-    def get_watchlist(self, group_name: str = None) -> pd.DataFrame:
-        with self._get_connection() as con:
-            if group_name and group_name != "전체 관심종목":
-                return pd.read_sql_query("SELECT * FROM watchlist WHERE group_name = ? ORDER BY created_at ASC", con, params=[group_name])
-            return pd.read_sql_query("SELECT * FROM watchlist ORDER BY group_name, created_at ASC", con)
-
-    def add_watchlist_item(self, ticker: str, name: str = "", group_name: str = "빅테크/AI"):
-        with self._get_connection() as con:
-            cur = con.cursor()
-            cur.execute("""
-                INSERT INTO watchlist (ticker, name, group_name) 
-                VALUES (?, ?, ?)
-                ON CONFLICT(ticker) DO UPDATE SET group_name = excluded.group_name
-            """, [ticker.upper().strip(), name, group_name])
-            con.commit()
-
-    def remove_watchlist_item(self, ticker: str):
-        with self._get_connection() as con:
-            cur = con.cursor()
-            cur.execute("DELETE FROM watchlist WHERE ticker = ?", [ticker.upper().strip()])
             con.commit()
 
     # ==========================================
