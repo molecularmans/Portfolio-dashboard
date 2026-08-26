@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-08-26 05:30:03",
+  "updated_at": "2026-08-26 05:30:06",
   "groups": [
     {
       "group_name": "지수",
@@ -107,6 +107,11 @@
     },
     {
       "ticker": "APPN",
+      "name": "",
+      "group_name": "소프트웨어"
+    },
+    {
+      "ticker": "NTSK",
       "name": "",
       "group_name": "소프트웨어"
     },
