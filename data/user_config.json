@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-08-26 05:30:17",
+  "updated_at": "2026-08-26 05:30:25",
   "groups": [
     {
       "group_name": "지수",
@@ -122,6 +122,11 @@
     },
     {
       "ticker": "YEXT",
+      "name": "",
+      "group_name": "소프트웨어"
+    },
+    {
+      "ticker": "QLYS",
       "name": "",
       "group_name": "소프트웨어"
     },
