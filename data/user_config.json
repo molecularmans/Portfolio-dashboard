@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-08-26 00:46:09",
+  "updated_at": "2026-08-26 00:46:19",
   "groups": [
     {
       "group_name": "지수",
@@ -114,6 +114,11 @@
       "ticker": "BTSG",
       "name": "",
       "group_name": "주도주후보"
+    },
+    {
+      "ticker": "QQQ",
+      "name": "",
+      "group_name": "지수"
     },
     {
       "ticker": "ORCL",
