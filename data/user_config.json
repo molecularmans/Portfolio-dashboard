@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-08-26 02:02:07",
+  "updated_at": "2026-08-26 02:09:33",
   "groups": [
     {
       "group_name": "지수",
@@ -127,6 +127,11 @@
     },
     {
       "ticker": "DINO",
+      "name": "",
+      "group_name": "주도주후보"
+    },
+    {
+      "ticker": "ZETA",
       "name": "",
       "group_name": "주도주후보"
     },
