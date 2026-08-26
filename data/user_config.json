@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-08-26 02:02:03",
+  "updated_at": "2026-08-26 02:02:07",
   "groups": [
     {
       "group_name": "지수",
@@ -97,11 +97,6 @@
     },
     {
       "ticker": "GKOS",
-      "name": "",
-      "group_name": "주도주후보"
-    },
-    {
-      "ticker": "MOG.A",
       "name": "",
       "group_name": "주도주후보"
     },
