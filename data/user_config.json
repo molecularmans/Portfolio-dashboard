@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-08-26 04:22:24",
+  "updated_at": "2026-08-26 04:22:34",
   "groups": [
     {
       "group_name": "지수",
@@ -182,6 +182,11 @@
     },
     {
       "ticker": "NBIS",
+      "name": "",
+      "group_name": "클라우드"
+    },
+    {
+      "ticker": "CRWV",
       "name": "",
       "group_name": "클라우드"
     }
