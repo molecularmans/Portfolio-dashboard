@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-08-26 02:00:59",
+  "updated_at": "2026-08-26 02:01:48",
   "groups": [
     {
       "group_name": "지수",
@@ -132,6 +132,11 @@
     },
     {
       "ticker": "MCP",
+      "name": "",
+      "group_name": "주도주후보"
+    },
+    {
+      "ticker": "DINO",
       "name": "",
       "group_name": "주도주후보"
     },
