@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-08-25 15:22:05",
+  "updated_at": "2026-08-26 00:44:52",
   "groups": [
     {
       "group_name": "빅테크/AI",
@@ -24,6 +24,10 @@
     {
       "group_name": "주도주후보",
       "sort_order": 5
+    },
+    {
+      "group_name": "지수",
+      "sort_order": 6
     }
   ],
   "watchlist": [
