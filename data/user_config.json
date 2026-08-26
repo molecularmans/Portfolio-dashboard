@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-08-26 01:25:06",
+  "updated_at": "2026-08-26 02:00:55",
   "groups": [
     {
       "group_name": "지수",
@@ -122,6 +122,11 @@
     },
     {
       "ticker": "NTAP",
+      "name": "",
+      "group_name": "주도주후보"
+    },
+    {
+      "ticker": "PANW",
       "name": "",
       "group_name": "주도주후보"
     },
