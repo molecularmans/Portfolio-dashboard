@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-08-26 00:48:04",
+  "updated_at": "2026-08-26 00:48:31",
   "groups": [
     {
       "group_name": "지수",
@@ -132,6 +132,11 @@
     },
     {
       "ticker": "BITO",
+      "name": "",
+      "group_name": "지수"
+    },
+    {
+      "ticker": "SOXX",
       "name": "",
       "group_name": "지수"
     },
