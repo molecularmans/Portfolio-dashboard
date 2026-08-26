@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-08-26 00:45:57",
+  "updated_at": "2026-08-26 00:46:09",
   "groups": [
     {
       "group_name": "지수",
@@ -28,6 +28,10 @@
     {
       "group_name": "소프트웨어",
       "sort_order": 6
+    },
+    {
+      "group_name": "헬스케어,바이오",
+      "sort_order": 7
     }
   ],
   "watchlist": [
