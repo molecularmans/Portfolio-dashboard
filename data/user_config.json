@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-08-26 04:54:05",
+  "updated_at": "2026-08-26 04:58:27",
   "groups": [
     {
       "group_name": "지수",
@@ -117,6 +117,11 @@
     },
     {
       "ticker": "EME",
+      "name": "",
+      "group_name": "전력"
+    },
+    {
+      "ticker": "VST",
       "name": "",
       "group_name": "전력"
     },
