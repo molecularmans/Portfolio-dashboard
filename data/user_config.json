@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-08-26 00:44:55",
+  "updated_at": "2026-08-26 00:44:56",
   "groups": [
     {
       "group_name": "빅테크/AI",
@@ -14,11 +14,11 @@
       "sort_order": 2
     },
     {
-      "group_name": "전력",
+      "group_name": "지수",
       "sort_order": 3
     },
     {
-      "group_name": "지수",
+      "group_name": "전력",
       "sort_order": 4
     },
     {
