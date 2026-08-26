@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-08-26 04:58:32",
+  "updated_at": "2026-08-26 04:58:37",
   "groups": [
     {
       "group_name": "지수",
@@ -127,6 +127,11 @@
     },
     {
       "ticker": "TLN",
+      "name": "",
+      "group_name": "전력"
+    },
+    {
+      "ticker": "CCJ",
       "name": "",
       "group_name": "전력"
     },
