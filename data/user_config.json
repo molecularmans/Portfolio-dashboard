@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-08-26 04:22:13",
+  "updated_at": "2026-08-26 04:22:24",
   "groups": [
     {
       "group_name": "지수",
@@ -178,6 +178,11 @@
     {
       "ticker": "ORCL",
       "name": "Oracle",
+      "group_name": "클라우드"
+    },
+    {
+      "ticker": "NBIS",
+      "name": "",
       "group_name": "클라우드"
     }
   ],
