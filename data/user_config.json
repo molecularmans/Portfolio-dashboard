@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-08-26 04:16:06",
+  "updated_at": "2026-08-26 04:22:13",
   "groups": [
     {
       "group_name": "지수",
@@ -18,7 +18,7 @@
       "sort_order": 3
     },
     {
-      "group_name": "클라우드/SaaS",
+      "group_name": "클라우드",
       "sort_order": 4
     },
     {
@@ -178,7 +178,7 @@
     {
       "ticker": "ORCL",
       "name": "Oracle",
-      "group_name": "클라우드/SaaS"
+      "group_name": "클라우드"
     }
   ],
   "timeframe_ma_settings": {
