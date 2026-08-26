@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-08-26 00:48:31",
+  "updated_at": "2026-08-26 01:24:58",
   "groups": [
     {
       "group_name": "지수",
@@ -112,6 +112,11 @@
     },
     {
       "ticker": "BTSG",
+      "name": "",
+      "group_name": "주도주후보"
+    },
+    {
+      "ticker": "DELL",
       "name": "",
       "group_name": "주도주후보"
     },
