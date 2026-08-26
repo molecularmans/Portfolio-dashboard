@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-08-26 00:45:45",
+  "updated_at": "2026-08-26 00:45:47",
   "groups": [
     {
       "group_name": "지수",
@@ -14,11 +14,11 @@
       "sort_order": 2
     },
     {
-      "group_name": "클라우드/SaaS",
+      "group_name": "주도주후보",
       "sort_order": 3
     },
     {
-      "group_name": "주도주후보",
+      "group_name": "클라우드/SaaS",
       "sort_order": 4
     },
     {
