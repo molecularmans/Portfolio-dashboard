@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-08-26 02:01:48",
+  "updated_at": "2026-08-26 02:02:03",
   "groups": [
     {
       "group_name": "지수",
@@ -94,11 +94,6 @@
       "ticker": "BOTZ",
       "name": "Global X Robotics & AI",
       "group_name": "빅테크/AI"
-    },
-    {
-      "ticker": "TWST",
-      "name": "",
-      "group_name": "주도주후보"
     },
     {
       "ticker": "GKOS",
