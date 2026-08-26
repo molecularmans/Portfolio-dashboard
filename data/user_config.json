@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-08-26 00:44:56",
+  "updated_at": "2026-08-26 00:45:07",
   "groups": [
     {
       "group_name": "빅테크/AI",
@@ -10,11 +10,11 @@
       "sort_order": 1
     },
     {
-      "group_name": "클라우드/SaaS",
+      "group_name": "지수",
       "sort_order": 2
     },
     {
-      "group_name": "지수",
+      "group_name": "클라우드/SaaS",
       "sort_order": 3
     },
     {
