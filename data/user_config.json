@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-08-26 00:45:47",
+  "updated_at": "2026-08-26 00:45:55",
   "groups": [
     {
       "group_name": "지수",
@@ -10,11 +10,11 @@
       "sort_order": 1
     },
     {
-      "group_name": "반도체",
+      "group_name": "주도주후보",
       "sort_order": 2
     },
     {
-      "group_name": "주도주후보",
+      "group_name": "반도체",
       "sort_order": 3
     },
     {
