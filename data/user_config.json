@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-08-26 04:54:01",
+  "updated_at": "2026-08-26 04:54:05",
   "groups": [
     {
       "group_name": "지수",
@@ -112,6 +112,11 @@
     },
     {
       "ticker": "ETN",
+      "name": "",
+      "group_name": "전력"
+    },
+    {
+      "ticker": "EME",
       "name": "",
       "group_name": "전력"
     },
