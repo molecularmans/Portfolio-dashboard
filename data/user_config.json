@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-08-26 04:15:49",
+  "updated_at": "2026-08-26 04:15:53",
   "groups": [
     {
       "group_name": "지수",
@@ -97,6 +97,11 @@
     },
     {
       "ticker": "BE",
+      "name": "",
+      "group_name": "전력"
+    },
+    {
+      "ticker": "INIO",
       "name": "",
       "group_name": "전력"
     },
