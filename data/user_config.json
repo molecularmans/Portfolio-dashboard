@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-08-27 04:55:18",
+  "updated_at": "2026-08-27 04:55:49",
   "groups": [
     {
       "group_name": "지수",
@@ -272,6 +272,11 @@
     },
     {
       "ticker": "XLV",
+      "name": "",
+      "group_name": "헬스케어,바이오"
+    },
+    {
+      "ticker": "XBI",
       "name": "",
       "group_name": "헬스케어,바이오"
     }
