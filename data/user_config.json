@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-08-27 00:54:43",
+  "updated_at": "2026-08-27 00:54:57",
   "groups": [
     {
       "group_name": "지수",
@@ -197,6 +197,11 @@
     },
     {
       "ticker": "ZETA",
+      "name": "",
+      "group_name": "주도주후보"
+    },
+    {
+      "ticker": "CRWD",
       "name": "",
       "group_name": "주도주후보"
     },
