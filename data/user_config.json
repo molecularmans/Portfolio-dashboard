@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-08-27 00:54:57",
+  "updated_at": "2026-08-27 00:55:17",
   "groups": [
     {
       "group_name": "지수",
@@ -202,6 +202,11 @@
     },
     {
       "ticker": "CRWD",
+      "name": "",
+      "group_name": "주도주후보"
+    },
+    {
+      "ticker": "CIBR",
       "name": "",
       "group_name": "주도주후보"
     },
