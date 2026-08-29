@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-08-29 05:35:58",
+  "updated_at": "2026-08-29 05:36:06",
   "groups": [
     {
       "group_name": "지수",
@@ -212,6 +212,11 @@
     },
     {
       "ticker": "TTAN",
+      "name": "",
+      "group_name": "주도주후보"
+    },
+    {
+      "ticker": "NSIT",
       "name": "",
       "group_name": "주도주후보"
     },
