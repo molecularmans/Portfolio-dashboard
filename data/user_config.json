@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-09-01 03:46:07",
+  "updated_at": "2026-09-01 03:46:55",
   "groups": [
     {
       "group_name": "지수",
@@ -287,6 +287,11 @@
     },
     {
       "ticker": "TEM",
+      "name": "",
+      "group_name": "헬스케어,바이오"
+    },
+    {
+      "ticker": "TMO",
       "name": "",
       "group_name": "헬스케어,바이오"
     }
