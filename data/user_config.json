@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-09-01 03:47:45",
+  "updated_at": "2026-09-01 03:48:10",
   "groups": [
     {
       "group_name": "지수",
@@ -297,6 +297,11 @@
     },
     {
       "ticker": "ILMN",
+      "name": "",
+      "group_name": "헬스케어,바이오"
+    },
+    {
+      "ticker": "NTRA",
       "name": "",
       "group_name": "헬스케어,바이오"
     }
