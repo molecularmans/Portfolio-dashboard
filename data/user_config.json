@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-08-29 05:40:00",
+  "updated_at": "2026-09-01 03:45:58",
   "groups": [
     {
       "group_name": "지수",
@@ -277,6 +277,11 @@
     },
     {
       "ticker": "XBI",
+      "name": "",
+      "group_name": "헬스케어,바이오"
+    },
+    {
+      "ticker": "MRNA",
       "name": "",
       "group_name": "헬스케어,바이오"
     }
