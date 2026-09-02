@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-09-01 03:48:10",
+  "updated_at": "2026-09-02 01:47:18",
   "groups": [
     {
       "group_name": "지수",
@@ -57,6 +57,11 @@
     },
     {
       "ticker": "CBRS",
+      "name": "",
+      "group_name": "반도체"
+    },
+    {
+      "ticker": "DELL",
       "name": "",
       "group_name": "반도체"
     },
