@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-09-02 02:09:24",
+  "updated_at": "2026-09-02 02:09:37",
   "groups": [
     {
       "group_name": "지수",
@@ -68,6 +68,11 @@
       "ticker": "DELL",
       "name": "",
       "group_name": "반도체"
+    },
+    {
+      "ticker": "RTX",
+      "name": "",
+      "group_name": "방산.항공"
     },
     {
       "ticker": "NVDA",
