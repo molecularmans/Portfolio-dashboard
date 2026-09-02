@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-09-02 01:47:31",
+  "updated_at": "2026-09-02 02:08:59",
   "groups": [
     {
       "group_name": "지수",
@@ -32,6 +32,10 @@
     {
       "group_name": "헬스케어,바이오",
       "sort_order": 7
+    },
+    {
+      "group_name": "방산",
+      "sort_order": 8
     }
   ],
   "watchlist": [
