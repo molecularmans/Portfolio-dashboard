@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-09-02 03:45:03",
+  "updated_at": "2026-09-02 03:45:41",
   "groups": [
     {
       "group_name": "지수",
@@ -181,6 +181,11 @@
     },
     {
       "ticker": "CRM",
+      "name": "",
+      "group_name": "소프트웨어"
+    },
+    {
+      "ticker": "PLTR",
       "name": "",
       "group_name": "소프트웨어"
     },
