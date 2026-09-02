@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-09-02 02:11:19",
+  "updated_at": "2026-09-02 02:11:35",
   "groups": [
     {
       "group_name": "지수",
@@ -86,6 +86,11 @@
     },
     {
       "ticker": "GE",
+      "name": "",
+      "group_name": "방산.항공"
+    },
+    {
+      "ticker": "LMT",
       "name": "",
       "group_name": "방산.항공"
     },
