@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-09-02 02:11:59",
+  "updated_at": "2026-09-02 03:41:43",
   "groups": [
     {
       "group_name": "지수",
@@ -66,6 +66,11 @@
     },
     {
       "ticker": "DELL",
+      "name": "",
+      "group_name": "반도체"
+    },
+    {
+      "ticker": "AMD",
       "name": "",
       "group_name": "반도체"
     },
