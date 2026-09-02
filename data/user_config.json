@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-09-02 02:09:37",
+  "updated_at": "2026-09-02 02:10:00",
   "groups": [
     {
       "group_name": "지수",
@@ -71,6 +71,11 @@
     },
     {
       "ticker": "RTX",
+      "name": "",
+      "group_name": "방산.항공"
+    },
+    {
+      "ticker": "BA",
       "name": "",
       "group_name": "방산.항공"
     },
