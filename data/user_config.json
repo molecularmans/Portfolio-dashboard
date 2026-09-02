@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-09-02 02:08:59",
+  "updated_at": "2026-09-02 02:09:24",
   "groups": [
     {
       "group_name": "지수",
@@ -34,7 +34,7 @@
       "sort_order": 7
     },
     {
-      "group_name": "방산",
+      "group_name": "방산.항공",
       "sort_order": 8
     }
   ],
