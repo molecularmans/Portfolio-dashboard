@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-09-03 00:51:43",
+  "updated_at": "2026-09-03 02:28:39",
   "groups": [
     {
       "group_name": "지수",
@@ -71,6 +71,11 @@
     },
     {
       "ticker": "AMD",
+      "name": "",
+      "group_name": "반도체"
+    },
+    {
+      "ticker": "MU",
       "name": "",
       "group_name": "반도체"
     },
