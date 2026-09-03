@@ -18,9 +18,21 @@ US_EXCHANGE_MAP = {
     "SPY": "AMS", "IVV": "AMS", "VOO": "AMS", "DIA": "AMS", "IWM": "AMS",
 }
 
+# KIS 공식 최신 해외주식 주문 TR ID 매핑 (모의투자 VTTT1001U 반영)
+OVERSEAS_ORDER_TR_MAP = {
+    "real": {
+        "buy": {"USA": "TTTT1002U", "HK": "TTTS1002U", "JP": "TTTS0308U"},
+        "sell": {"USA": "TTTT1006U", "HK": "TTTS1001U", "JP": "TTTS0307U"},
+    },
+    "paper": {
+        "buy": {"USA": "VTTT1002U", "HK": "VTTS1002U"},
+        "sell": {"USA": "VTTT1001U", "HK": "VTTS1001U"},  # KIS 최신 GitHub 업데이트: VTTT1006U -> VTTT1001U
+    }
+}
+
 
 class KISClient:
-    """한국투자증권(KIS) REST API 클라이언트 (거래소 자동 탐색 및 최신 시세 수집)"""
+    """한국투자증권(KIS) REST API 클라이언트 (최신 공식 GitHub TR ID 및 거래소 자동 탐색)"""
 
     def __init__(self, auth: KISAuth = None):
         self.auth = auth or KISAuth()
@@ -96,7 +108,7 @@ class KISClient:
                     if len(all_records) >= count:
                         break
 
-                    time.sleep(0.1)
+                    time.sleep(0.05)
 
                 except Exception:
                     break
@@ -112,6 +124,7 @@ class KISClient:
     # 2. 국내 주식 기간별 시세
     # ==========================================
     def get_kr_ohlcv(self, ticker: str, timeframe: str = "D", count: int = 250) -> pd.DataFrame:
+        """국내 주식 일/주/월봉 데이터 조회 (FHKST01010400)"""
         ticker_clean = ticker.strip()
         if not self.is_configured():
             return self._generate_mock_ohlcv(ticker_clean, timeframe=timeframe, count=count)
@@ -214,7 +227,7 @@ class KISClient:
                                 "eval_amount": eval_amt,
                                 "account": acc["name"],
                             }
-                time.sleep(0.1)
+                time.sleep(0.05)
             except Exception:
                 pass
 
@@ -254,7 +267,54 @@ class KISClient:
         return list(combined_map.values())
 
     # ==========================================
-    # 4. Mock Data Generator (최신 일자 기준 생성)
+    # 4. 해외주식 주문 (최신 KIS 공식 스펙 및 TR ID 반영)
+    # ==========================================
+    def order_overseas_stock(
+        self,
+        ticker: str,
+        ord_dv: str,  # "buy" 또는 "sell"
+        qty: int,
+        price: float,
+        exchange: str = "NASD",
+        ord_dvsn: str = "00",  # 00: 지정가
+        account_idx: int = 1,
+    ) -> dict:
+        """
+        해외주식 주문 실행 (최신 공식 GitHub TR ID 적용)
+        - 실전 매수: TTTT1002U / 매도: TTTT1006U
+        - 모의 매수: VTTT1002U / 매도: VTTT1001U (최신 변경 반영)
+        """
+        acc = next((a for a in self.auth.accounts if a["idx"] == account_idx), None)
+        if not acc:
+            return {"rt_cd": "-1", "msg1": "유효한 계좌가 없습니다."}
+
+        mode = "paper" if self.auth.is_paper else "real"
+        tr_id = OVERSEAS_ORDER_TR_MAP[mode][ord_dv]["USA"]
+
+        endpoint = f"{self.base_url}/uapi/overseas-stock/v1/trading/order"
+        body = {
+            "CANO": acc["cano"],
+            "ACNT_PRDT_CD": acc["acnt_prdt_cd"],
+            "OVRS_EXCG_CD": exchange.upper(),
+            "PDNO": ticker.upper().strip(),
+            "ORD_QTY": str(qty),
+            "OVRS_ORD_UNPR": f"{price:.2f}",
+            "ORD_SVR_DVSN_CD": "0",
+            "ORD_DVSN": ord_dvsn,
+        }
+
+        # KIS 공식 POST Hashkey 발급 및 헤더 주입
+        hashkey = self.auth.get_hashkey(body, account_idx=acc["idx"])
+        headers = self.auth.get_common_headers(tr_id=tr_id, account_idx=acc["idx"], hashkey=hashkey)
+
+        try:
+            res = requests.post(endpoint, headers=headers, json=body, timeout=10)
+            return res.json()
+        except Exception as e:
+            return {"rt_cd": "-1", "msg1": str(e)}
+
+    # ==========================================
+    # 5. Mock Data Generator (데모 모드용)
     # ==========================================
     def _generate_mock_ohlcv(self, ticker: str, timeframe: str = "D", count: int = 250) -> pd.DataFrame:
         seed = sum(ord(c) for c in ticker) + (10 if timeframe == "W" else (20 if timeframe == "M" else 0))
