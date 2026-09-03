@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-09-02 03:46:18",
+  "updated_at": "2026-09-03 00:51:43",
   "groups": [
     {
       "group_name": "지수",
@@ -191,6 +191,11 @@
     },
     {
       "ticker": "NOW",
+      "name": "",
+      "group_name": "소프트웨어"
+    },
+    {
+      "ticker": "PANW",
       "name": "",
       "group_name": "소프트웨어"
     },
