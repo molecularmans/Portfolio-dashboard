@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-09-04 06:33:28",
+  "updated_at": "2026-09-04 06:33:29",
   "groups": [
     {
       "group_name": "지수",
@@ -411,7 +411,7 @@
         "label": "20 MA"
       },
       "show_d_ma30": {
-        "enabled": false,
+        "enabled": true,
         "length": 30,
         "type": "SMA",
         "label": "30 MA"
