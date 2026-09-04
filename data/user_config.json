@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-09-03 02:28:39",
+  "updated_at": "2026-09-04 01:58:10",
   "groups": [
     {
       "group_name": "지수",
@@ -381,6 +381,11 @@
     },
     {
       "ticker": "NTRA",
+      "name": "",
+      "group_name": "헬스케어,바이오"
+    },
+    {
+      "ticker": "VEEV",
       "name": "",
       "group_name": "헬스케어,바이오"
     }
