@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-09-07 01:28:20",
+  "updated_at": "2026-09-07 04:52:38",
   "groups": [
     {
       "group_name": "지수",
@@ -246,6 +246,11 @@
     },
     {
       "ticker": "EROC",
+      "name": "",
+      "group_name": "전력"
+    },
+    {
+      "ticker": "PWR",
       "name": "",
       "group_name": "전력"
     },
