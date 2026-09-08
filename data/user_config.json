@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-09-08 05:19:06",
+  "updated_at": "2026-09-08 05:19:23",
   "groups": [
     {
       "group_name": "지수",
@@ -81,6 +81,11 @@
     },
     {
       "ticker": "INTC",
+      "name": "",
+      "group_name": "반도체"
+    },
+    {
+      "ticker": "COHR",
       "name": "",
       "group_name": "반도체"
     },
