@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-09-10 03:52:48",
+  "updated_at": "2026-09-10 03:54:24",
   "groups": [
     {
       "group_name": "지수",
@@ -36,6 +36,10 @@
     {
       "group_name": "방산.항공",
       "sort_order": 8
+    },
+    {
+      "group_name": "원자재",
+      "sort_order": 9
     }
   ],
   "watchlist": [
