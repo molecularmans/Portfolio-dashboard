@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-09-10 08:00:29",
+  "updated_at": "2026-09-10 08:07:36",
   "groups": [
     {
       "group_name": "지수",
@@ -44,6 +44,10 @@
     {
       "group_name": "금융",
       "sort_order": 10
+    },
+    {
+      "group_name": "피지컬AI",
+      "sort_order": 11
     }
   ],
   "watchlist": [
