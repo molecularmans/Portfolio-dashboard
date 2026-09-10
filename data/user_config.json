@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-09-10 07:49:21",
+  "updated_at": "2026-09-10 07:49:30",
   "groups": [
     {
       "group_name": "지수",
@@ -49,6 +49,11 @@
   "watchlist": [
     {
       "ticker": "HOOD",
+      "name": "",
+      "group_name": "금융"
+    },
+    {
+      "ticker": "BNY",
       "name": "",
       "group_name": "금융"
     },
