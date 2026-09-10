@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-09-10 03:54:59",
+  "updated_at": "2026-09-10 03:55:07",
   "groups": [
     {
       "group_name": "지수",
@@ -219,6 +219,11 @@
       "group_name": "소프트웨어"
     },
     {
+      "ticker": "GLD",
+      "name": "",
+      "group_name": "원자재"
+    },
+    {
       "ticker": "FCX",
       "name": "",
       "group_name": "원자재"
@@ -345,11 +350,6 @@
     },
     {
       "ticker": "SPY",
-      "name": "",
-      "group_name": "지수"
-    },
-    {
-      "ticker": "GLD",
       "name": "",
       "group_name": "지수"
     },
