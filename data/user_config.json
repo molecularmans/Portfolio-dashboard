@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-09-10 03:54:24",
+  "updated_at": "2026-09-10 03:54:59",
   "groups": [
     {
       "group_name": "지수",
@@ -217,6 +217,11 @@
       "ticker": "PANW",
       "name": "",
       "group_name": "소프트웨어"
+    },
+    {
+      "ticker": "FCX",
+      "name": "",
+      "group_name": "원자재"
     },
     {
       "ticker": "BE",
