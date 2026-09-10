@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-09-10 08:09:30",
+  "updated_at": "2026-09-10 08:09:57",
   "groups": [
     {
       "group_name": "지수",
@@ -413,6 +413,11 @@
     },
     {
       "ticker": "OUST",
+      "name": "",
+      "group_name": "피지컬AI"
+    },
+    {
+      "ticker": "CGNX",
       "name": "",
       "group_name": "피지컬AI"
     },
