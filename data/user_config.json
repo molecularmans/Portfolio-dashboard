@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-09-10 08:07:50",
+  "updated_at": "2026-09-10 08:08:37",
   "groups": [
     {
       "group_name": "지수",
@@ -388,6 +388,11 @@
     },
     {
       "ticker": "SOXX",
+      "name": "",
+      "group_name": "지수"
+    },
+    {
+      "ticker": "CGNX",
       "name": "",
       "group_name": "지수"
     },
