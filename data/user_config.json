@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-09-08 05:19:23",
+  "updated_at": "2026-09-10 03:52:48",
   "groups": [
     {
       "group_name": "지수",
@@ -261,6 +261,11 @@
     },
     {
       "ticker": "PWR",
+      "name": "",
+      "group_name": "전력"
+    },
+    {
+      "ticker": "EXE",
       "name": "",
       "group_name": "전력"
     },
