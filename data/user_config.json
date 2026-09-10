@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-09-10 03:55:07",
+  "updated_at": "2026-09-10 07:49:11",
   "groups": [
     {
       "group_name": "지수",
@@ -40,6 +40,10 @@
     {
       "group_name": "원자재",
       "sort_order": 9
+    },
+    {
+      "group_name": "금융",
+      "sort_order": 10
     }
   ],
   "watchlist": [
