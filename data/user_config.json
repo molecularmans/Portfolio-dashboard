@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-09-10 08:07:36",
+  "updated_at": "2026-09-10 08:07:50",
   "groups": [
     {
       "group_name": "지수",
@@ -410,6 +410,11 @@
       "ticker": "SPCX",
       "name": "",
       "group_name": "클라우드"
+    },
+    {
+      "ticker": "OUST",
+      "name": "",
+      "group_name": "피지컬AI"
     },
     {
       "ticker": "XLV",
