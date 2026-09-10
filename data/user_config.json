@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-09-10 07:49:30",
+  "updated_at": "2026-09-10 07:50:00",
   "groups": [
     {
       "group_name": "지수",
@@ -54,6 +54,11 @@
     },
     {
       "ticker": "BNY",
+      "name": "",
+      "group_name": "금융"
+    },
+    {
+      "ticker": "GS",
       "name": "",
       "group_name": "금융"
     },
