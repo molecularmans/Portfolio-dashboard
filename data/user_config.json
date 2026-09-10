@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-09-10 07:49:11",
+  "updated_at": "2026-09-10 07:49:21",
   "groups": [
     {
       "group_name": "지수",
@@ -47,6 +47,11 @@
     }
   ],
   "watchlist": [
+    {
+      "ticker": "HOOD",
+      "name": "",
+      "group_name": "금융"
+    },
     {
       "ticker": "CRDO",
       "name": "",
