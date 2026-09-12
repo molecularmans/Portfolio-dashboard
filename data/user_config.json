@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-09-12 02:45:30",
+  "updated_at": "2026-09-12 02:48:41",
   "groups": [
     {
       "group_name": "지수",
@@ -318,6 +318,11 @@
     },
     {
       "ticker": "CEG",
+      "name": "",
+      "group_name": "전력"
+    },
+    {
+      "ticker": "POWL",
       "name": "",
       "group_name": "전력"
     },
