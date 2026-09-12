@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-09-12 02:35:23",
+  "updated_at": "2026-09-12 02:35:35",
   "groups": [
     {
       "group_name": "지수",
@@ -393,6 +393,11 @@
     },
     {
       "ticker": "US10Y",
+      "name": "",
+      "group_name": "지수"
+    },
+    {
+      "ticker": "US30Y",
       "name": "",
       "group_name": "지수"
     },
