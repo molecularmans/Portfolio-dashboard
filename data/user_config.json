@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-09-12 02:49:03",
+  "updated_at": "2026-09-13 12:09:09",
   "groups": [
     {
       "group_name": "지수",
@@ -68,6 +68,11 @@
     },
     {
       "ticker": "JPM",
+      "name": "",
+      "group_name": "금융"
+    },
+    {
+      "ticker": "COIN",
       "name": "",
       "group_name": "금융"
     },
