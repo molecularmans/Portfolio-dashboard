@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-09-13 12:09:09",
+  "updated_at": "2026-09-17 01:46:26",
   "groups": [
     {
       "group_name": "지수",
@@ -48,6 +48,10 @@
     {
       "group_name": "피지컬AI",
       "sort_order": 11
+    },
+    {
+      "group_name": "필수소비재",
+      "sort_order": 12
     }
   ],
   "watchlist": [
