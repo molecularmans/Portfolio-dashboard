@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-09-19 05:57:34",
+  "updated_at": "2026-09-19 06:05:01",
   "groups": [
     {
       "group_name": "지수",
@@ -452,6 +452,11 @@
     },
     {
       "ticker": "SPCX",
+      "name": "",
+      "group_name": "클라우드"
+    },
+    {
+      "ticker": "IREN",
       "name": "",
       "group_name": "클라우드"
     },
