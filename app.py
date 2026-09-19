@@ -7,6 +7,7 @@ from src.indicators.technicals import calc_indicators
 from src.ui.charts import create_detail_chart, CHART_CONFIG
 from src.ui.tradingview import render_tradingview_chart, render_tradingview_mini_chart
 from src.ui.sidebar import render_sidebar
+from src.ui.vcp_view import render_vcp_analysis_panel
 
 # 1. Streamlit 페이지 기본 설정
 st.set_page_config(
@@ -241,6 +242,10 @@ def main():
 
         st.caption("트레이딩뷰 좌측 툴바에서 추세선, 수평선, 피보나치, 채널 등을 마우스로 직접 긋고, 클릭하여 복사/삭제/색상변경을 자유롭게 사용할 수 있습니다. (자동 저장 지원)")
         render_tradingview_chart(sel_ticker, timeframe=detail_tf, settings=detail_settings, height=750)
+
+        # 마크 미너비니 VCP 패턴 & 8대 추세 템플릿 자동 진단 엔진
+        df_vcp = load_and_calc_stock_data(sel_ticker, db, client, force_refresh=False, timeframe="일봉")
+        render_vcp_analysis_panel(df_vcp, sel_ticker)
         return
 
     # ==========================================
