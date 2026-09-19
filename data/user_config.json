@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-09-19 06:05:01",
+  "updated_at": "2026-09-19 06:24:23",
   "groups": [
     {
       "group_name": "지수",
@@ -357,11 +357,6 @@
     },
     {
       "ticker": "NTAP",
-      "name": "",
-      "group_name": "주도주후보"
-    },
-    {
-      "ticker": "MCP",
       "name": "",
       "group_name": "주도주후보"
     },
