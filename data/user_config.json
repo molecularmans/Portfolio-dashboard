@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-09-19 06:31:04",
+  "updated_at": "2026-09-19 06:31:19",
   "groups": [
     {
       "group_name": "지수",
@@ -362,11 +362,6 @@
     },
     {
       "ticker": "ZETA",
-      "name": "",
-      "group_name": "주도주후보"
-    },
-    {
-      "ticker": "CIBR",
       "name": "",
       "group_name": "주도주후보"
     },
