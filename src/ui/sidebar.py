@@ -168,17 +168,20 @@ def render_sidebar(db: StockDB, client: KISClient) -> dict:
         st.subheader("스마트 차트 분석 레이어")
         show_support_resistance = st.checkbox(
             "자동 지지·저항선 [A]",
-            value=True,
+            value=st.session_state.get("chk_sr", True),
+            key="chk_sr",
             help="주요 지지선(초록) 및 저항선(빨강)을 차트에 자동 표시합니다.",
         )
         show_trendlines = st.checkbox(
             "자동 추세선 [A]",
-            value=True,
+            value=st.session_state.get("chk_tl", True),
+            key="chk_tl",
             help="상단 저항 추세선 및 하단 지지 추세선을 자동 계산하여 표시합니다.",
         )
         show_pattern_lines = st.checkbox(
             "고전 패턴 넥라인 [B]",
-            value=True,
+            value=st.session_state.get("chk_pat", True),
+            key="chk_pat",
             help="쌍바닥, 삼각수렴 등 감지된 패턴의 넥라인 및 목표/손절가를 차트에 표시합니다.",
         )
 

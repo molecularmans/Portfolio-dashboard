@@ -289,7 +289,20 @@ def main():
         tab_chart_smart, tab_chart_tv = st.tabs(["📊 스마트 분석 차트 (자동 작도)", "📈 TradingView 프로 (수동 작도)"])
 
         with tab_chart_smart:
-            st.caption("알고리즘이 계산한 주요 지지·저항선, 대각 추세선 및 차트 패턴 넥라인이 자동으로 작도된 인터랙티브 차트입니다. (마우스 휠 줌/드래그 이동 지원)")
+            tcol_txt, tcol_sr, tcol_tl, tcol_pat = st.columns([3.8, 2.2, 2.0, 2.2])
+            with tcol_txt:
+                st.caption("알고리즘이 계산한 지지·저항, 추세선, 패턴 넥라인 인터랙티브 차트 (마우스 휠 줌/드래그 지원)")
+            with tcol_sr:
+                layer_sr = st.checkbox("🛡️ 지지·저항선 [A]", value=detail_settings.get("show_support_resistance", True), key="inline_layer_sr")
+            with tcol_tl:
+                layer_tl = st.checkbox("📐 자동 추세선 [A]", value=detail_settings.get("show_trendlines", True), key="inline_layer_tl")
+            with tcol_pat:
+                layer_pat = st.checkbox("💎 패턴 넥라인 [B]", value=detail_settings.get("show_pattern_lines", True), key="inline_layer_pat")
+
+            detail_settings["show_support_resistance"] = layer_sr
+            detail_settings["show_trendlines"] = layer_tl
+            detail_settings["show_pattern_lines"] = layer_pat
+
             if not df_stock.empty:
                 fig = create_detail_chart(df_stock, sel_ticker, settings=detail_settings)
                 st.plotly_chart(fig, use_container_width=True, config=CHART_CONFIG)
