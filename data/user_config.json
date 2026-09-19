@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-09-19 06:26:20",
+  "updated_at": "2026-09-19 06:31:04",
   "groups": [
     {
       "group_name": "지수",
@@ -382,11 +382,6 @@
     },
     {
       "ticker": "CAKE",
-      "name": "",
-      "group_name": "주도주후보"
-    },
-    {
-      "ticker": "DE",
       "name": "",
       "group_name": "주도주후보"
     },
