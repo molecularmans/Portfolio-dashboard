@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-09-19 06:25:48",
+  "updated_at": "2026-09-19 06:26:20",
   "groups": [
     {
       "group_name": "지수",
@@ -372,11 +372,6 @@
     },
     {
       "ticker": "ANET",
-      "name": "",
-      "group_name": "주도주후보"
-    },
-    {
-      "ticker": "DDOG",
       "name": "",
       "group_name": "주도주후보"
     },
