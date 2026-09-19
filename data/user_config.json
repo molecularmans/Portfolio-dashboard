@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-09-19 06:31:29",
+  "updated_at": "2026-09-19 06:31:37",
   "groups": [
     {
       "group_name": "지수",
@@ -344,11 +344,6 @@
       "ticker": "FIX",
       "name": "",
       "group_name": "전력"
-    },
-    {
-      "ticker": "GKOS",
-      "name": "",
-      "group_name": "주도주후보"
     },
     {
       "ticker": "NTAP",
