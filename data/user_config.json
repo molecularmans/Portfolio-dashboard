@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-09-19 06:24:23",
+  "updated_at": "2026-09-19 06:25:48",
   "groups": [
     {
       "group_name": "지수",
@@ -377,11 +377,6 @@
     },
     {
       "ticker": "DDOG",
-      "name": "",
-      "group_name": "주도주후보"
-    },
-    {
-      "ticker": "TTAN",
       "name": "",
       "group_name": "주도주후보"
     },
