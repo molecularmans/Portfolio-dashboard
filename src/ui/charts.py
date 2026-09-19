@@ -2,6 +2,9 @@ import plotly.graph_objects as go
 from plotly.subplots import make_subplots
 import pandas as pd
 
+from src.indicators.trendline_analyzer import analyze_support_resistance_and_trendlines
+from src.indicators.pattern_detector import detect_all_chart_patterns
+
 
 # Plotly 모드바 설정
 CHART_CONFIG = {
@@ -61,6 +64,138 @@ def add_moving_averages_to_fig(fig, df: pd.DataFrame, settings: dict, x_col: str
                 row=row,
                 col=col,
             )
+
+
+def add_analysis_overlays_to_fig(fig, plot_df: pd.DataFrame, settings: dict, row: int = 1, col: int = 1):
+    """설정에 따라 자동 지지/저항선, 추세선 및 감지된 패턴 넥라인을 차트에 오버레이"""
+    if plot_df.empty or len(plot_df) < 20:
+        return
+
+    show_sr = settings.get("show_support_resistance", True)
+    show_tl = settings.get("show_trendlines", True)
+    show_pat = settings.get("show_pattern_lines", True)
+
+    if not (show_sr or show_tl or show_pat):
+        return
+
+    # 1. 지지/저항선 및 추세선 분석
+    sr_data = analyze_support_resistance_and_trendlines(plot_df)
+
+    if sr_data.get("is_valid", False):
+        # (1) 수평 지지선 & 저항선
+        if show_sr:
+            if sr_data.get("nearest_support"):
+                sup_p = sr_data["nearest_support"]["price"]
+                fig.add_trace(
+                    go.Scatter(
+                        x=[plot_df["date_str"].iloc[0], plot_df["date_str"].iloc[-1]],
+                        y=[sup_p, sup_p],
+                        mode="lines",
+                        name=f"지지선 (${sup_p:,.2f})",
+                        line=dict(color="#26a69a", width=1.4, dash="dash"),
+                        hoverinfo="name+y",
+                    ),
+                    row=row,
+                    col=col,
+                )
+
+            if sr_data.get("nearest_resistance"):
+                res_p = sr_data["nearest_resistance"]["price"]
+                fig.add_trace(
+                    go.Scatter(
+                        x=[plot_df["date_str"].iloc[0], plot_df["date_str"].iloc[-1]],
+                        y=[res_p, res_p],
+                        mode="lines",
+                        name=f"저항선 (${res_p:,.2f})",
+                        line=dict(color="#ef5350", width=1.4, dash="dash"),
+                        hoverinfo="name+y",
+                    ),
+                    row=row,
+                    col=col,
+                )
+
+        # (2) 대각 추세선
+        if show_tl:
+            utl = sr_data.get("upper_trendline")
+            if utl and 0 <= utl["start_idx"] < len(plot_df):
+                fig.add_trace(
+                    go.Scatter(
+                        x=[plot_df["date_str"].iloc[utl["start_idx"]], plot_df["date_str"].iloc[-1]],
+                        y=[utl["start_price"], utl["current_price"]],
+                        mode="lines",
+                        name=f"저항 추세선 (${utl['current_price']:,.2f})",
+                        line=dict(color="#FF7043", width=2, dash="dashdot"),
+                        hoverinfo="name+y",
+                    ),
+                    row=row,
+                    col=col,
+                )
+
+            ltl = sr_data.get("lower_trendline")
+            if ltl and 0 <= ltl["start_idx"] < len(plot_df):
+                fig.add_trace(
+                    go.Scatter(
+                        x=[plot_df["date_str"].iloc[ltl["start_idx"]], plot_df["date_str"].iloc[-1]],
+                        y=[ltl["start_price"], ltl["current_price"]],
+                        mode="lines",
+                        name=f"지지 추세선 (${ltl['current_price']:,.2f})",
+                        line=dict(color="#42A5F5", width=2, dash="dashdot"),
+                        hoverinfo="name+y",
+                    ),
+                    row=row,
+                    col=col,
+                )
+
+    # 2. 감지된 차트 패턴 오버레이 (넥라인, 목표가, 손절선)
+    if show_pat:
+        pat_res = detect_all_chart_patterns(plot_df)
+        if pat_res.get("has_pattern", False):
+            pri = pat_res["primary_pattern"]
+            neckline = pri["neckline"]
+            target = pri["target_price"]
+            stop = pri["stop_loss"]
+            span_start = max(0, len(plot_df) - 40)
+
+            fig.add_trace(
+                go.Scatter(
+                    x=[plot_df["date_str"].iloc[span_start], plot_df["date_str"].iloc[-1]],
+                    y=[neckline, neckline],
+                    mode="lines",
+                    name=f"넥라인 (${neckline:,.2f})",
+                    line=dict(color="#FFD54F", width=1.6, dash="dot"),
+                    hoverinfo="name+y",
+                ),
+                row=row,
+                col=col,
+            )
+
+            if target > 0:
+                fig.add_trace(
+                    go.Scatter(
+                        x=[plot_df["date_str"].iloc[span_start], plot_df["date_str"].iloc[-1]],
+                        y=[target, target],
+                        mode="lines",
+                        name=f"목표가 (${target:,.2f})",
+                        line=dict(color="#00E676", width=1.5, dash="dot"),
+                        hoverinfo="name+y",
+                    ),
+                    row=row,
+                    col=col,
+                )
+
+            if stop > 0:
+                fig.add_trace(
+                    go.Scatter(
+                        x=[plot_df["date_str"].iloc[span_start], plot_df["date_str"].iloc[-1]],
+                        y=[stop, stop],
+                        mode="lines",
+                        name=f"손절선 (${stop:,.2f})",
+                        line=dict(color="#FF5252", width=1.5, dash="dot"),
+                        hoverinfo="name+y",
+                    ),
+                    row=row,
+                    col=col,
+                )
 
 
 def create_mini_chart(df: pd.DataFrame, ticker: str, settings: dict = None) -> go.Figure:
@@ -219,6 +354,9 @@ def create_detail_chart(df: pd.DataFrame, ticker: str, settings: dict = None) ->
 
     # 이동평균선 추가 (Row 1)
     add_moving_averages_to_fig(fig, plot_df, settings, x_col="date_str", row=1, col=1, show_legend=True)
+
+    # 자동 지지/저항선, 추세선 및 패턴 오버레이 추가 (Row 1)
+    add_analysis_overlays_to_fig(fig, plot_df, settings, row=1, col=1)
 
     # 2. 거래량 (Row 2)
     colors = ["#26a69a" if c >= o else "#ef5350" for c, o in zip(plot_df["close"], plot_df["open"])]

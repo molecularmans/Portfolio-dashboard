@@ -8,6 +8,7 @@ from src.ui.charts import create_detail_chart, CHART_CONFIG
 from src.ui.tradingview import render_tradingview_chart, render_tradingview_mini_chart
 from src.ui.sidebar import render_sidebar
 from src.ui.vcp_view import render_vcp_analysis_panel
+from src.ui.pattern_view import render_pattern_analysis_dashboard
 
 # 1. Streamlit 페이지 기본 설정
 st.set_page_config(
@@ -221,14 +222,55 @@ def main():
     if st.session_state.selected_ticker:
         sel_ticker = st.session_state.selected_ticker
 
-        col_back, col_title, col_tf = st.columns([1.8, 4, 2.2])
-        if col_back.button("← 전체 멀티차트로 돌아가기", use_container_width=True):
+        col_back, col_title, col_tf, col_nav = st.columns([1.5, 3.2, 1.8, 3.2])
+        if col_back.button("← 전체 멀티차트", use_container_width=True):
             st.session_state.selected_ticker = None
             st.rerun()
 
         col_title.subheader(f"{sel_ticker} 상세 기술적 분석")
-        detail_tf = col_tf.radio("차트 주기", ["일봉", "주봉", "월봉"], index=["일봉", "주봉", "월봉"].index(timeframe), horizontal=True, key="detail_tf_select")
-        
+        detail_tf = col_tf.radio(
+            "차트 주기",
+            ["일봉", "주봉", "월봉"],
+            index=["일봉", "주봉", "월봉"].index(timeframe),
+            horizontal=True,
+            key="detail_tf_select",
+        )
+
+        # 우측: 그룹 내 다른 종목 바로가기 네비게이터
+        if tickers:
+            avail_tickers = tickers if sel_ticker in tickers else [sel_ticker] + [t for t in tickers if t != sel_ticker]
+            cur_idx = avail_tickers.index(sel_ticker) if sel_ticker in avail_tickers else 0
+            
+            with col_nav:
+                st.caption(f"📌 **{view_mode}** 종목 바로가기 ({cur_idx + 1}/{len(avail_tickers)})")
+                c_prev, c_sel, c_next = st.columns([1, 4.2, 1])
+                with c_prev:
+                    if st.button("◀", key="nav_btn_prev", help="이전 종목으로 바로가기", use_container_width=True):
+                        st.session_state.selected_ticker = avail_tickers[(cur_idx - 1) % len(avail_tickers)]
+                        st.rerun()
+                with c_sel:
+                    def _format_ticker(t):
+                        if t in portfolio_map:
+                            pr = portfolio_map[t].get("profit_rate", 0)
+                            sign = "+" if pr >= 0 else ""
+                            return f"{t} ({sign}{pr:.1f}%)"
+                        return t
+
+                    new_sel = st.selectbox(
+                        "종목 빠른 전환",
+                        options=avail_tickers,
+                        index=cur_idx,
+                        format_func=_format_ticker,
+                        label_visibility="collapsed",
+                    )
+                    if new_sel != sel_ticker:
+                        st.session_state.selected_ticker = new_sel
+                        st.rerun()
+                with c_next:
+                    if st.button("▶", key="nav_btn_next", help="다음 종목으로 바로가기", use_container_width=True):
+                        st.session_state.selected_ticker = avail_tickers[(cur_idx + 1) % len(avail_tickers)]
+                        st.rerun()
+
         detail_settings = settings.copy()
         detail_settings["timeframe"] = detail_tf
 
@@ -240,12 +282,27 @@ def main():
             c2.metric("보유 수량", f"{int(it_p['qty'])}주")
             c3.metric("평가 금액", f"${it_p['eval_amount']:,.2f}")
 
-        st.caption("트레이딩뷰 좌측 툴바에서 추세선, 수평선, 피보나치, 채널 등을 마우스로 직접 긋고, 클릭하여 복사/삭제/색상변경을 자유롭게 사용할 수 있습니다. (자동 저장 지원)")
-        render_tradingview_chart(sel_ticker, timeframe=detail_tf, settings=detail_settings, height=750)
+        # 시세 데이터 로드
+        df_stock = load_and_calc_stock_data(sel_ticker, db, client, force_refresh=False, timeframe=detail_tf)
 
-        # 마크 미너비니 VCP 패턴 & 8대 추세 템플릿 자동 진단 엔진
-        df_vcp = load_and_calc_stock_data(sel_ticker, db, client, force_refresh=False, timeframe="일봉")
-        render_vcp_analysis_panel(df_vcp, sel_ticker)
+        # 차트 보기 모드 탭 (스마트 분석 차트 vs 트레이딩뷰 프로 차트)
+        tab_chart_smart, tab_chart_tv = st.tabs(["📊 스마트 분석 차트 (자동 작도)", "📈 TradingView 프로 (수동 작도)"])
+
+        with tab_chart_smart:
+            st.caption("알고리즘이 계산한 주요 지지·저항선, 대각 추세선 및 차트 패턴 넥라인이 자동으로 작도된 인터랙티브 차트입니다. (마우스 휠 줌/드래그 이동 지원)")
+            if not df_stock.empty:
+                fig = create_detail_chart(df_stock, sel_ticker, settings=detail_settings)
+                st.plotly_chart(fig, use_container_width=True, config=CHART_CONFIG)
+            else:
+                st.info(f"📊 {sel_ticker}의 시세 데이터를 불러오는 중입니다...")
+
+        with tab_chart_tv:
+            st.caption("트레이딩뷰 좌측 툴바에서 추세선, 수평선, 피보나치, 채널 등을 마우스로 직접 긋고, 클릭하여 복사/삭제/색상변경을 자유롭게 사용할 수 있습니다.")
+            render_tradingview_chart(sel_ticker, timeframe=detail_tf, settings=detail_settings, height=750)
+
+        # 종합 진단 엔진 ([A] 지지/저항 & 추세선 + [B] 고전 패턴 + [C] 마크 미너비니 VCP)
+        df_daily = df_stock if detail_tf == "일봉" else load_and_calc_stock_data(sel_ticker, db, client, force_refresh=False, timeframe="일봉")
+        render_pattern_analysis_dashboard(df_daily, sel_ticker)
         return
 
     # ==========================================

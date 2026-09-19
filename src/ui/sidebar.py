@@ -164,7 +164,27 @@ def render_sidebar(db: StockDB, client: KISClient) -> dict:
 
         st.divider()
 
-        # 7. 클라우드 영구 저장 (GitHub 동기화)
+        # 7. 스마트 차트 분석 레이어 (A/B 옵션)
+        st.subheader("스마트 차트 분석 레이어")
+        show_support_resistance = st.checkbox(
+            "자동 지지·저항선 [A]",
+            value=True,
+            help="주요 지지선(초록) 및 저항선(빨강)을 차트에 자동 표시합니다.",
+        )
+        show_trendlines = st.checkbox(
+            "자동 추세선 [A]",
+            value=True,
+            help="상단 저항 추세선 및 하단 지지 추세선을 자동 계산하여 표시합니다.",
+        )
+        show_pattern_lines = st.checkbox(
+            "고전 패턴 넥라인 [B]",
+            value=True,
+            help="쌍바닥, 삼각수렴 등 감지된 패턴의 넥라인 및 목표/손절가를 차트에 표시합니다.",
+        )
+
+        st.divider()
+
+        # 8. 클라우드 영구 저장 (GitHub 동기화)
         st.subheader("클라우드 영구 저장")
         if db.github_sync.is_configured:
             st.caption("✅ GitHub 자동 동기화 활성화됨 (슬립 모드 복원 지원)")
@@ -185,7 +205,7 @@ def render_sidebar(db: StockDB, client: KISClient) -> dict:
 
         st.divider()
 
-        # 8. 시세 새로고침
+        # 9. 시세 새로고침
         if st.button("시세 데이터 새로고침", use_container_width=True):
             db.clear_all_prices()
             st.session_state["force_refresh"] = True
@@ -196,6 +216,9 @@ def render_sidebar(db: StockDB, client: KISClient) -> dict:
             "timeframe": timeframe,
             "timeframe_ma": current_tf_ma,
             "selected_sub_indicators": selected_sub_indicators,
+            "show_support_resistance": show_support_resistance,
+            "show_trendlines": show_trendlines,
+            "show_pattern_lines": show_pattern_lines,
         }
 
         return settings
