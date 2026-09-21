@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-09-21 01:55:57",
+  "updated_at": "2026-09-21 01:56:07",
   "groups": [
     {
       "group_name": "지수",
@@ -82,6 +82,11 @@
     },
     {
       "ticker": "PURR",
+      "name": "",
+      "group_name": "금융"
+    },
+    {
+      "ticker": "HYPEUSD",
       "name": "",
       "group_name": "금융"
     },
