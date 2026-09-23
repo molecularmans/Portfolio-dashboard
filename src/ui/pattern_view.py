@@ -230,22 +230,32 @@ def render_pattern_analysis_dashboard(df: pd.DataFrame, ticker: str):
 
         col_sups, col_ress = st.columns(2)
         with col_sups:
-            st.caption("🛡️ 하단 주요 지지 매물대 (터치 횟수 순)")
+            st.caption("🛡️ 주요 지지 구간 (과거 반응 횟수 순)")
             if sr_data["support_levels"]:
                 for s in sr_data["support_levels"]:
-                    zone = f" · 존 ${s['zone_low']:,.2f}~${s['zone_high']:,.2f} · 강도 {s['strength_score']}점" if "zone_low" in s else ""
-                    st.write(f"- **${s['price']:,.2f}** &nbsp; (지지의식 {s['touches']}회{zone})")
+                    zone = (
+                        f" · 가격 구간 ${s['zone_low']:,.2f}~${s['zone_high']:,.2f}"
+                        f" · 강도 {s['strength_score']}점"
+                        if "zone_low" in s
+                        else ""
+                    )
+                    st.write(f"- **${s['price']:,.2f}** · 지지 반응 {s['touches']}회{zone}")
             else:
-                st.write("- 추가 지지 매물대 분석 중")
+                st.write("- 추가 지지 구간을 분석하고 있습니다.")
 
         with col_ress:
-            st.caption("🛑 상단 주요 저항 매물대 (터치 횟수 순)")
+            st.caption("🛑 주요 저항 구간 (과거 반응 횟수 순)")
             if sr_data["resistance_levels"]:
                 for r in sr_data["resistance_levels"]:
-                    zone = f" · 존 ${r['zone_low']:,.2f}~${r['zone_high']:,.2f} · 강도 {r['strength_score']}점" if "zone_low" in r else ""
-                    st.write(f"- **${r['price']:,.2f}** &nbsp; (저항의식 {r['touches']}회{zone})")
+                    zone = (
+                        f" · 가격 구간 ${r['zone_low']:,.2f}~${r['zone_high']:,.2f}"
+                        f" · 강도 {r['strength_score']}점"
+                        if "zone_low" in r
+                        else ""
+                    )
+                    st.write(f"- **${r['price']:,.2f}** · 저항 반응 {r['touches']}회{zone}")
             else:
-                st.write("- 상단 매물 부담 적음 (신고가 랠리 영역)")
+                st.write("- 뚜렷한 상단 저항이 없어 신고가 흐름을 관찰할 구간입니다.")
 
     # -------------------------------------------------------------
     # TAB B: 고전 차트 패턴 (쌍바닥, 삼각수렴 등)
