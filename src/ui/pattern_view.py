@@ -21,6 +21,8 @@ PATTERN_HELP = {
     "target": "패턴의 높이를 돌파 기준 가격에 적용해 계산한 참고 목표입니다. 실제 도달을 보장하지 않습니다.",
     "stop": "패턴 해석이 틀렸다고 판단할 위험 관리 기준입니다. 실제 주문 가격은 투자 성향과 변동성에 맞게 조정해야 합니다.",
     "reward_risk": "현재 종가에서 예상 목표 가격까지의 이익폭을 위험 관리 가격까지의 손실폭으로 나눈 값입니다. 예: 2:1은 예상 이익폭이 손실폭의 2배라는 뜻입니다. 수수료와 실제 체결 가격은 반영하지 않습니다.",
+    "entry_reward_risk": "패턴의 돌파 기준 가격에서 진입했다고 가정한 최초 손익비입니다. 이미 가격이 움직인 뒤에도 처음 계획의 기대수익과 위험을 비교할 수 있습니다.",
+    "setup_strength": "패턴 신뢰도 35%, 지지·저항 품질 20%, 선택 엔진 종합 점수 25%, 돌파 기준 진입 손익비 20%를 합산한 참고 점수입니다. 실제 수익 가능성을 보장하지 않습니다.",
 }
 
 DASHBOARD_HELP = {
@@ -64,19 +66,60 @@ def _friendly_squeeze_text(text: str) -> str:
     return result.replace("스퀴즈", "변동성 압축").replace("모멘텀", "가격 움직임").replace("밴드 폭 백분위", "최근 변동성 위치")
 
 
-def _pattern_reward_risk(pattern: Dict[str, Any], current_price: float) -> float | None:
-    """Return the prospective reward per unit of risk for a valid long or short setup."""
+def _pattern_reward_risk_result(pattern: Dict[str, Any], entry_price: float) -> Dict[str, Any]:
+    """Return reward/risk plus a reader-friendly reason when it is not valid."""
     target = float(pattern["target_price"])
     stop = float(pattern["stop_loss"])
-    if not all(math.isfinite(value) and value > 0 for value in (current_price, target, stop)):
-        return None
+    if not all(math.isfinite(value) and value > 0 for value in (entry_price, target, stop)):
+        return {"ratio": None, "status": "가격 데이터가 충분하지 않음"}
     if pattern.get("type") == "bearish":
-        if not target < current_price < stop:
-            return None
-        return (current_price - target) / (stop - current_price)
-    if not stop < current_price < target:
-        return None
-    return (target - current_price) / (current_price - stop)
+        if target >= stop:
+            return {"ratio": None, "status": "목표·위험 가격 순서 불일치"}
+        if entry_price <= target:
+            return {"ratio": None, "status": "목표 가격 도달 또는 초과"}
+        if entry_price >= stop:
+            return {"ratio": None, "status": "위험 관리 가격 이탈"}
+        return {"ratio": (entry_price - target) / (stop - entry_price), "status": "하락 패턴 진입 가정"}
+    if stop >= target:
+        return {"ratio": None, "status": "목표·위험 가격 순서 불일치"}
+    if entry_price >= target:
+        return {"ratio": None, "status": "목표 가격 도달 또는 초과"}
+    if entry_price <= stop:
+        return {"ratio": None, "status": "위험 관리 가격 이탈"}
+    return {"ratio": (target - entry_price) / (entry_price - stop), "status": "상승 패턴 진입 가정"}
+
+
+def _pattern_reward_risk(pattern: Dict[str, Any], entry_price: float) -> float | None:
+    return _pattern_reward_risk_result(pattern, entry_price)["ratio"]
+
+
+def _entry_setup_strength(
+    pattern: Dict[str, Any],
+    structure_score: float,
+    engine_score: float,
+    entry_reward_risk: float | None,
+) -> Dict[str, Any]:
+    """Summarise chart quality without presenting it as a probability."""
+    pattern_score = float(pattern.get("confidence", 50))
+    ratio_score = 35.0 if entry_reward_risk is None else max(0.0, min(100.0, 25.0 + entry_reward_risk * 25.0))
+    score = round(
+        pattern_score * 0.35
+        + max(0.0, min(100.0, structure_score)) * 0.20
+        + max(0.0, min(100.0, engine_score)) * 0.25
+        + ratio_score * 0.20
+    )
+    label = "매우 강함" if score >= 80 else "강함" if score >= 70 else "보통" if score >= 58 else "약함" if score >= 45 else "주의"
+    if entry_reward_risk is None:
+        interpretation = "진입 가격 조건을 먼저 확인하세요."
+    elif entry_reward_risk < 1.0:
+        interpretation = "예상 이익보다 위험이 커서 진입에 불리합니다."
+    elif score >= 70 and entry_reward_risk >= 2.0:
+        interpretation = "차트 조건과 최초 손익비가 함께 양호합니다."
+    elif score >= 58 and entry_reward_risk >= 1.5:
+        interpretation = "진입 후보로 관찰할 수 있으나 추가 확인이 필요합니다."
+    else:
+        interpretation = "일부 조건이 약해 보수적인 접근이 필요합니다."
+    return {"score": int(score), "label": label, "interpretation": interpretation}
 
 
 def render_pattern_analysis_dashboard(df: pd.DataFrame, ticker: str):
@@ -364,11 +407,43 @@ def render_pattern_analysis_dashboard(df: pd.DataFrame, ticker: str):
                     help=PATTERN_HELP["stop"],
                 )
 
-            reward_risk = _pattern_reward_risk(p, float(df["close"].iloc[-1]))
-            st.metric(
-                label="예상 손익비",
-                value=f"{reward_risk:.2f}:1" if reward_risk is not None else "계산 불가",
+            current_price = float(df["close"].iloc[-1])
+            current_rr = _pattern_reward_risk_result(p, current_price)
+            entry_rr = _pattern_reward_risk_result(p, float(p["neckline"]))
+            engine_score = (
+                float(v4_bundle.get("composite_score", 50))
+                if v4_bundle
+                else float(v3_bundle.get("composite_score", 50))
+                if v3_bundle
+                else float(sr_data.get("quality_score", p.get("confidence", 50)))
+            )
+            setup_strength = _entry_setup_strength(
+                p,
+                float(sr_data.get("quality_score", 50)),
+                engine_score,
+                entry_rr["ratio"],
+            )
+            rr_current_col, rr_entry_col, strength_col = st.columns(3)
+            rr_current_col.metric(
+                label="현재가 기준 손익비",
+                value=f"{current_rr['ratio']:.2f}:1" if current_rr["ratio"] is not None else "산출 제외",
+                delta=current_rr["status"],
+                delta_color="off" if current_rr["ratio"] is None else "normal",
                 help=PATTERN_HELP["reward_risk"],
+            )
+            rr_entry_col.metric(
+                label="돌파 기준 진입 손익비",
+                value=f"{entry_rr['ratio']:.2f}:1" if entry_rr["ratio"] is not None else "산출 제외",
+                delta=f"기준 가격 ${p['neckline']:,.2f} 진입 가정" if entry_rr["ratio"] is not None else entry_rr["status"],
+                delta_color="off" if entry_rr["ratio"] is None else "normal",
+                help=PATTERN_HELP["entry_reward_risk"],
+            )
+            strength_col.metric(
+                label="진입 관점 차트 강도",
+                value=f"{setup_strength['score']}점 · {setup_strength['label']}",
+                delta=setup_strength["interpretation"],
+                delta_color="off",
+                help=PATTERN_HELP["setup_strength"],
             )
 
             pattern_description = _friendly_pattern_text(p["description"])
