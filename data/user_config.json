@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-09-21 01:56:07",
+  "updated_at": "2026-09-23 07:35:51",
   "groups": [
     {
       "group_name": "지수",
@@ -147,6 +147,11 @@
     },
     {
       "ticker": "NVT",
+      "name": "",
+      "group_name": "반도체"
+    },
+    {
+      "ticker": "MRVL",
       "name": "",
       "group_name": "반도체"
     },
