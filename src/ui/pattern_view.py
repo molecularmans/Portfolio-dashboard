@@ -1,5 +1,6 @@
 import streamlit as st
 import pandas as pd
+import math
 from typing import Dict, Any
 
 from src.indicators.trendline_analyzer import analyze_support_resistance_and_trendlines
@@ -19,6 +20,7 @@ PATTERN_HELP = {
     "breakout": "패턴이 완성됐다고 판단하는 기준 가격입니다. 종가가 이 가격을 넘고 거래량까지 늘어나는지 함께 확인합니다.",
     "target": "패턴의 높이를 돌파 기준 가격에 적용해 계산한 참고 목표입니다. 실제 도달을 보장하지 않습니다.",
     "stop": "패턴 해석이 틀렸다고 판단할 위험 관리 기준입니다. 실제 주문 가격은 투자 성향과 변동성에 맞게 조정해야 합니다.",
+    "reward_risk": "현재 종가에서 예상 목표 가격까지의 이익폭을 위험 관리 가격까지의 손실폭으로 나눈 값입니다. 예: 2:1은 예상 이익폭이 손실폭의 2배라는 뜻입니다. 수수료와 실제 체결 가격은 반영하지 않습니다.",
 }
 
 DASHBOARD_HELP = {
@@ -60,6 +62,21 @@ def _friendly_regime_text(text: str) -> str:
 def _friendly_squeeze_text(text: str) -> str:
     result = str(text or "")
     return result.replace("스퀴즈", "변동성 압축").replace("모멘텀", "가격 움직임").replace("밴드 폭 백분위", "최근 변동성 위치")
+
+
+def _pattern_reward_risk(pattern: Dict[str, Any], current_price: float) -> float | None:
+    """Return the prospective reward per unit of risk for a valid long or short setup."""
+    target = float(pattern["target_price"])
+    stop = float(pattern["stop_loss"])
+    if not all(math.isfinite(value) and value > 0 for value in (current_price, target, stop)):
+        return None
+    if pattern.get("type") == "bearish":
+        if not target < current_price < stop:
+            return None
+        return (current_price - target) / (stop - current_price)
+    if not stop < current_price < target:
+        return None
+    return (target - current_price) / (current_price - stop)
 
 
 def render_pattern_analysis_dashboard(df: pd.DataFrame, ticker: str):
@@ -346,6 +363,13 @@ def render_pattern_analysis_dashboard(df: pd.DataFrame, ticker: str):
                     delta_color="inverse",
                     help=PATTERN_HELP["stop"],
                 )
+
+            reward_risk = _pattern_reward_risk(p, float(df["close"].iloc[-1]))
+            st.metric(
+                label="예상 손익비",
+                value=f"{reward_risk:.2f}:1" if reward_risk is not None else "계산 불가",
+                help=PATTERN_HELP["reward_risk"],
+            )
 
             pattern_description = _friendly_pattern_text(p["description"])
             pattern_status = _friendly_pattern_text(p["status_text"])
