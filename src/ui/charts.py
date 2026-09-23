@@ -4,6 +4,9 @@ import pandas as pd
 
 from src.indicators.trendline_analyzer import analyze_support_resistance_and_trendlines
 from src.indicators.pattern_detector import detect_all_chart_patterns
+from src.indicators.smart_analysis_v2 import analyze_chart_patterns_v2, analyze_support_resistance_v2
+from src.indicators.smart_analysis_v3 import analyze_smart_chart_v3
+from src.indicators.smart_analysis_v4 import analyze_smart_chart_v4
 
 
 # Plotly 모드바 설정
@@ -79,7 +82,18 @@ def add_analysis_overlays_to_fig(fig, plot_df: pd.DataFrame, settings: dict, row
         return
 
     # 1. 지지/저항선 및 추세선 분석
-    sr_data = analyze_support_resistance_and_trendlines(plot_df)
+    engine = settings.get("smart_analysis_engine")
+    if engine not in {"v1", "v2", "v3", "v4"}:
+        engine = "v2" if settings.get("smart_analysis_v2", True) else "v1"
+    v4_bundle = analyze_smart_chart_v4(plot_df) if engine == "v4" else None
+    v3_bundle = v4_bundle["v3_baseline"] if v4_bundle else analyze_smart_chart_v3(plot_df) if engine == "v3" else None
+    sr_data = (
+        v3_bundle["support_resistance"]
+        if v3_bundle
+        else analyze_support_resistance_v2(plot_df)
+        if engine == "v2"
+        else analyze_support_resistance_and_trendlines(plot_df)
+    )
 
     if sr_data.get("is_valid", False):
         # (1) 수평 지지선 & 저항선
@@ -146,9 +160,32 @@ def add_analysis_overlays_to_fig(fig, plot_df: pd.DataFrame, settings: dict, row
                     col=col,
                 )
 
+            if v4_bundle:
+                supertrend_stop = v4_bundle["trend_strength"].get("supertrend_stop", 0)
+                if supertrend_stop > 0:
+                    span_start = max(0, len(plot_df) - 60)
+                    fig.add_trace(
+                        go.Scatter(
+                            x=[plot_df["date_str"].iloc[span_start], plot_df["date_str"].iloc[-1]],
+                            y=[supertrend_stop, supertrend_stop],
+                            mode="lines",
+                            name=f"SuperTrend (${supertrend_stop:,.2f})",
+                            line=dict(color="#AB47BC", width=1.5, dash="dot"),
+                            hoverinfo="name+y",
+                        ),
+                        row=row,
+                        col=col,
+                    )
+
     # 2. 감지된 차트 패턴 오버레이 (넥라인, 목표가, 손절선)
     if show_pat:
-        pat_res = detect_all_chart_patterns(plot_df)
+        pat_res = (
+            v3_bundle["patterns"]
+            if v3_bundle
+            else analyze_chart_patterns_v2(plot_df)
+            if engine == "v2"
+            else detect_all_chart_patterns(plot_df)
+        )
         if pat_res.get("has_pattern", False):
             pri = pat_res["primary_pattern"]
             neckline = pri["neckline"]

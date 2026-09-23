@@ -3,7 +3,7 @@ import pandas as pd
 from src.indicators.vcp_analyzer import detect_vcp_pattern, check_trend_template
 
 
-def render_vcp_analysis_panel(df: pd.DataFrame, ticker: str):
+def render_vcp_analysis_panel(df: pd.DataFrame, ticker: str, analysis: dict | None = None):
     """
     마크 미너비니 VCP 패턴 & 8대 추세 템플릿 전용 분석 대시보드 렌더링
     """
@@ -12,7 +12,7 @@ def render_vcp_analysis_panel(df: pd.DataFrame, ticker: str):
         return
 
     # VCP 정밀 알고리즘 분석 실행
-    vcp_data = detect_vcp_pattern(df)
+    vcp_data = analysis if analysis is not None else detect_vcp_pattern(df)
     tt = vcp_data["trend_template"]
     pivot = vcp_data["pivot"]
     vdu = vcp_data["volume_dryup"]
@@ -94,6 +94,17 @@ def render_vcp_analysis_panel(df: pd.DataFrame, ticker: str):
             delta=vdu_delta_str,
             delta_color="normal" if vdu["is_vdu"] else "off",
             help="최근 5일 평균 거래량이 50일 평균 거래량의 몇 % 수준으로 말랐는지를 나타냅니다 (70% 이하 시 VDU 충족).",
+        )
+
+    if "quality_score" in vcp_data:
+        volatility = vcp_data.get("volatility", {})
+        supply = vcp_data.get("supply", {})
+        breakout = vcp_data.get("breakout_confirmation", {})
+        st.caption(
+            f"🧪 **VCP 품질 {vcp_data['quality_score']}점 ({vcp_data.get('quality_grade', 'N/A')}등급)** · "
+            f"ATR 축소비 {volatility.get('atr_ratio_pct', 0):.1f}% · "
+            f"거래량 추세 {supply.get('volume_slope_pct', 0):+.2f}%/봉 · "
+            f"돌파 거래량 {breakout.get('volume_ratio', 0):.2f}×"
         )
 
     st.markdown("<div style='height: 10px;'></div>", unsafe_allow_html=True)

@@ -272,6 +272,11 @@ def main():
                         st.rerun()
 
         detail_settings = settings.copy()
+        detail_settings["smart_analysis_engine"] = st.session_state.get(
+            f"smart_analysis_engine_{sel_ticker}", "v4"
+        )
+        # Keep the old flag for compatibility with any secondary chart paths.
+        detail_settings["smart_analysis_v2"] = detail_settings["smart_analysis_engine"] != "v1"
         detail_settings["timeframe"] = detail_tf
 
         # 상단 핵심 메트릭 (잔고 실시간 데이터 우선 연동)
