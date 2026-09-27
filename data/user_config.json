@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-09-27 10:50:42",
+  "updated_at": "2026-09-27 10:51:39",
   "groups": [
     {
       "group_name": "지수",
@@ -306,6 +306,11 @@
     },
     {
       "ticker": "AMAT",
+      "name": "",
+      "group_name": "장비"
+    },
+    {
+      "ticker": "LRCX",
       "name": "",
       "group_name": "장비"
     },
