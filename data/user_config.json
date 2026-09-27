@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-09-27 10:49:16",
+  "updated_at": "2026-09-27 10:49:20",
   "groups": [
     {
       "group_name": "지수",
@@ -30,11 +30,11 @@
       "sort_order": 6
     },
     {
-      "group_name": "헬스케어,바이오",
+      "group_name": "장비",
       "sort_order": 7
     },
     {
-      "group_name": "장비",
+      "group_name": "헬스케어,바이오",
       "sort_order": 8
     },
     {
