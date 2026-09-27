@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-09-27 10:52:07",
+  "updated_at": "2026-09-27 11:36:29",
   "groups": [
     {
       "group_name": "지수",
@@ -531,6 +531,11 @@
     },
     {
       "ticker": "MRK",
+      "name": "",
+      "group_name": "헬스케어,바이오"
+    },
+    {
+      "ticker": "GH",
       "name": "",
       "group_name": "헬스케어,바이오"
     }
