@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-09-27 10:48:55",
+  "updated_at": "2026-09-27 10:48:58",
   "groups": [
     {
       "group_name": "지수",
@@ -46,11 +46,11 @@
       "sort_order": 10
     },
     {
-      "group_name": "피지컬AI",
+      "group_name": "장비",
       "sort_order": 11
     },
     {
-      "group_name": "장비",
+      "group_name": "피지컬AI",
       "sort_order": 12
     },
     {
