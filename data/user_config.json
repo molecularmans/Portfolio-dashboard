@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-09-30 08:21:44",
+  "updated_at": "2026-10-01 03:44:58",
   "groups": [
     {
       "group_name": "지수",
@@ -546,6 +546,11 @@
     },
     {
       "ticker": "TXG",
+      "name": "",
+      "group_name": "헬스케어,바이오"
+    },
+    {
+      "ticker": "TWST",
       "name": "",
       "group_name": "헬스케어,바이오"
     }
