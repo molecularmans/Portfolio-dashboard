@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-10-01 03:44:58",
+  "updated_at": "2026-10-01 05:50:48",
   "groups": [
     {
       "group_name": "지수",
@@ -321,6 +321,11 @@
     },
     {
       "ticker": "TER",
+      "name": "",
+      "group_name": "장비"
+    },
+    {
+      "ticker": "FORM",
       "name": "",
       "group_name": "장비"
     },
