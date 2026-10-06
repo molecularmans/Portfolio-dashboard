@@ -14,6 +14,7 @@ from src.indicators.smart_analysis_v3 import analyze_smart_chart_v3
 from src.indicators.smart_analysis_v4 import analyze_smart_chart_v4
 from src.indicators.vcp_analyzer import detect_vcp_pattern
 from src.indicators.integrated_assessment import build_integrated_assessment
+from src.indicators.investment_risk_report import build_investment_risk_report
 from src.indicators.relative_performance import calculate_rp_history, current_rp_rating, load_rp_reference
 from src.ui.vcp_view import render_vcp_analysis_panel
 
@@ -67,6 +68,26 @@ def _friendly_regime_text(text: str) -> str:
 def _friendly_squeeze_text(text: str) -> str:
     result = str(text or "")
     return result.replace("스퀴즈", "변동성 압축").replace("모멘텀", "가격 움직임").replace("밴드 폭 백분위", "최근 변동성 위치")
+
+
+def _report_pct(value: float | None, signed: bool = False) -> str:
+    if value is None or not math.isfinite(value):
+        return "자료 부족"
+    return f"{value:+.1f}%" if signed else f"{value:.1f}%"
+
+
+def _report_traded_value(value: float | None, currency: str) -> str:
+    if value is None or not math.isfinite(value):
+        return "자료 부족"
+    if currency == "₩":
+        if value >= 1e8:
+            return f"₩{value / 1e8:,.1f}억"
+        return f"₩{value / 1e4:,.1f}만" if value >= 1e4 else f"₩{value:,.0f}"
+    if value >= 1e9:
+        return f"${value / 1e9:,.1f}B"
+    if value >= 1e6:
+        return f"${value / 1e6:,.1f}M"
+    return f"${value / 1e3:,.1f}K" if value >= 1e3 else f"${value:,.0f}"
 
 
 def _pattern_reward_risk_result(pattern: Dict[str, Any], entry_price: float) -> Dict[str, Any]:
@@ -256,10 +277,14 @@ def render_pattern_analysis_dashboard(df: pd.DataFrame, ticker: str):
     """, unsafe_allow_html=True)
 
     # -------------------------------------------------------------
-    # 탭 구성: [A] 지지/저항 & 추세선 | [B] 차트 포메이션 패턴 | [C] 미너비니 VCP
+    # 탭 구성: 종합판정·위험 점검과 [A]~[D] 세부 근거
     # -------------------------------------------------------------
-    tab_summary, tab_sr, tab_pattern, tab_vcp, tab_validation = st.tabs([
+    summary = build_integrated_assessment(df, sr_data, pattern_data, vcp_data, v3_bundle, v4_bundle)
+    risk_report = build_investment_risk_report(df, summary)
+    currency = "₩" if ticker.isdigit() and len(ticker) == 6 else "$"
+    tab_summary, tab_risk, tab_sr, tab_pattern, tab_vcp, tab_validation = st.tabs([
         "🎯 [A–D] 종합판정·진입/손절 시나리오",
+        "🛡️ 매수 전 위험 점검 리포트",
         "📐 [A] 자동 지지·저항 & 추세선",
         "💎 [B] 가격 패턴 분석 (쌍바닥·삼각수렴)",
         "🧠 [C] 마크 미너비니 VCP 분석",
@@ -267,8 +292,6 @@ def render_pattern_analysis_dashboard(df: pd.DataFrame, ticker: str):
     ])
 
     with tab_summary:
-        summary = build_integrated_assessment(df, sr_data, pattern_data, vcp_data, v3_bundle, v4_bundle)
-        currency = "₩" if ticker.isdigit() and len(ticker) == 6 else "$"
         st.subheader(f"{ticker} 차트 종합판정 · {summary['verdict']}")
         last_date = pd.to_datetime(df["date"].iloc[-1]).strftime("%Y-%m-%d") if "date" in df else "최근 일봉"
         st.caption(f"기준: {last_date} 종가 · 현재가 {currency}{summary['current']:,.2f} · 신규 매수 관점의 기술적 조건")
@@ -315,6 +338,38 @@ def render_pattern_analysis_dashboard(df: pd.DataFrame, ticker: str):
         if not summary["d_available"]:
             st.caption("[D] 판단은 v3/v4 엔진에서 제공됩니다. 현재 엔진에서는 종합판정을 보수적으로 표시합니다.")
         st.caption("차트 기반 참고 판정입니다. 기업 실적·밸류에이션·뉴스·계좌 위험 한도는 반영하지 않습니다. 손절 기준은 주문 체결가를 보장하지 않습니다.")
+
+    with tab_risk:
+        st.subheader(f"{ticker} 매수 전 위험 점검")
+        if not risk_report["is_valid"]:
+            st.warning("최근 종가가 없어 위험 지표를 계산할 수 없습니다.")
+        else:
+            report_date = risk_report["date"].isoformat() if risk_report["date"] else "날짜 정보 없음"
+            age = f" · {risk_report['days_since']}일 경과" if risk_report["days_since"] is not None else ""
+            st.caption(f"마지막 일봉 {report_date}{age} · 최근 가격·거래량 기록으로 계산")
+            r1, r2, r3, r4 = st.columns(4)
+            r1.metric("최근 20일 하루 변동성", _report_pct(risk_report["daily_vol_pct"]), help="최근 20개 일간 수익률의 표준편차입니다. 하루 가격 움직임의 과거 크기를 보여줍니다.")
+            r2.metric("14일 ATR / 현재가", _report_pct(risk_report["atr_pct"]), help="갭을 포함한 최근 14개 일봉의 평균 가격 변동폭을 현재가로 나눈 값입니다.")
+            r3.metric("최근 60일 최대 하락 개장 갭", _report_pct(risk_report["max_down_gap_pct"]), help="전일 종가에서 다음 거래일 시가까지의 하락폭 중 최근 60거래일 최대치입니다.")
+            r4.metric("최근 20일 중앙 거래대금", _report_traded_value(risk_report["median_value_20"], currency), help="일별 종가×거래량의 중앙값입니다. 실제 호가 잔량이나 예상 체결가는 반영하지 않습니다.")
+
+            s1, s2, s3 = st.columns(3)
+            s1.metric("최근 20거래일 변화", _report_pct(risk_report["change_20_pct"], signed=True))
+            s2.metric("최근 60거래일 변화", _report_pct(risk_report["change_60_pct"], signed=True))
+            s3.metric("52주 고점 대비", _report_pct(risk_report["drawdown_52w_pct"], signed=True), help="250개 일봉이 있을 때만 계산합니다.")
+
+            st.markdown("#### 계획 손절폭과 실제 변동 비교")
+            if risk_report["stop_atr_multiple"] is not None:
+                st.write(
+                    f"가정 진입가 대비 손절폭 **{risk_report['stop_risk_pct']:.1f}%**는 "
+                    f"최근 ATR의 **{risk_report['stop_atr_multiple']:.1f}배**입니다. "
+                    "이 비율은 손절선이 평소 변동에 얼마나 가까운지 보는 참고값이며 손실 상한이 아닙니다."
+                )
+            else:
+                st.write("손절선 또는 ATR 자료가 부족해 변동폭과 손절폭을 비교할 수 없습니다.")
+            for warning in risk_report["warnings"]:
+                st.warning(warning)
+            st.caption("과거 변동성·갭·거래대금은 미래 수익이나 체결 품질을 예측하지 않습니다. 실적 발표 일정, 뉴스, 보유 종목과의 중복 위험은 별도 확인이 필요합니다.")
 
     # -------------------------------------------------------------
     # TAB A: 지지 / 저항선 및 추세선 분석
