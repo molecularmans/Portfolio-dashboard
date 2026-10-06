@@ -14,6 +14,7 @@ from src.indicators.smart_analysis_v3 import analyze_smart_chart_v3
 from src.indicators.smart_analysis_v4 import analyze_smart_chart_v4
 from src.indicators.vcp_analyzer import detect_vcp_pattern
 from src.indicators.integrated_assessment import build_integrated_assessment
+from src.indicators.daily_screen import STAGE_LABELS, classify_entry_stage
 from src.indicators.investment_risk_report import build_investment_risk_report
 from src.indicators.relative_performance import calculate_rp_history, current_rp_rating, load_rp_reference
 from src.ui.vcp_view import render_vcp_analysis_panel
@@ -254,6 +255,7 @@ def render_pattern_analysis_dashboard(df: pd.DataFrame, ticker: str):
     # 탭 구성: 종합판정·위험 점검과 [A]~[D] 세부 근거
     # -------------------------------------------------------------
     summary = build_integrated_assessment(df, sr_data, pattern_data, vcp_data, v3_bundle, v4_bundle)
+    stage = classify_entry_stage(summary, vcp_data, v3_bundle, v4_bundle)
     risk_report = build_investment_risk_report(df, summary)
     currency = "₩" if ticker.isdigit() and len(ticker) == 6 else "$"
     tab_summary, tab_risk, tab_sr, tab_pattern, tab_vcp, tab_validation = st.tabs([
@@ -266,9 +268,10 @@ def render_pattern_analysis_dashboard(df: pd.DataFrame, ticker: str):
     ])
 
     with tab_summary:
-        st.subheader(f"{ticker} 차트 종합판정 · {summary['verdict']}")
+        st.subheader(f"{ticker} 차트 판정 · {STAGE_LABELS[stage['stage']]}")
         last_date = pd.to_datetime(df["date"].iloc[-1]).strftime("%Y-%m-%d") if "date" in df else "최근 일봉"
-        st.caption(f"기준: {last_date} 종가 · 현재가 {currency}{summary['current']:,.2f} · 신규 매수 관점의 기술적 조건")
+        st.caption(f"기준: {last_date} 종가 · 현재가 {currency}{summary['current']:,.2f} · 당일 진입 신호: {summary['verdict']}")
+        st.info(stage["reason"])
         st.markdown(f"**현재 차트 형태:** {summary['shape']}")
         for label, detail in summary["evidence"]:
             st.write(f"**{label}** · {detail}")
@@ -296,7 +299,7 @@ def render_pattern_analysis_dashboard(df: pd.DataFrame, ticker: str):
         else:
             st.caption("현재 가격보다 높은 유효 목표/저항이 없어 참고 손익비를 산출하지 않았습니다.")
 
-        st.markdown("#### 차트상 신규 진입 적합도")
+        st.markdown("#### 당일 진입 조건 점검")
         if summary["blockers"]:
             st.warning(" · ".join(summary["blockers"]))
         elif summary["verdict"] == "조건 충족 · 확인 필요":

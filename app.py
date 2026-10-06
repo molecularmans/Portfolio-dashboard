@@ -4,6 +4,7 @@ import pandas as pd
 from src.db.database import StockDB
 from src.api.kis_rest import KISClient, looks_like_mock_ohlcv
 from src.indicators.technicals import calc_indicators
+from src.indicators.daily_screen import STAGE_LABELS, evaluate_daily_ticker, scan_day
 from src.ui.charts import create_detail_chart, CHART_CONFIG
 from src.ui.tradingview import render_tradingview_chart, render_tradingview_mini_chart
 from src.ui.sidebar import render_sidebar
@@ -140,6 +141,67 @@ def load_and_calc_stock_data(ticker: str, db: StockDB, client: KISClient, force_
                 db.save_prices(ticker, tf_code, df)
 
     return calc_indicators(df)
+
+
+@st.fragment(run_every="2s")
+def render_daily_watchlist_screen(db: StockDB, client: KISClient) -> None:
+    """Advance the daily screen one ticker at a time without blocking the chart grid."""
+    st.markdown("##### 📅 관심종목 일봉 판정")
+    st.caption("미국 장 마감 후 오전 9시 30분(한국시간)에 거래일별로 자동 분석합니다. 앱이 잠들어 있으면 다시 열 때 진행됩니다.")
+    if not client.is_configured():
+        st.info("KIS 실전 시세가 연결되면 관심종목 판정을 시작합니다.")
+        return
+
+    watchlist = db.get_watchlist()
+    tickers = sorted(set(watchlist["ticker"].dropna().astype(str).str.strip().str.upper()) - {""}) if not watchlist.empty else []
+    if not tickers:
+        st.info("등록된 관심종목이 없습니다.")
+        return
+
+    scan_key = (scan_day(), tuple(tickers))
+    state = st.session_state.get("daily_watchlist_scan")
+    if not state or state["key"] != scan_key:
+        state = {"key": scan_key, "cursor": 0, "results": {}}
+        st.session_state["daily_watchlist_scan"] = state
+
+    if state["cursor"] < len(tickers):
+        ticker = tickers[state["cursor"]]
+        try:
+            df = load_and_calc_stock_data(ticker, db, client, force_refresh=True, timeframe="일봉")
+            result = evaluate_daily_ticker(df, ticker)
+        except Exception:
+            result = {"stage": "unavailable", "date": None}
+        state["results"][ticker] = result
+        state["cursor"] += 1
+
+    done = state["cursor"]
+    if done < len(tickers):
+        st.progress(done / len(tickers), text=f"자동 판정 진행 중 · {done}/{len(tickers)}종목")
+    else:
+        st.caption(f"{done}종목 판정 완료 · 다음 미국 거래일에 자동 갱신")
+
+    results = state["results"]
+    dates = sorted({item["date"] for item in results.values() if item.get("date") and item["stage"] != "unavailable"})
+    if dates:
+        date_text = dates[-1] if len(dates) == 1 else f"{dates[0]} ~ {dates[-1]}"
+        st.caption(f"판정에 사용한 일봉 종가 기준일: {date_text} · 최근 장 마감 일봉이 없는 종목은 제외")
+
+    buckets = {
+        stage: [ticker for ticker, result in results.items() if result["stage"] == stage]
+        for stage in STAGE_LABELS
+    }
+    cols = st.columns(3)
+    for col, stage in zip(cols, ("ready", "setup", "watch")):
+        with col:
+            st.markdown(f"**{STAGE_LABELS[stage]} ({len(buckets[stage])})**")
+            st.write(" · ".join(buckets[stage]) if buckets[stage] else "없음")
+    with st.expander(f"{STAGE_LABELS['hold']} ({len(buckets['hold'])})", expanded=False):
+        st.write(" · ".join(buckets["hold"]) if buckets["hold"] else "없음")
+    if buckets["unavailable"]:
+        with st.expander(f"{STAGE_LABELS['unavailable']} ({len(buckets['unavailable'])})", expanded=False):
+            st.write(" · ".join(buckets["unavailable"]))
+    st.caption("관심 우선순위와 진입 준비는 매수 신호가 아닙니다. 당일 조건 충족도 최신 가격·거래량과 개인 위험 한도를 확인해야 합니다.")
+    st.divider()
 
 
 def main():
@@ -344,6 +406,9 @@ def main():
     # ==========================================
     # VIEW 모드 2: 멀티 차트 그리드 (트레이딩뷰 실시간 정품 캔들 엔진 탑재)
     # ==========================================
+    if force_refresh:
+        st.session_state.pop("daily_watchlist_scan", None)
+    render_daily_watchlist_screen(db, client)
     st.markdown(f"##### {view_mode} ({len(tickers)} 종목) · {timeframe}")
 
     if not tickers:

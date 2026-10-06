@@ -30,7 +30,11 @@ from src.api.kis_rest import KISClient
 
 class TestChartAnalysis(unittest.TestCase):
     def setUp(self):
-        self.client = KISClient()
+        class DemoAuth:
+            is_configured = False
+            base_url = ""
+
+        self.client = KISClient(auth=DemoAuth())
 
     def test_support_resistance_and_trendlines_with_mock_data(self):
         """실제 모의 시세 데이터(NVDA, TSLA) 기반 지지/저항선 및 추세선 검증"""
