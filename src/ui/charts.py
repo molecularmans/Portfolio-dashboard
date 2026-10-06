@@ -69,7 +69,19 @@ def add_moving_averages_to_fig(fig, df: pd.DataFrame, settings: dict, x_col: str
             )
 
 
-def add_analysis_overlays_to_fig(fig, plot_df: pd.DataFrame, settings: dict, row: int = 1, col: int = 1):
+def _visible_trendline_segment(line: dict, source_len: int, plot_len: int) -> tuple[int, float, float] | None:
+    """Project a full-history trendline onto the visible tail of the chart."""
+    start_idx = int(line.get("start_idx", -1))
+    if not 0 <= start_idx < source_len or plot_len <= 0:
+        return None
+    visible_offset = source_len - plot_len
+    visible_start = max(start_idx, visible_offset)
+    y_start = float(line["slope"]) * visible_start + float(line["intercept"])
+    return visible_start - visible_offset, y_start, float(line["current_price"])
+
+
+def add_analysis_overlays_to_fig(fig, plot_df: pd.DataFrame, settings: dict, row: int = 1, col: int = 1,
+                                 analysis_df: pd.DataFrame | None = None):
     """설정에 따라 자동 지지/저항선, 추세선 및 감지된 패턴 넥라인을 차트에 오버레이"""
     if plot_df.empty or len(plot_df) < 20:
         return
@@ -81,18 +93,22 @@ def add_analysis_overlays_to_fig(fig, plot_df: pd.DataFrame, settings: dict, row
     if not (show_sr or show_tl or show_pat):
         return
 
+    # The visible chart is capped at 200 bars, while the A-D panel uses all
+    # available daily bars. Analyze the same source for matching levels.
+    source_df = analysis_df if analysis_df is not None else plot_df
+
     # 1. 지지/저항선 및 추세선 분석
     engine = settings.get("smart_analysis_engine")
     if engine not in {"v1", "v2", "v3", "v4"}:
         engine = "v2" if settings.get("smart_analysis_v2", True) else "v1"
-    v4_bundle = analyze_smart_chart_v4(plot_df) if engine == "v4" else None
-    v3_bundle = v4_bundle["v3_baseline"] if v4_bundle else analyze_smart_chart_v3(plot_df) if engine == "v3" else None
+    v4_bundle = analyze_smart_chart_v4(source_df) if engine == "v4" else None
+    v3_bundle = v4_bundle["v3_baseline"] if v4_bundle else analyze_smart_chart_v3(source_df) if engine == "v3" else None
     sr_data = (
         v3_bundle["support_resistance"]
         if v3_bundle
-        else analyze_support_resistance_v2(plot_df)
+        else analyze_support_resistance_v2(source_df)
         if engine == "v2"
-        else analyze_support_resistance_and_trendlines(plot_df)
+        else analyze_support_resistance_and_trendlines(source_df)
     )
 
     if sr_data.get("is_valid", False):
@@ -131,11 +147,13 @@ def add_analysis_overlays_to_fig(fig, plot_df: pd.DataFrame, settings: dict, row
         # (2) 대각 추세선
         if show_tl:
             utl = sr_data.get("upper_trendline")
-            if utl and 0 <= utl["start_idx"] < len(plot_df):
+            upper_segment = _visible_trendline_segment(utl, len(source_df), len(plot_df)) if utl else None
+            if upper_segment:
+                start_plot_idx, start_price, end_price = upper_segment
                 fig.add_trace(
                     go.Scatter(
-                        x=[plot_df["date_str"].iloc[utl["start_idx"]], plot_df["date_str"].iloc[-1]],
-                        y=[utl["start_price"], utl["current_price"]],
+                        x=[plot_df["date_str"].iloc[start_plot_idx], plot_df["date_str"].iloc[-1]],
+                        y=[start_price, end_price],
                         mode="lines",
                         name=f"저항 추세선 (${utl['current_price']:,.2f})",
                         line=dict(color="#FF7043", width=2, dash="dashdot"),
@@ -146,11 +164,13 @@ def add_analysis_overlays_to_fig(fig, plot_df: pd.DataFrame, settings: dict, row
                 )
 
             ltl = sr_data.get("lower_trendline")
-            if ltl and 0 <= ltl["start_idx"] < len(plot_df):
+            lower_segment = _visible_trendline_segment(ltl, len(source_df), len(plot_df)) if ltl else None
+            if lower_segment:
+                start_plot_idx, start_price, end_price = lower_segment
                 fig.add_trace(
                     go.Scatter(
-                        x=[plot_df["date_str"].iloc[ltl["start_idx"]], plot_df["date_str"].iloc[-1]],
-                        y=[ltl["start_price"], ltl["current_price"]],
+                        x=[plot_df["date_str"].iloc[start_plot_idx], plot_df["date_str"].iloc[-1]],
+                        y=[start_price, end_price],
                         mode="lines",
                         name=f"지지 추세선 (${ltl['current_price']:,.2f})",
                         line=dict(color="#42A5F5", width=2, dash="dashdot"),
@@ -182,9 +202,9 @@ def add_analysis_overlays_to_fig(fig, plot_df: pd.DataFrame, settings: dict, row
         pat_res = (
             v3_bundle["patterns"]
             if v3_bundle
-            else analyze_chart_patterns_v2(plot_df)
+            else analyze_chart_patterns_v2(source_df)
             if engine == "v2"
-            else detect_all_chart_patterns(plot_df)
+            else detect_all_chart_patterns(source_df)
         )
         if pat_res.get("has_pattern", False):
             pri = pat_res["primary_pattern"]
@@ -393,7 +413,7 @@ def create_detail_chart(df: pd.DataFrame, ticker: str, settings: dict = None) ->
     add_moving_averages_to_fig(fig, plot_df, settings, x_col="date_str", row=1, col=1, show_legend=True)
 
     # 자동 지지/저항선, 추세선 및 패턴 오버레이 추가 (Row 1)
-    add_analysis_overlays_to_fig(fig, plot_df, settings, row=1, col=1)
+    add_analysis_overlays_to_fig(fig, plot_df, settings, row=1, col=1, analysis_df=df)
 
     # 2. 거래량 (Row 2)
     colors = ["#26a69a" if c >= o else "#ef5350" for c, o in zip(plot_df["close"], plot_df["open"])]

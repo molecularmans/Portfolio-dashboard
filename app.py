@@ -2,7 +2,7 @@ import streamlit as st
 import pandas as pd
 
 from src.db.database import StockDB
-from src.api.kis_rest import KISClient
+from src.api.kis_rest import KISClient, looks_like_mock_ohlcv
 from src.indicators.technicals import calc_indicators
 from src.ui.charts import create_detail_chart, CHART_CONFIG
 from src.ui.tradingview import render_tradingview_chart, render_tradingview_mini_chart
@@ -116,9 +116,11 @@ def load_and_calc_stock_data(ticker: str, db: StockDB, client: KISClient, force_
     tf_code = tf_map.get(timeframe, "D")
     count_target = 300 if tf_code == "D" else (200 if tf_code == "W" else 120)
 
-    df = pd.DataFrame()
-    if not force_refresh:
-        df = db.get_prices(ticker, timeframe=tf_code)
+    df = db.get_prices(ticker, timeframe=tf_code)
+    if client.is_configured() and looks_like_mock_ohlcv(df, ticker, tf_code):
+        # Older versions cached synthetic fallback prices after KIS failures.
+        db.delete_prices(ticker, tf_code)
+        df = pd.DataFrame()
 
     need_fetch = df.empty or len(df) < 20 or force_refresh
     if not need_fetch and not df.empty and tf_code == "D":
@@ -128,12 +130,14 @@ def load_and_calc_stock_data(ticker: str, db: StockDB, client: KISClient, force_
 
     if need_fetch:
         if ticker.isdigit() and len(ticker) == 6:
-            df = client.get_kr_ohlcv(ticker, timeframe=tf_code, count=count_target)
+            fetched = client.get_kr_ohlcv(ticker, timeframe=tf_code, count=count_target)
         else:
-            df = client.get_us_ohlcv(ticker, timeframe=tf_code, count=count_target)
+            fetched = client.get_us_ohlcv(ticker, timeframe=tf_code, count=count_target)
 
-        if not df.empty:
-            db.save_prices(ticker, tf_code, df)
+        if not fetched.empty:
+            df = fetched
+            if client.is_configured():
+                db.save_prices(ticker, tf_code, df)
 
     return calc_indicators(df)
 
@@ -278,17 +282,18 @@ def main():
         # Keep the old flag for compatibility with any secondary chart paths.
         detail_settings["smart_analysis_v2"] = detail_settings["smart_analysis_engine"] != "v1"
         detail_settings["timeframe"] = detail_tf
+        currency = "₩" if sel_ticker.isdigit() and len(sel_ticker) == 6 else "$"
 
-        # 상단 핵심 메트릭 (잔고 실시간 데이터 우선 연동)
+        # 계좌 잔고 평가가는 과거 일봉 종가와 시점이 다를 수 있다.
         if sel_ticker in portfolio_map:
             it_p = portfolio_map[sel_ticker]
             c1, c2, c3 = st.columns(3)
-            c1.metric("현재가", f"${it_p['current_price']:,.2f}", f"{it_p['profit_rate']:+.2f}%")
+            c1.metric("잔고 평가 기준가", f"{currency}{it_p['current_price']:,.2f}", f"{it_p['profit_rate']:+.2f}%")
             c2.metric("보유 수량", f"{int(it_p['qty'])}주")
             c3.metric("평가 금액", f"${it_p['eval_amount']:,.2f}")
 
         # 시세 데이터 로드
-        df_stock = load_and_calc_stock_data(sel_ticker, db, client, force_refresh=False, timeframe=detail_tf)
+        df_stock = load_and_calc_stock_data(sel_ticker, db, client, force_refresh=force_refresh, timeframe=detail_tf)
 
         # 차트 보기 모드 탭 (스마트 분석 차트 vs 트레이딩뷰 프로 차트)
         tab_chart_smart, tab_chart_tv = st.tabs(["📊 스마트 분석 차트 (자동 작도)", "📈 TradingView 프로 (수동 작도)"])
@@ -311,15 +316,28 @@ def main():
             if not df_stock.empty:
                 fig = create_detail_chart(df_stock, sel_ticker, settings=detail_settings)
                 st.plotly_chart(fig, use_container_width=True, config=CHART_CONFIG)
+                last_bar = df_stock.iloc[-1]
+                last_bar_date = pd.to_datetime(last_bar["date"]).strftime("%Y-%m-%d")
+                source_label = "KIS" if client.is_configured() else "데모"
+                st.caption(f"자동 차트: {source_label} {detail_tf} · {last_bar_date} 종가 {currency}{last_bar['close']:,.2f}")
             else:
                 st.info(f"📊 {sel_ticker}의 시세 데이터를 불러오는 중입니다...")
 
         with tab_chart_tv:
             st.caption("트레이딩뷰 좌측 툴바에서 추세선, 수평선, 피보나치, 채널 등을 마우스로 직접 긋고, 클릭하여 복사/삭제/색상변경을 자유롭게 사용할 수 있습니다.")
+            st.caption("TradingView는 별도 시세원입니다. 아래 [A–D] 분석은 KIS 일봉 종가를 사용하므로 시점·가격 조정 방식에 따라 표시 가격이 다를 수 있습니다.")
             render_tradingview_chart(sel_ticker, timeframe=detail_tf, settings=detail_settings, height=750)
 
         # 종합 진단 엔진 ([A] 지지/저항 & 추세선 + [B] 고전 패턴 + [C] 마크 미너비니 VCP)
-        df_daily = df_stock if detail_tf == "일봉" else load_and_calc_stock_data(sel_ticker, db, client, force_refresh=False, timeframe="일봉")
+        df_daily = df_stock if detail_tf == "일봉" else load_and_calc_stock_data(sel_ticker, db, client, force_refresh=force_refresh, timeframe="일봉")
+        if detail_tf != "일봉" and not df_daily.empty:
+            st.caption("아래 [A–D] 분석은 선택한 주봉·월봉 차트와 별도로 일봉 데이터로 계산합니다.")
+        if sel_ticker in portfolio_map and not df_daily.empty:
+            quote = float(portfolio_map[sel_ticker]["current_price"])
+            daily_close = float(df_daily["close"].iloc[-1])
+            if daily_close > 0 and abs(quote / daily_close - 1) >= 0.005:
+                bar_date = pd.to_datetime(df_daily["date"].iloc[-1]).strftime("%Y-%m-%d")
+                st.info(f"잔고 평가 현재가 {currency}{quote:,.2f}와 분석 기준 {bar_date} 일봉 종가 {currency}{daily_close:,.2f}는 시점이 다릅니다. [A–D] 분석은 일봉 종가를 사용합니다.")
         render_pattern_analysis_dashboard(df_daily, sel_ticker)
         return
 
@@ -350,7 +368,8 @@ def main():
                         show_delta = it_p["profit_rate"]
                         color_class = "positive-text" if show_delta >= 0 else "negative-text"
                         sign = "+" if show_delta >= 0 else ""
-                        st.markdown(f"**{ticker}** &nbsp; <span class='{color_class}'>${show_price:,.2f} ({sign}{show_delta:.2f}%)</span>", unsafe_allow_html=True)
+                        price_currency = "₩" if ticker.isdigit() and len(ticker) == 6 else "$"
+                        st.markdown(f"**{ticker}** · 잔고 평가가 &nbsp; <span class='{color_class}'>{price_currency}{show_price:,.2f} ({sign}{show_delta:.2f}%)</span>", unsafe_allow_html=True)
                     else:
                         st.markdown(f"**{ticker}**", unsafe_allow_html=True)
 

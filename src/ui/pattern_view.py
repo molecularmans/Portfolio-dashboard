@@ -90,6 +90,20 @@ def _report_traded_value(value: float | None, currency: str) -> str:
     return f"${value / 1e3:,.1f}K" if value >= 1e3 else f"${value:,.0f}"
 
 
+def _stop_scenario_text(summary: Dict[str, Any], currency: str) -> str:
+    """Keep a structural support line readable when no entry price exists."""
+    stop = summary.get("stop")
+    if stop is None:
+        return "현재가 아래의 유효한 구조적 손절 기준을 찾지 못했습니다. 손절 기준이 잡히기 전에는 신규 진입을 보류합니다."
+    prefix = f"**{summary['stop_source']} {currency}{stop:,.2f}**"
+    if summary.get("risk_pct") is None:
+        return prefix + "는 현재 차트의 지지 이탈 관찰선입니다. 진입 기준 가격이 없어 손절 폭은 아직 계산할 수 없습니다."
+    return (
+        prefix + " 아래 일봉 종가 마감 시 진입 가정을 재검토합니다. "
+        f"가정 진입가 대비 손절 폭은 **{summary['risk_pct']:.1f}%**입니다."
+    )
+
+
 def _pattern_reward_risk_result(pattern: Dict[str, Any], entry_price: float) -> Dict[str, Any]:
     """Return reward/risk plus a reader-friendly reason when it is not valid."""
     target = float(pattern["target_price"])
@@ -229,52 +243,12 @@ def render_pattern_analysis_dashboard(df: pd.DataFrame, ticker: str):
         engine_label = "Legacy v1"
     quality_label = f" · A품질 {sr_data.get('quality_score', 0)}점" if use_v2 else ""
 
-    st.markdown(f"""
-    <div style="
-        background: linear-gradient(135deg, rgba(15, 23, 42, 0.95) 0%, rgba(30, 41, 59, 0.85) 100%);
-        border: 1.5px solid rgba(56, 189, 248, 0.35);
-        border-radius: 12px;
-        padding: 16px 20px;
-        margin-top: 15px;
-        margin-bottom: 20px;
-        box-shadow: 0 4px 20px rgba(0,0,0,0.3);
-    ">
-        <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px;">
-            <div>
-                <span style="font-size: 1.15rem; font-weight: 700; color: #f8fafc; margin-right: 10px;">
-                    🎯 {ticker} 차트 종합 진단 엔진 (AI Pattern & Trendline)
-                </span>
-                <span style="font-size: 0.82rem; color: #94a3b8;">
-                    {engine_label}{quality_label} · Support / Resistance · Trendlines · Classic Formations
-                </span>
-            </div>
-            <div style="display: flex; gap: 8px; flex-wrap: wrap;">
-                <div style="
-                    background-color: {sr_color}22;
-                    border: 1px solid {sr_color};
-                    color: {sr_color};
-                    padding: 4px 12px;
-                    border-radius: 16px;
-                    font-size: 0.85rem;
-                    font-weight: 600;
-                ">
-                    {sr_badge}
-                </div>
-                {f'''<div style="
-                    background-color: {primary_pat['badge_color']}22;
-                    border: 1px solid {primary_pat['badge_color']};
-                    color: {primary_pat['badge_color']};
-                    padding: 4px 12px;
-                    border-radius: 16px;
-                    font-size: 0.85rem;
-                    font-weight: 600;
-                ">
-                    {primary_pat['name']}
-                </div>''' if primary_pat else ''}
-            </div>
-        </div>
-    </div>
-    """, unsafe_allow_html=True)
+    with st.container(border=True):
+        st.markdown(f"**🎯 {ticker} 차트 종합 진단 엔진**")
+        st.caption(f"{engine_label}{quality_label} · Support / Resistance · Trendlines · Classic Formations")
+        st.write(sr_badge)
+        if primary_pat:
+            st.write(primary_pat["name"])
 
     # -------------------------------------------------------------
     # 탭 구성: 종합판정·위험 점검과 [A]~[D] 세부 근거
@@ -315,13 +289,7 @@ def render_pattern_analysis_dashboard(df: pd.DataFrame, ticker: str):
             st.write("유효한 돌파 기준 가격을 찾지 못했습니다. 새로운 지지·저항 또는 패턴이 형성될 때까지 진입 판단을 보류합니다.")
 
         st.markdown("#### 손절·무효화 시나리오")
-        if summary["stop"]:
-            st.write(
-                f"**{summary['stop_source']} {currency}{summary['stop']:,.2f}** 아래 일봉 종가 마감 시 "
-                f"진입 가정을 재검토합니다. 가정 진입가 대비 손절 폭은 **{summary['risk_pct']:.1f}%**입니다."
-            )
-        else:
-            st.write("현재가 아래의 유효한 구조적 손절 기준을 찾지 못했습니다. 손절 기준이 잡히기 전에는 신규 진입을 보류합니다.")
+        st.write(_stop_scenario_text(summary, currency))
         if summary["target"]:
             ratio = f" · 참고 손익비 {summary['reward_risk']:.1f}:1" if summary["reward_risk"] is not None else ""
             st.caption(f"{summary['target_source']} {currency}{summary['target']:,.2f}{ratio} · 목표가와 손익비는 실현 수익을 보장하지 않습니다.")

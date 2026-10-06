@@ -11,12 +11,37 @@ from .kis_auth import KISAuth
 US_EXCHANGE_MAP = {
     # NYSE 상장 종목
     "EME": "NYS", "ORCL": "NYS", "RTX": "NYS", "STRL": "NYS", "TSM": "NYS",
-    "PLTR": "NYS", "BABA": "NYS", "NIO": "NYS", "SPOT": "NYS", "UBER": "NYS",
+    "BABA": "NYS", "NIO": "NYS", "SPOT": "NYS", "UBER": "NYS",
     "RBLX": "NYS", "SNOW": "NYS", "NET": "NYS", "DIS": "NYS", "KO": "NYS",
     "PFE": "NYS", "VST": "NYS", "DE": "NYS", "CAT": "NYS", "IBM": "NYS",
     # AMEX 상장 종목
     "SPY": "AMS", "IVV": "AMS", "VOO": "AMS", "DIA": "AMS", "IWM": "AMS",
 }
+
+MOCK_BASE_PRICE_MAP = {
+    "NVDA": 130.0, "AAPL": 225.0, "MSFT": 415.0, "GOOGL": 165.0,
+    "AMZN": 185.0, "TSLA": 210.0, "ORCL": 140.0, "MRVL": 75.0,
+    "BOTZ": 36.0, "MU": 105.0, "HOOD": 22.0, "EME": 380.0, "COHR": 85.0,
+}
+
+
+def looks_like_mock_ohlcv(df: pd.DataFrame, ticker: str, timeframe: str = "D") -> bool:
+    """Detect deterministic demo prices left in older quote caches."""
+    if df.empty or "close" not in df or len(df) < 8:
+        return False
+    values = pd.to_numeric(df["close"], errors="coerce").to_numpy(dtype=float)
+    tf = timeframe.upper()
+    seed = sum(ord(c) for c in ticker.upper().strip()) + (10 if tf == "W" else 20 if tf == "M" else 0)
+    volatility = 0.035 if tf == "W" else 0.05 if tf == "M" else 0.02
+    drift = 0.002 if tf == "W" else 0.008 if tf == "M" else 0.0008
+    returns = np.random.RandomState(seed).normal(drift, volatility, 600)
+    simulated = np.round(MOCK_BASE_PRICE_MAP.get(ticker.upper().strip(), 100.0) * np.cumprod(1 + returns), 2)
+    signatures = {tuple(segment) for segment in np.lib.stride_tricks.sliding_window_view(simulated, 8)}
+    return any(
+        tuple(segment) in signatures
+        for segment in np.lib.stride_tricks.sliding_window_view(values, 8)
+        if np.isfinite(segment).all()
+    )
 
 # KIS 공식 최신 해외주식 주문 TR ID 매핑 (모의투자 VTTT1001U 반영)
 OVERSEAS_ORDER_TR_MAP = {
@@ -54,11 +79,16 @@ class KISClient:
         gubn = gubn_map.get(timeframe.upper(), "0")
 
         endpoint = f"{self.base_url}/uapi/overseas-price/v1/quotations/dailyprice"
-        headers = self.auth.get_common_headers(tr_id="HHDFS76240000", account_idx=1)
+        try:
+            headers = self.auth.get_common_headers(tr_id="HHDFS76240000", account_idx=1)
+        except Exception:
+            return pd.DataFrame()
 
         # 1순위: 매핑된 거래소, 없으면 NAS -> NYS -> AMS 순서로 시도
         preferred_ex = US_EXCHANGE_MAP.get(ticker_clean, "NAS")
         ex_candidates = [preferred_ex] + [e for e in ["NAS", "NYS", "AMS"] if e != preferred_ex]
+        freshest = pd.DataFrame()
+        recent_cutoff = pd.Timestamp.now().normalize() - pd.Timedelta(days=7)
 
         for excd in ex_candidates:
             all_records = []
@@ -115,10 +145,14 @@ class KISClient:
 
             if success and len(all_records) >= 5:
                 df = pd.DataFrame(all_records).drop_duplicates(subset=["date"]).sort_values("date").reset_index(drop=True)
-                return df.tail(count)
+                df = df[(df[["open", "high", "low", "close"]] > 0).all(axis=1)].tail(count).reset_index(drop=True)
+                if len(df) >= 5 and (freshest.empty or df["date"].iloc[-1] > freshest["date"].iloc[-1]):
+                    freshest = df
+                if not df.empty and df["date"].iloc[-1] >= recent_cutoff:
+                    break
 
-        # 모든 거래소 탐색 실패 시에만 fallback
-        return self._generate_mock_ohlcv(ticker_clean, timeframe=timeframe, count=count)
+        # Use the freshest exchange response; never replace API failure with demo data.
+        return freshest
 
     # ==========================================
     # 2. 국내 주식 기간별 시세
@@ -130,7 +164,10 @@ class KISClient:
             return self._generate_mock_ohlcv(ticker_clean, timeframe=timeframe, count=count)
 
         endpoint = f"{self.base_url}/uapi/domestic-stock/v1/quotations/inquire-daily-price"
-        headers = self.auth.get_common_headers(tr_id="FHKST01010400", account_idx=1)
+        try:
+            headers = self.auth.get_common_headers(tr_id="FHKST01010400", account_idx=1)
+        except Exception:
+            return pd.DataFrame()
 
         days_back = count * (1.6 if timeframe == "D" else (7.5 if timeframe == "W" else 31.0))
         end_date = datetime.today().strftime("%Y%m%d")
@@ -150,7 +187,7 @@ class KISClient:
             data = res.json()
 
             if res.status_code != 200 or data.get("rt_cd") != "0":
-                return self._generate_mock_ohlcv(ticker_clean, timeframe=timeframe, count=count)
+                return pd.DataFrame()
 
             records = []
             for row in data.get("output2", []):
@@ -167,13 +204,14 @@ class KISClient:
                 })
 
             if not records:
-                return self._generate_mock_ohlcv(ticker_clean, timeframe=timeframe, count=count)
+                return pd.DataFrame()
 
             df = pd.DataFrame(records).drop_duplicates(subset=["date"]).sort_values("date").reset_index(drop=True)
-            return df.tail(count)
+            df = df[(df[["open", "high", "low", "close"]] > 0).all(axis=1)]
+            return df.tail(count).reset_index(drop=True)
 
         except Exception:
-            return self._generate_mock_ohlcv(ticker_clean, timeframe=timeframe, count=count)
+            return pd.DataFrame()
 
     # ==========================================
     # 3. 해외주식 잔고 조회 (계좌별 독립 토큰/헤더 호출)
@@ -318,7 +356,7 @@ class KISClient:
     # ==========================================
     def _generate_mock_ohlcv(self, ticker: str, timeframe: str = "D", count: int = 250) -> pd.DataFrame:
         seed = sum(ord(c) for c in ticker) + (10 if timeframe == "W" else (20 if timeframe == "M" else 0))
-        np.random.seed(seed)
+        rng = np.random.RandomState(seed)
 
         end_date = datetime.today()
         if timeframe == "M":
@@ -334,24 +372,19 @@ class KISClient:
             volatility = 0.02
             drift = 0.0008
 
-        base_price_map = {
-            "NVDA": 130.0, "AAPL": 225.0, "MSFT": 415.0, "GOOGL": 165.0,
-            "AMZN": 185.0, "TSLA": 210.0, "ORCL": 140.0, "MRVL": 75.0,
-            "BOTZ": 36.0, "MU": 105.0, "HOOD": 22.0, "EME": 380.0, "COHR": 85.0,
-        }
-        start_price = base_price_map.get(ticker.upper(), 100.0)
+        start_price = MOCK_BASE_PRICE_MAP.get(ticker.upper(), 100.0)
 
-        daily_returns = np.random.normal(drift, volatility, count)
+        daily_returns = rng.normal(drift, volatility, count)
         price_series = start_price * np.cumprod(1 + daily_returns)
 
         records = []
         for d, close in zip(dates, price_series):
-            bar_vol = close * np.random.uniform(0.01, volatility * 1.2)
-            open_p = close + np.random.uniform(-bar_vol * 0.5, bar_vol * 0.5)
-            high_p = max(open_p, close) + abs(np.random.uniform(0, bar_vol * 0.7))
-            low_p = min(open_p, close) - abs(np.random.uniform(0, bar_vol * 0.7))
+            bar_vol = close * rng.uniform(0.01, volatility * 1.2)
+            open_p = close + rng.uniform(-bar_vol * 0.5, bar_vol * 0.5)
+            high_p = max(open_p, close) + abs(rng.uniform(0, bar_vol * 0.7))
+            low_p = min(open_p, close) - abs(rng.uniform(0, bar_vol * 0.7))
             vol_mult = 4.0 if timeframe == "W" else (16.0 if timeframe == "M" else 1.0)
-            vol = int(np.random.uniform(1000000, 8000000) * vol_mult)
+            vol = int(rng.uniform(1000000, 8000000) * vol_mult)
 
             records.append({
                 "date": pd.to_datetime(d),

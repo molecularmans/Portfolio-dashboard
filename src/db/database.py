@@ -470,6 +470,9 @@ class StockDB:
 
         with self._get_connection() as con:
             cur = con.cursor()
+            # A fresh historical download may use a different adjustment basis
+            # or replace legacy demo bars. Keep one coherent series per period.
+            cur.execute("DELETE FROM stock_prices WHERE ticker = ? AND timeframe = ?", [ticker, timeframe])
             for _, row in df.iterrows():
                 d_val = row["date"].strftime("%Y-%m-%d %H:%M:%S") if isinstance(row["date"], (pd.Timestamp, datetime)) else str(row["date"])
                 cur.execute("""
@@ -492,6 +495,14 @@ class StockDB:
                     float(row["close"]),
                     float(row["volume"]),
                 ])
+            con.commit()
+
+    def delete_prices(self, ticker: str, timeframe: str):
+        with self._get_connection() as con:
+            con.execute(
+                "DELETE FROM stock_prices WHERE ticker = ? AND timeframe = ?",
+                [ticker.upper().strip(), timeframe.upper().strip()],
+            )
             con.commit()
 
     def clear_all_prices(self):
