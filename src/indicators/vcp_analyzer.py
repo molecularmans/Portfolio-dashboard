@@ -3,134 +3,93 @@ import numpy as np
 from datetime import datetime
 
 
-def check_trend_template(df: pd.DataFrame) -> dict:
+def check_trend_template(df: pd.DataFrame, rp_rating: float | None = None) -> dict:
+    """스크린샷의 일봉 미너비니 추세 템플릿 10개 조건을 평가한다.
+
+    RP는 종목 간 상대 성과 순위이므로 OHLCV만으로 만들지 않는다.
+    값이 없거나 기간 데이터가 부족한 조건은 미확인으로 남긴다.
     """
-    마크 미너비니 8대 추세 템플릿 (Trend Template - Stage 2 상승 국면) 정밀 검증
-    1. 현재 주가 > 150일선 및 200일선
-    2. 150일선 > 200일선
-    3. 200일선이 최소 1개월(20거래일) 이상 우상향
-    4. 50일선 > 150일선 및 200일선
-    5. 현재 주가 > 50일선
-    6. 현재 주가 >= 52주 최저가 대비 +25% 이상
-    7. 현재 주가 >= 52주 최고가 대비 25% 이내 (최고가 근접)
-    8. 상대강도/모멘텀: 최근 3개월/6개월 주가 추세 우상향
-    """
-    if df.empty or len(df) < 50:
-        return {
-            "pass_count": 0,
-            "total_count": 8,
-            "is_stage_2": False,
-            "score_pct": 0.0,
-            "checks": [],
-        }
+    required_columns = {"close", "high", "low"}
+    if df is None or df.empty or not required_columns.issubset(df.columns):
+        prices = pd.DataFrame(columns=["close", "high", "low"])
+    else:
+        prices = df[list(required_columns)].apply(pd.to_numeric, errors="coerce")
+        prices = prices.dropna()
+        prices = prices[(prices > 0).all(axis=1)]
 
-    close = float(df["close"].iloc[-1])
-    
-    # 이동평균선 계산
-    sma_50 = df["close"].rolling(50, min_periods=10).mean()
-    sma_150 = df["close"].rolling(150, min_periods=20).mean()
-    sma_200 = df["close"].rolling(200, min_periods=30).mean()
+    n = len(prices)
+    close = float(prices["close"].iloc[-1]) if n else None
+    sma50 = float(prices["close"].tail(50).mean()) if n >= 50 else None
+    sma150 = float(prices["close"].tail(150).mean()) if n >= 150 else None
+    sma200 = float(prices["close"].tail(200).mean()) if n >= 200 else None
+    sma200_prev30 = float(prices["close"].iloc[-230:-30].mean()) if n >= 230 else None
 
-    cur_sma50 = float(sma_50.iloc[-1])
-    cur_sma150 = float(sma_150.iloc[-1])
-    cur_sma200 = float(sma_200.iloc[-1])
+    # 이 프로젝트의 일봉 기준 52주는 약 250거래일이다.
+    high_52w = float(prices["high"].tail(250).max()) if n >= 250 else None
+    low_52w = float(prices["low"].tail(250).min()) if n >= 250 else None
+    dist_high = (close / high_52w - 1) * 100 if high_52w else None
+    dist_low = (close / low_52w - 1) * 100 if low_52w else None
 
-    # 200일 전 또는 20거래일 전 200일선
-    lookback_20 = min(20, len(sma_200) - 1)
-    sma200_prev20 = float(sma_200.iloc[-1 - lookback_20])
+    try:
+        rp = float(rp_rating) if rp_rating is not None else None
+    except (TypeError, ValueError):
+        rp = None
+    if rp is not None and (not np.isfinite(rp) or not 0 <= rp <= 100):
+        rp = None
 
-    # 52주(약 250거래일) 최고가 / 최저가
-    lookback_52w = min(250, len(df))
-    high_52w = float(df["high"].tail(lookback_52w).max())
-    low_52w = float(df["low"].tail(lookback_52w).min())
+    def price(value):
+        return f"{value:,.2f}" if value is not None else "데이터 부족"
 
-    dist_from_52w_low_pct = ((close - low_52w) / (low_52w + 1e-9)) * 100
-    dist_from_52w_high_pct = ((close - high_52w) / (high_52w + 1e-9)) * 100
+    def add(name, desc, passed, current, required):
+        checks.append({
+            "id": len(checks) + 1,
+            "name": name,
+            "desc": desc,
+            "passed": bool(passed) if passed is not None else None,
+            "current": current,
+            "required": required,
+        })
 
-    # 모멘텀 (최근 60거래일 수익률)
-    lookback_60 = min(60, len(df) - 1)
-    return_60d = ((close - float(df["close"].iloc[-1 - lookback_60])) / (float(df["close"].iloc[-1 - lookback_60]) + 1e-9)) * 100
+    checks = []
+    add("RP > 70", "S&P 500 종목군 대비 1년 가중 수익률 백분위(RP)", rp > 70 if rp is not None else None,
+        f"{rp:.1f}" if rp is not None else "RP 데이터 없음", "> 70")
+    add("주가 > 50일선", "현재 종가가 50일 단순이동평균 위", close > sma50 if sma50 is not None else None,
+        price(close), f"> {price(sma50)}")
+    add("주가 > 150일선", "현재 종가가 150일 단순이동평균 위", close > sma150 if sma150 is not None else None,
+        price(close), f"> {price(sma150)}")
+    add("주가 > 200일선", "현재 종가가 200일 단순이동평균 위", close > sma200 if sma200 is not None else None,
+        price(close), f"> {price(sma200)}")
+    add("50일선 > 150일선", "50일선이 150일선 위", sma50 > sma150 if sma150 is not None else None,
+        price(sma50), f"> {price(sma150)}")
+    add("50일선 > 200일선", "50일선이 200일선 위", sma50 > sma200 if sma200 is not None else None,
+        price(sma50), f"> {price(sma200)}")
+    add("150일선 > 200일선", "150일선이 200일선 위", sma150 > sma200 if sma200 is not None else None,
+        price(sma150), f"> {price(sma200)}")
+    add("52주 저점 대비 +30% 이상", "현재 종가가 52주 저점보다 30% 이상 높음",
+        dist_low >= 30 if dist_low is not None else None,
+        f"{dist_low:+.1f}%" if dist_low is not None else "데이터 부족", "≥ +30.0%")
+    add("52주 고점의 25% 이내", "현재 종가가 52주 고점보다 25% 넘게 낮지 않음",
+        dist_high >= -25 if dist_high is not None else None,
+        f"{dist_high:+.1f}%" if dist_high is not None else "데이터 부족", "≥ -25.0%")
+    add("200일선 상승 중", "현재 200일선이 30거래일 전보다 높음",
+        sma200 > sma200_prev30 if sma200_prev30 is not None else None,
+        price(sma200), f"> 30거래일 전 {price(sma200_prev30)}")
 
-    checks = [
-        {
-            "id": 1,
-            "name": "150일·200일선 위 주가",
-            "desc": "현재 주가가 150일 및 200일 이동평균선 위에 위치",
-            "passed": bool(close > cur_sma150 and close > cur_sma200),
-            "current": f"${close:,.2f}",
-            "required": f"> 150일선(${cur_sma150:,.2f}), 200일선(${cur_sma200:,.2f})",
-        },
-        {
-            "id": 2,
-            "name": "150일선 > 200일선",
-            "desc": "150일 이평선이 200일 이평선 위에 위치 (중장기 정배열)",
-            "passed": bool(cur_sma150 > cur_sma200),
-            "current": f"150일선 ${cur_sma150:,.2f}",
-            "required": f"> 200일선 ${cur_sma200:,.2f}",
-        },
-        {
-            "id": 3,
-            "name": "200일선 1개월 우상향",
-            "desc": "200일 이평선이 최소 1개월(20거래일) 이상 상승 추세",
-            "passed": bool(cur_sma200 >= sma200_prev20),
-            "current": f"현재 ${cur_sma200:,.2f}",
-            "required": f"≥ 20일전 ${sma200_prev20:,.2f}",
-        },
-        {
-            "id": 4,
-            "name": "50일선 정배열",
-            "desc": "50일 이평선이 150일선과 200일선 위에 위치",
-            "passed": bool(cur_sma50 > cur_sma150 and cur_sma50 > cur_sma200),
-            "current": f"50일선 ${cur_sma50:,.2f}",
-            "required": f"> 150일선 & 200일선",
-        },
-        {
-            "id": 5,
-            "name": "50일선 위 주가",
-            "desc": "현재 주가가 50일 이평선 위에 위치 (단기 모멘텀 지지)",
-            "passed": bool(close > cur_sma50),
-            "current": f"${close:,.2f}",
-            "required": f"> 50일선 ${cur_sma50:,.2f}",
-        },
-        {
-            "id": 6,
-            "name": "52주 최저가 대비 +25%↑",
-            "desc": "현재 주가가 52주 최저가 대비 최소 25% 이상 상승",
-            "passed": bool(dist_from_52w_low_pct >= 25.0),
-            "current": f"+{dist_from_52w_low_pct:.1f}%",
-            "required": "≥ +25.0%",
-        },
-        {
-            "id": 7,
-            "name": "52주 최고가 근접 (25% 이내)",
-            "desc": "현재 주가가 52주 신고가 대비 25% 이내 근접 (이상적 10~15%)",
-            "passed": bool(dist_from_52w_high_pct >= -25.0),
-            "current": f"{dist_from_52w_high_pct:.1f}%",
-            "required": "≥ -25.0%",
-        },
-        {
-            "id": 8,
-            "name": "중기 모멘텀 상승세",
-            "desc": "최근 3개월(60일) 주가 모멘텀 우상향 양호",
-            "passed": bool(return_60d >= 0),
-            "current": f"{return_60d:+.1f}%",
-            "required": "≥ 0.0%",
-        },
-    ]
-
-    pass_count = sum(1 for c in checks if c["passed"])
-    is_stage_2 = pass_count >= 6
-
+    pass_count = sum(c["passed"] is True for c in checks)
+    evaluated_count = sum(c["passed"] is not None for c in checks)
     return {
         "pass_count": pass_count,
         "total_count": len(checks),
-        "is_stage_2": is_stage_2,
-        "score_pct": (pass_count / len(checks)) * 100.0,
+        "evaluated_count": evaluated_count,
+        "template_complete": evaluated_count == len(checks),
+        "is_stage_2": pass_count >= 8 and evaluated_count >= 9,
+        "score_pct": pass_count / len(checks) * 100.0,
         "checks": checks,
+        "rp_rating": rp,
         "high_52w": high_52w,
         "low_52w": low_52w,
-        "dist_from_52w_high_pct": dist_from_52w_high_pct,
-        "dist_from_52w_low_pct": dist_from_52w_low_pct,
+        "dist_from_52w_high_pct": dist_high,
+        "dist_from_52w_low_pct": dist_low,
     }
 
 
@@ -230,7 +189,7 @@ def extract_vcp_contractions(df: pd.DataFrame, min_reversal_pct: float = 2.5) ->
     return contractions
 
 
-def detect_vcp_pattern(df: pd.DataFrame, base_window: int = 90) -> dict:
+def detect_vcp_pattern(df: pd.DataFrame, base_window: int = 90, rp_rating: float | None = None) -> dict:
     """
     마크 미너비니 VCP (Volatility Contraction Pattern, 변동성 축소 패턴) 정밀 감지
     """
@@ -245,7 +204,7 @@ def detect_vcp_pattern(df: pd.DataFrame, base_window: int = 90) -> dict:
             "volume_dryup": {"is_vdu": False, "ratio": 1.0, "avg_50": 0, "recent_avg": 0},
             "pivot": {"price": 0.0, "stop_loss": 0.0, "risk_pct": 0.0, "dist_pct": 0.0},
             "summary_text": "분석에 필요한 캔들 데이터가 충분하지 않습니다.",
-            "trend_template": {"pass_count": 0, "total_count": 8, "is_stage_2": False, "checks": []},
+            "trend_template": check_trend_template(df, rp_rating=rp_rating),
         }
 
     # 최근 base_window 봉 추출 (기본 90거래일 베이스)
@@ -301,7 +260,7 @@ def detect_vcp_pattern(df: pd.DataFrame, base_window: int = 90) -> dict:
     dist_to_pivot_pct = round(((cur_close - pivot_price) / pivot_price) * 100.0, 1)
 
     # 5. 종합 판정
-    tt = check_trend_template(df)
+    tt = check_trend_template(df, rp_rating=rp_rating)
     stage_count = len(contractions)
     last_depth = abs(last_c["depth_pct"])
 
@@ -368,10 +327,12 @@ def generate_vcp_summary(vcp_status: str, stage_count: int, contractions: list, 
     lines = []
 
     # 1. 추세 템플릿 평가
+    pending = tt["total_count"] - tt.get("evaluated_count", tt["total_count"])
+    pending_text = f" · {pending}개 미확인" if pending else ""
     if tt["is_stage_2"]:
-        lines.append(f"• **추세 국면**: 8대 추세 템플릿 중 **{tt['pass_count']}/8개**를 충족하여 완벽한 **Stage 2(기관 주도 상승 국면)**에 안착해 있습니다.")
+        lines.append(f"• **추세 국면**: 미너비니 추세 템플릿(D) **{tt['pass_count']}/{tt['total_count']}개 충족{pending_text}**. 가격 추세는 Stage 2 기준을 충족합니다.")
     else:
-        lines.append(f"• **추세 국면**: 8대 추세 템플릿 중 **{tt['pass_count']}/8개** 충족에 그쳐, 아직 장기 정배열 및 모멘텀 조건이 일부 미달된 상태입니다.")
+        lines.append(f"• **추세 국면**: 미너비니 추세 템플릿(D) **{tt['pass_count']}/{tt['total_count']}개 충족{pending_text}**. 추세 조건을 추가로 확인해야 합니다.")
 
     # 2. VCP 수축 파동 분석
     depth_str_list = [f"{c['stage']}({c['depth_pct']}%)" for c in contractions]

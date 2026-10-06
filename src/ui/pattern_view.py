@@ -12,6 +12,7 @@ from src.indicators.smart_analysis_v2 import (
 )
 from src.indicators.smart_analysis_v3 import analyze_smart_chart_v3
 from src.indicators.smart_analysis_v4 import analyze_smart_chart_v4
+from src.indicators.relative_performance import calculate_rp_history, current_rp_rating, load_rp_reference
 from src.ui.vcp_view import render_vcp_analysis_panel
 
 
@@ -159,22 +160,28 @@ def render_pattern_analysis_dashboard(df: pd.DataFrame, ticker: str):
     v3_bundle = None
     v4_bundle = None
 
+    # TrendSpider 화면의 RP(yearly, SPX500)에 대응하는 자체 산출 점수.
+    # 국내 6자리 종목코드는 미국 S&P 500과 비교하지 않는다.
+    rp_reference = load_rp_reference() if not (ticker.isdigit() and len(ticker) == 6) else None
+    rp_history = calculate_rp_history(df, rp_reference)
+    rp_rating = current_rp_rating(df, rp_history)
+
     # 1. 알고리즘 분석 실행 — 테스트 단계에서는 기존 엔진과 즉시 A/B 비교 가능
     if engine == "v4":
-        v4_bundle = analyze_smart_chart_v4(df)
+        v4_bundle = analyze_smart_chart_v4(df, rp_rating=rp_rating)
         v3_bundle = v4_bundle["v3_baseline"]
         sr_data = v4_bundle["support_resistance"]
         pattern_data = v4_bundle["patterns"]
         vcp_data = v4_bundle["vcp"]
     elif engine == "v3":
-        v3_bundle = analyze_smart_chart_v3(df)
+        v3_bundle = analyze_smart_chart_v3(df, rp_rating=rp_rating)
         sr_data = v3_bundle["support_resistance"]
         pattern_data = v3_bundle["patterns"]
         vcp_data = v3_bundle["vcp"]
     elif engine == "v2":
         sr_data = analyze_support_resistance_v2(df)
         pattern_data = analyze_chart_patterns_v2(df)
-        vcp_data = analyze_vcp_v2(df)
+        vcp_data = analyze_vcp_v2(df, rp_rating=rp_rating)
     else:
         sr_data = analyze_support_resistance_and_trendlines(df)
         pattern_data = detect_all_chart_patterns(df)
@@ -499,7 +506,7 @@ def render_pattern_analysis_dashboard(df: pd.DataFrame, ticker: str):
     # TAB C: 마크 미너비니 VCP 분석
     # -------------------------------------------------------------
     with tab_vcp:
-        render_vcp_analysis_panel(df, ticker, analysis=vcp_data)
+        render_vcp_analysis_panel(df, ticker, analysis=vcp_data, rp_rating=rp_rating, rp_history=rp_history)
         if v4_bundle:
             flow = v4_bundle["volume_flow"]
             st.caption(f"💧 v4 수급 확인: {flow.get('summary', '분석 중')}")

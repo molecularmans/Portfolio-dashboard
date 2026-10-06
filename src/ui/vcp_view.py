@@ -1,18 +1,21 @@
 import streamlit as st
 import pandas as pd
+import plotly.graph_objects as go
 from src.indicators.vcp_analyzer import detect_vcp_pattern, check_trend_template
+from src.indicators.relative_performance import load_rp_reference
 
 
-def render_vcp_analysis_panel(df: pd.DataFrame, ticker: str, analysis: dict | None = None):
+def render_vcp_analysis_panel(df: pd.DataFrame, ticker: str, analysis: dict | None = None,
+                              rp_rating: float | None = None, rp_history: pd.DataFrame | None = None):
     """
-    마크 미너비니 VCP 패턴 & 8대 추세 템플릿 전용 분석 대시보드 렌더링
+    마크 미너비니 VCP 패턴 및 일봉 추세 템플릿 분석 대시보드 렌더링
     """
     if df.empty or len(df) < 30:
         st.info(f"📊 {ticker}의 VCP 정밀 분석을 위한 충분한 과거 데이터가 부족합니다.")
         return
 
     # VCP 정밀 알고리즘 분석 실행
-    vcp_data = analysis if analysis is not None else detect_vcp_pattern(df)
+    vcp_data = analysis if analysis is not None else detect_vcp_pattern(df, rp_rating=rp_rating)
     tt = vcp_data["trend_template"]
     pivot = vcp_data["pivot"]
     vdu = vcp_data["volume_dryup"]
@@ -112,7 +115,7 @@ def render_vcp_analysis_panel(df: pd.DataFrame, ticker: str, analysis: dict | No
     # 3개 상세 분석 탭
     tab_waves, tab_trend, tab_report = st.tabs([
         "🌊 변동성 수축 파동 (Contractions)",
-        "📋 8대 추세 템플릿 (Trend Template)",
+        "📋 미너비니 추세 템플릿 (D·10개 조건)",
         "💡 미너비니 종합 리포트 & 실전 전략"
     ])
 
@@ -154,13 +157,13 @@ def render_vcp_analysis_panel(df: pd.DataFrame, ticker: str, analysis: dict | No
         else:
             st.caption("최근 90일 구간 내 감지된 수축 파동이 없습니다.")
 
-    # 탭 2: 8대 추세 템플릿 검증표
+    # 탭 2: 스크린샷의 10개 조건별 추세 템플릿 검증표
     with tab_trend:
-        st.markdown(f"##### 📋 마크 미너비니 8대 추세 템플릿 검증 (통과: {tt['pass_count']} / {tt['total_count']})")
+        st.markdown(f"##### 📋 Minervini Trend Template (D) — {tt['pass_count']}/{tt['total_count']}")
         
         table_rows = []
         for chk in tt["checks"]:
-            mark = "✅ 통과" if chk["passed"] else "❌ 미달"
+            mark = "➖ 확인 불가" if chk["passed"] is None else "✅ 통과" if chk["passed"] else "❌ 미달"
             table_rows.append({
                 "검증 항목": chk["name"],
                 "설명": chk["desc"],
@@ -172,10 +175,57 @@ def render_vcp_analysis_panel(df: pd.DataFrame, ticker: str, analysis: dict | No
         df_table = pd.DataFrame(table_rows)
         st.dataframe(df_table, use_container_width=True, hide_index=True)
 
-        if tt["is_stage_2"]:
-            st.success(f"🎉 **Stage 2(강력한 상승 국면) 충족**: {tt['pass_count']}/{tt['total_count']}개 항목을 통과하여 VCP 패턴이 유효하게 작동할 수 있는 최적의 추세 환경입니다.")
+        st.markdown("**현재 값 (Current Values)**")
+        rp_col, high_col, low_col = st.columns(3)
+        rp = tt.get("rp_rating")
+        dist_high = tt.get("dist_from_52w_high_pct")
+        dist_low = tt.get("dist_from_52w_low_pct")
+        rp_col.metric("RP", f"{rp:.1f}" if rp is not None else "확인 불가")
+        high_col.metric("주가 vs 52주 고점", f"{dist_high:+.1f}%" if dist_high is not None else "데이터 부족")
+        low_col.metric("주가 vs 52주 저점", f"{dist_low:+.1f}%" if dist_low is not None else "데이터 부족")
+
+        st.markdown("**RP 상대강도 추이 · S&P 500 종목군 대비**")
+        if rp_history is not None and not rp_history.empty:
+            points = rp_history.tail(60)
+            fig = go.Figure()
+            fig.add_trace(go.Scatter(
+                x=points["date"], y=points["rp"], mode="lines+markers",
+                name="RP", line=dict(color="#38bdf8", width=3),
+                marker=dict(size=4), hovertemplate="%{x|%Y-%m-%d}<br>RP %{y:.1f}<extra></extra>",
+            ))
+            fig.add_hline(y=70, line_dash="dash", line_color="#f59e0b",
+                          annotation_text="템플릿 기준 70", annotation_position="top left")
+            fig.update_layout(
+                height=290, margin=dict(l=10, r=10, t=15, b=10),
+                template="plotly_dark", paper_bgcolor="rgba(0,0,0,0)", plot_bgcolor="rgba(0,0,0,0)",
+                yaxis=dict(title="RP 점수", range=[0, 100]),
+                xaxis=dict(title=None), showlegend=False,
+            )
+            st.plotly_chart(fig, use_container_width=True)
+            latest_rp_date = points["date"].iloc[-1].strftime("%Y-%m-%d")
+            reference = load_rp_reference() or {}
+            st.caption(
+                f"자체 산출 RP · 최근 기준일 {latest_rp_date} · 비교 종목 {int(points['peer_count'].iloc[-1])}개 · "
+                "3/6/9/12개월 수익률 40/20/20/20 가중(63/126/189/252거래일 근사). "
+                f"기준 자료 업데이트: {reference.get('as_of', '확인 불가')}. TrendSpider 점수와 다를 수 있습니다."
+            )
+        elif ticker.isdigit() and len(ticker) == 6:
+            st.caption("현재 RP 기준 종목군은 미국 S&P 500입니다. 국내 종목 RP는 제공하지 않습니다.")
         else:
-            st.warning(f"⚠️ **주의**: 추세 템플릿 만족도({tt['pass_count']}/{tt['total_count']})가 기준에 미치지 못합니다. 200일선 및 50일선 정배열 회복을 먼저 확인하세요.")
+            st.caption("RP 기준 자료 또는 1년 이상의 일봉 데이터가 아직 없어 그래프를 표시할 수 없습니다.")
+
+        pending_count = tt["total_count"] - tt.get("evaluated_count", tt["total_count"])
+        if pending_count:
+            reason = "RP는 최신 S&P 500 기준 자료와 1년 이상의 일봉이 있어야 판정할 수 있습니다. " if rp is None else ""
+            st.caption(f"{pending_count}개 항목 미확인 · {reason}이 화면은 일봉 약 250거래일을 기준으로 합니다.")
+
+        if tt["is_stage_2"]:
+            if pending_count:
+                st.info(f"가격 추세는 Stage 2 기준을 충족합니다 ({tt['pass_count']}/{tt['total_count']}). 미확인 항목은 별도 확인이 필요합니다.")
+            else:
+                st.success(f"Stage 2 추세 기준 충족: {tt['pass_count']}/{tt['total_count']}개 항목 통과")
+        else:
+            st.warning(f"추세 기준 미충족 또는 자료 부족: {tt['pass_count']}/{tt['total_count']}개 통과. 미달·미확인 항목을 확인하세요.")
 
     # 탭 3: 자연어 해석 리포트 & 실전 전략
     with tab_report:

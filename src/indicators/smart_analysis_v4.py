@@ -349,9 +349,9 @@ def _engine_comparison(v3_validation: Dict[str, Any], v4_validation: Dict[str, A
     }
 
 
-def analyze_smart_chart_v4(df: pd.DataFrame) -> Dict[str, Any]:
+def analyze_smart_chart_v4(df: pd.DataFrame, rp_rating: float | None = None) -> Dict[str, Any]:
     """Run v3 structural analysis plus v4 confirmation and comparison layers."""
-    v3 = analyze_smart_chart_v3(df)
+    v3 = analyze_smart_chart_v3(df, rp_rating=rp_rating)
     momentum = analyze_momentum_confirmation(df)
     volume_flow = analyze_volume_flow(df)
     trend_strength = analyze_trend_strength(df)

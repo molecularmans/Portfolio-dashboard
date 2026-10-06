@@ -10,7 +10,7 @@ from src.api.kis_rest import KISClient
 
 def test_vcp_mock_and_real():
     print("=" * 60)
-    print("🧠 마크 미너비니 VCP 패턴 & 8대 추세 템플릿 엔진 단위 테스트")
+    print("🧠 마크 미너비니 VCP 패턴 & 10개 조건 추세 템플릿 엔진 테스트")
     print("=" * 60)
 
     # 1. 이상적인 VCP 합성 데이터 생성 테스트
@@ -56,7 +56,7 @@ def test_vcp_mock_and_real():
     print(f"• 수축 단계: {res_ideal['contraction_count']}T 수축 (감소성: {res_ideal['is_diminishing']})")
     print(f"• 거래량 건조(VDU): {res_ideal['volume_dryup']['ratio']}% (VDU 여부: {res_ideal['volume_dryup']['is_vdu']})")
     print(f"• 피봇 매수가: ${res_ideal['pivot']['price']:,.2f} | 손절가: ${res_ideal['pivot']['stop_loss']:,.2f} (리스크: {res_ideal['pivot']['risk_pct']}%)")
-    print(f"• 추세 템플릿: {res_ideal['trend_template']['pass_count']}/8개 충족")
+    print(f"• 추세 템플릿: {res_ideal['trend_template']['pass_count']}/10개 충족")
 
     assert res_ideal["contraction_count"] >= 2, "수축 단계가 2개 이상 감지되어야 함"
     assert res_ideal["is_diminishing"], "수축 진폭이 점진적으로 감소해야 함"
@@ -77,7 +77,7 @@ def test_vcp_mock_and_real():
         print(f"  • 상태: {res_real['status_badge']}")
         print(f"  • 수축 단계: {res_real['contraction_count']}T (감소성: {res_real['is_diminishing']})")
         print(f"  • 피봇가: ${res_real['pivot']['price']:,.2f} | 손절가: ${res_real['pivot']['stop_loss']:,.2f}")
-        print(f"  • 8대 추세 템플릿: {res_real['trend_template']['pass_count']}/8개")
+        print(f"  • 10개 조건 추세 템플릿: {res_real['trend_template']['pass_count']}/10개")
         print(f"  • 리포트 요약:\n    " + res_real['summary_text'].replace('\n\n', '\n    '))
 
     print("\n" + "=" * 60)

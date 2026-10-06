@@ -355,11 +355,11 @@ def walk_forward_breakout_validation(df: pd.DataFrame, horizon: int = 10) -> Dic
     }
 
 
-def analyze_smart_chart_v3(df: pd.DataFrame) -> Dict[str, Any]:
+def analyze_smart_chart_v3(df: pd.DataFrame, rp_rating: float | None = None) -> Dict[str, Any]:
     """Run A/B/C plus candle, squeeze, regime and walk-forward diagnostics."""
     sr = analyze_support_resistance_v2(df)
     patterns = analyze_chart_patterns_v2(df)
-    vcp = analyze_vcp_v2(df)
+    vcp = analyze_vcp_v2(df, rp_rating=rp_rating)
     candles = analyze_candlestick_patterns(df)
     squeeze = analyze_volatility_squeeze(df)
     regime = analyze_market_regime(df)

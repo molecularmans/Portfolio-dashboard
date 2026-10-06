@@ -1,0 +1,44 @@
+name: Update S&P 500 RP reference
+
+on:
+  schedule:
+    # US market close 이후 평일 08:30 KST. 휴장일에는 마지막 거래일 자료를 유지한다.
+    - cron: "30 23 * * 1-5"
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - .github/workflows/update-rp.yml
+      - scripts/update_rp_reference.py
+      - src/indicators/relative_performance.py
+
+permissions:
+  contents: write
+
+concurrency:
+  group: update-rp-reference
+  cancel-in-progress: false
+
+jobs:
+  update:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v7
+        with:
+          python-version: "3.12"
+      - name: Install data dependencies
+        run: python -m pip install pandas numpy requests 'yfinance>=0.2.60,<1'
+      - name: Build RP reference
+        run: python scripts/update_rp_reference.py
+      - name: Commit updated reference
+        run: |
+          git add data/rp_reference.json
+          if git diff --cached --quiet; then
+            echo "RP reference unchanged"
+            exit 0
+          fi
+          git -c user.name="github-actions[bot]" -c user.email="41898282+github-actions[bot]@users.noreply.github.com" \
+            commit -m "Update S&P 500 RP reference"
+          git push

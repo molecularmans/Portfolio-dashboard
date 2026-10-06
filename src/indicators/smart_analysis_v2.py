@@ -457,10 +457,10 @@ def _linear_slope(values: pd.Series) -> float:
     return float(np.polyfit(x, array, 1)[0])
 
 
-def analyze_vcp_v2(df: pd.DataFrame, base_window: int = 90) -> Dict[str, Any]:
+def analyze_vcp_v2(df: pd.DataFrame, base_window: int = 90, rp_rating: float | None = None) -> Dict[str, Any]:
     """[C] Add volatility/supply diagnostics and a weighted VCP quality score."""
     clean = _prepare_ohlcv(df)
-    base = detect_vcp_pattern(clean, base_window=base_window)
+    base = detect_vcp_pattern(clean, base_window=base_window, rp_rating=rp_rating)
     base["algorithm_version"] = "experimental-v2"
     if len(clean) < 30:
         base.update(
