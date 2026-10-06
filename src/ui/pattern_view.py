@@ -12,6 +12,8 @@ from src.indicators.smart_analysis_v2 import (
 )
 from src.indicators.smart_analysis_v3 import analyze_smart_chart_v3
 from src.indicators.smart_analysis_v4 import analyze_smart_chart_v4
+from src.indicators.vcp_analyzer import detect_vcp_pattern
+from src.indicators.integrated_assessment import build_integrated_assessment
 from src.indicators.relative_performance import calculate_rp_history, current_rp_rating, load_rp_reference
 from src.ui.vcp_view import render_vcp_analysis_panel
 
@@ -185,7 +187,7 @@ def render_pattern_analysis_dashboard(df: pd.DataFrame, ticker: str):
     else:
         sr_data = analyze_support_resistance_and_trendlines(df)
         pattern_data = detect_all_chart_patterns(df)
-        vcp_data = None
+        vcp_data = detect_vcp_pattern(df, rp_rating=rp_rating)
 
     # -------------------------------------------------------------
     # 섹션 1: 상단 종합 분석 브리핑 헤더
@@ -256,12 +258,63 @@ def render_pattern_analysis_dashboard(df: pd.DataFrame, ticker: str):
     # -------------------------------------------------------------
     # 탭 구성: [A] 지지/저항 & 추세선 | [B] 차트 포메이션 패턴 | [C] 미너비니 VCP
     # -------------------------------------------------------------
-    tab_sr, tab_pattern, tab_vcp, tab_validation = st.tabs([
+    tab_summary, tab_sr, tab_pattern, tab_vcp, tab_validation = st.tabs([
+        "🎯 [A–D] 종합판정·진입/손절 시나리오",
         "📐 [A] 자동 지지·저항 & 추세선",
         "💎 [B] 가격 패턴 분석 (쌍바닥·삼각수렴)",
         "🧠 [C] 마크 미너비니 VCP 분석",
         "🧪 [D] 추세 환경·캔들 신호·과거 검증",
     ])
+
+    with tab_summary:
+        summary = build_integrated_assessment(df, sr_data, pattern_data, vcp_data, v3_bundle, v4_bundle)
+        currency = "₩" if ticker.isdigit() and len(ticker) == 6 else "$"
+        st.subheader(f"{ticker} 차트 종합판정 · {summary['verdict']}")
+        last_date = pd.to_datetime(df["date"].iloc[-1]).strftime("%Y-%m-%d") if "date" in df else "최근 일봉"
+        st.caption(f"기준: {last_date} 종가 · 현재가 {currency}{summary['current']:,.2f} · 신규 매수 관점의 기술적 조건")
+        st.markdown(f"**현재 차트 형태:** {summary['shape']}")
+        for label, detail in summary["evidence"]:
+            st.write(f"**{label}** · {detail}")
+
+        st.markdown("#### 진입 시나리오")
+        if summary["verdict"] == "신규 진입 보류":
+            st.caption("아래 가격은 향후 관찰 기준이며 현재 신규 진입 실행 신호가 아닙니다.")
+        if summary["entry"]:
+            st.write(
+                f"**{summary['entry_source']} {currency}{summary['entry']:,.2f}** 위 일봉 종가와 "
+                f"직전 20거래일 평균 대비 **{summary['required_volume']:.1f}배 이상 거래량**을 함께 확인합니다."
+            )
+            volume_text = f"{summary['volume_ratio']:.2f}배" if summary["volume_ratio"] is not None else "확인 불가"
+            st.caption(f"현재 거래량: {volume_text} · {'가격·거래량 조건 확인' if summary['confirmed'] else '가격 또는 거래량 조건 대기'}")
+            if summary["current"] > summary["entry"]:
+                st.write("이미 돌파선 위라면 재진입 전에 해당 가격대의 지지 여부와 현재 이격을 다시 확인합니다.")
+        else:
+            st.write("유효한 돌파 기준 가격을 찾지 못했습니다. 새로운 지지·저항 또는 패턴이 형성될 때까지 진입 판단을 보류합니다.")
+
+        st.markdown("#### 손절·무효화 시나리오")
+        if summary["stop"]:
+            st.write(
+                f"**{summary['stop_source']} {currency}{summary['stop']:,.2f}** 아래 일봉 종가 마감 시 "
+                f"진입 가정을 재검토합니다. 가정 진입가 대비 손절 폭은 **{summary['risk_pct']:.1f}%**입니다."
+            )
+        else:
+            st.write("현재가 아래의 유효한 구조적 손절 기준을 찾지 못했습니다. 손절 기준이 잡히기 전에는 신규 진입을 보류합니다.")
+        if summary["target"]:
+            ratio = f" · 참고 손익비 {summary['reward_risk']:.1f}:1" if summary["reward_risk"] is not None else ""
+            st.caption(f"{summary['target_source']} {currency}{summary['target']:,.2f}{ratio} · 목표가와 손익비는 실현 수익을 보장하지 않습니다.")
+        else:
+            st.caption("현재 가격보다 높은 유효 목표/저항이 없어 참고 손익비를 산출하지 않았습니다.")
+
+        st.markdown("#### 차트상 신규 진입 적합도")
+        if summary["blockers"]:
+            st.warning(" · ".join(summary["blockers"]))
+        elif summary["verdict"] == "조건 충족 · 확인 필요":
+            st.success("A–D의 핵심 조건이 맞아 기술적 진입 후보로 볼 수 있습니다. 실제 체결 전 최신 가격과 수급을 재확인하세요.")
+        else:
+            st.info("돌파·거래량·추세·손절 기준이 함께 맞을 때까지 관찰합니다.")
+        if not summary["d_available"]:
+            st.caption("[D] 판단은 v3/v4 엔진에서 제공됩니다. 현재 엔진에서는 종합판정을 보수적으로 표시합니다.")
+        st.caption("차트 기반 참고 판정입니다. 기업 실적·밸류에이션·뉴스·계좌 위험 한도는 반영하지 않습니다. 손절 기준은 주문 체결가를 보장하지 않습니다.")
 
     # -------------------------------------------------------------
     # TAB A: 지지 / 저항선 및 추세선 분석
