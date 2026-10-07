@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-10-01 05:50:48",
+  "updated_at": "2026-10-07 03:56:17",
   "groups": [
     {
       "group_name": "지수",
@@ -556,6 +556,11 @@
     },
     {
       "ticker": "TWST",
+      "name": "",
+      "group_name": "헬스케어,바이오"
+    },
+    {
+      "ticker": "DGX",
       "name": "",
       "group_name": "헬스케어,바이오"
     }
