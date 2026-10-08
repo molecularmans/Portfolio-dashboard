@@ -1,0 +1,1879 @@
+{
+  "schema_version": 1,
+  "screens": {
+    "D": {
+      "scan_day": "2026-10-07",
+      "tickers": [
+        "AAPL",
+        "ALAB",
+        "AMAT",
+        "AMD",
+        "AMPL",
+        "AMZN",
+        "ANET",
+        "APPN",
+        "BA",
+        "BE",
+        "BITO",
+        "BNY",
+        "BOTZ",
+        "CAKE",
+        "CBRS",
+        "CCJ",
+        "CEG",
+        "CGNX",
+        "COHR",
+        "COIN",
+        "CRDO",
+        "CRM",
+        "CRWD",
+        "CRWV",
+        "DELL",
+        "DGX",
+        "EME",
+        "EROC",
+        "ETN",
+        "EXE",
+        "FCX",
+        "FIX",
+        "FORM",
+        "GE",
+        "GFS",
+        "GH",
+        "GLD",
+        "GOOGL",
+        "GS",
+        "HOOD",
+        "HWM",
+        "HYPEUSD",
+        "ILMN",
+        "INIO",
+        "INTA",
+        "INTC",
+        "IREN",
+        "JNJ",
+        "JPM",
+        "KLAC",
+        "LMT",
+        "LRCX",
+        "MRK",
+        "MRNA",
+        "MRVL",
+        "MSFT",
+        "MU",
+        "NBIS",
+        "NOC",
+        "NOW",
+        "NSIT",
+        "NTAP",
+        "NTRA",
+        "NTSK",
+        "NVDA",
+        "NVT",
+        "ON",
+        "ORCL",
+        "OUST",
+        "PANW",
+        "PLTR",
+        "POWL",
+        "PURR",
+        "PWR",
+        "QLYS",
+        "QQQ",
+        "RKLB",
+        "RTX",
+        "SNOW",
+        "SOXX",
+        "SPCX",
+        "SPY",
+        "STM",
+        "STRL",
+        "TEAM",
+        "TEM",
+        "TER",
+        "TLN",
+        "TMO",
+        "TSLA",
+        "TWST",
+        "TXG",
+        "TXN",
+        "US10Y",
+        "US30Y",
+        "VEEV",
+        "VST",
+        "XBI",
+        "XLV",
+        "YEXT",
+        "ZBRA",
+        "ZETA"
+      ],
+      "results": {
+        "AAPL": {
+          "stage": "setup",
+          "date": "2026-10-07"
+        },
+        "ALAB": {
+          "stage": "hold",
+          "date": "2026-10-07"
+        },
+        "AMAT": {
+          "stage": "hold",
+          "date": "2026-10-07"
+        },
+        "AMD": {
+          "stage": "watch",
+          "date": "2026-10-07"
+        },
+        "AMPL": {
+          "stage": "hold",
+          "date": "2026-10-07"
+        },
+        "AMZN": {
+          "stage": "hold",
+          "date": "2026-10-07"
+        },
+        "ANET": {
+          "stage": "setup",
+          "date": "2026-10-07"
+        },
+        "APPN": {
+          "stage": "hold",
+          "date": "2026-10-07"
+        },
+        "BA": {
+          "stage": "hold",
+          "date": "2026-10-07"
+        },
+        "BE": {
+          "stage": "hold",
+          "date": "2026-10-07"
+        },
+        "BITO": {
+          "stage": "hold",
+          "date": "2026-10-07"
+        },
+        "BNY": {
+          "stage": "hold",
+          "date": "2026-10-07"
+        },
+        "BOTZ": {
+          "stage": "hold",
+          "date": "2026-10-07"
+        },
+        "CAKE": {
+          "stage": "hold",
+          "date": "2026-10-07"
+        },
+        "CBRS": {
+          "stage": "hold",
+          "date": "2026-10-07"
+        },
+        "CCJ": {
+          "stage": "hold",
+          "date": "2026-10-07"
+        },
+        "CEG": {
+          "stage": "hold",
+          "date": "2026-10-07"
+        },
+        "CGNX": {
+          "stage": "hold",
+          "date": "2026-10-07"
+        },
+        "COHR": {
+          "stage": "hold",
+          "date": "2026-10-07"
+        },
+        "COIN": {
+          "stage": "hold",
+          "date": "2026-10-07"
+        },
+        "CRDO": {
+          "stage": "hold",
+          "date": "2026-10-07"
+        },
+        "CRM": {
+          "stage": "hold",
+          "date": "2026-10-07"
+        },
+        "CRWD": {
+          "stage": "hold",
+          "date": "2026-10-07"
+        },
+        "CRWV": {
+          "stage": "hold",
+          "date": "2026-10-07"
+        },
+        "DELL": {
+          "stage": "hold",
+          "date": "2026-10-07"
+        },
+        "DGX": {
+          "stage": "hold",
+          "date": "2026-10-07"
+        },
+        "EME": {
+          "stage": "hold",
+          "date": "2026-10-07"
+        },
+        "EROC": {
+          "stage": "hold",
+          "date": "2026-10-07"
+        },
+        "ETN": {
+          "stage": "setup",
+          "date": "2026-10-07"
+        },
+        "EXE": {
+          "stage": "hold",
+          "date": "2026-10-07"
+        },
+        "FCX": {
+          "stage": "setup",
+          "date": "2026-10-07"
+        },
+        "FIX": {
+          "stage": "hold",
+          "date": "2026-10-07"
+        },
+        "FORM": {
+          "stage": "hold",
+          "date": "2026-10-07"
+        },
+        "GE": {
+          "stage": "hold",
+          "date": "2026-10-07"
+        },
+        "GFS": {
+          "stage": "hold",
+          "date": "2026-10-07"
+        },
+        "GH": {
+          "stage": "hold",
+          "date": "2026-10-07"
+        },
+        "GLD": {
+          "stage": "hold",
+          "date": "2026-10-07"
+        },
+        "GOOGL": {
+          "stage": "setup",
+          "date": "2026-10-07"
+        },
+        "GS": {
+          "stage": "hold",
+          "date": "2026-10-07"
+        },
+        "HOOD": {
+          "stage": "hold",
+          "date": "2026-10-07"
+        },
+        "HWM": {
+          "stage": "hold",
+          "date": "2026-10-07"
+        },
+        "HYPEUSD": {
+          "stage": "unavailable",
+          "date": null
+        },
+        "ILMN": {
+          "stage": "watch",
+          "date": "2026-10-07"
+        },
+        "INIO": {
+          "stage": "hold",
+          "date": "2026-10-07"
+        },
+        "INTA": {
+          "stage": "hold",
+          "date": "2026-10-07"
+        },
+        "INTC": {
+          "stage": "hold",
+          "date": "2026-10-07"
+        },
+        "IREN": {
+          "stage": "hold",
+          "date": "2026-10-07"
+        },
+        "JNJ": {
+          "stage": "hold",
+          "date": "2026-10-07"
+        },
+        "JPM": {
+          "stage": "hold",
+          "date": "2026-10-07"
+        },
+        "KLAC": {
+          "stage": "hold",
+          "date": "2026-10-07"
+        },
+        "LMT": {
+          "stage": "hold",
+          "date": "2026-10-07"
+        },
+        "LRCX": {
+          "stage": "hold",
+          "date": "2026-10-07"
+        },
+        "MRK": {
+          "stage": "hold",
+          "date": "2026-10-07"
+        },
+        "MRNA": {
+          "stage": "watch",
+          "date": "2026-10-07"
+        },
+        "MRVL": {
+          "stage": "hold",
+          "date": "2026-10-07"
+        },
+        "MSFT": {
+          "stage": "hold",
+          "date": "2026-10-07"
+        },
+        "MU": {
+          "stage": "hold",
+          "date": "2026-10-07"
+        },
+        "NBIS": {
+          "stage": "hold",
+          "date": "2026-10-07"
+        },
+        "NOC": {
+          "stage": "hold",
+          "date": "2026-10-07"
+        },
+        "NOW": {
+          "stage": "hold",
+          "date": "2026-10-07"
+        },
+        "NSIT": {
+          "stage": "setup",
+          "date": "2026-10-07"
+        },
+        "NTAP": {
+          "stage": "hold",
+          "date": "2026-10-07"
+        },
+        "NTRA": {
+          "stage": "watch",
+          "date": "2026-10-07"
+        },
+        "NTSK": {
+          "stage": "hold",
+          "date": "2026-10-07"
+        },
+        "NVDA": {
+          "stage": "hold",
+          "date": "2026-10-07"
+        },
+        "NVT": {
+          "stage": "hold",
+          "date": "2026-10-07"
+        },
+        "ON": {
+          "stage": "hold",
+          "date": "2026-10-07"
+        },
+        "ORCL": {
+          "stage": "hold",
+          "date": "2026-10-07"
+        },
+        "OUST": {
+          "stage": "hold",
+          "date": "2026-10-07"
+        },
+        "PANW": {
+          "stage": "hold",
+          "date": "2026-10-07"
+        },
+        "PLTR": {
+          "stage": "hold",
+          "date": "2026-10-07"
+        },
+        "POWL": {
+          "stage": "hold",
+          "date": "2026-10-07"
+        },
+        "PURR": {
+          "stage": "hold",
+          "date": "2026-10-07"
+        },
+        "PWR": {
+          "stage": "hold",
+          "date": "2026-10-07"
+        },
+        "QLYS": {
+          "stage": "hold",
+          "date": "2026-10-07"
+        },
+        "QQQ": {
+          "stage": "setup",
+          "date": "2026-10-07"
+        },
+        "RKLB": {
+          "stage": "hold",
+          "date": "2026-10-07"
+        },
+        "RTX": {
+          "stage": "hold",
+          "date": "2026-10-07"
+        },
+        "SNOW": {
+          "stage": "hold",
+          "date": "2026-10-07"
+        },
+        "SOXX": {
+          "stage": "hold",
+          "date": "2026-10-07"
+        },
+        "SPCX": {
+          "stage": "hold",
+          "date": "2026-10-07"
+        },
+        "SPY": {
+          "stage": "hold",
+          "date": "2026-10-07"
+        },
+        "STM": {
+          "stage": "hold",
+          "date": "2026-10-07"
+        },
+        "STRL": {
+          "stage": "hold",
+          "date": "2026-10-07"
+        },
+        "TEAM": {
+          "stage": "hold",
+          "date": "2026-10-07"
+        },
+        "TEM": {
+          "stage": "hold",
+          "date": "2026-10-07"
+        },
+        "TER": {
+          "stage": "hold",
+          "date": "2026-10-07"
+        },
+        "TLN": {
+          "stage": "hold",
+          "date": "2026-10-07"
+        },
+        "TMO": {
+          "stage": "hold",
+          "date": "2026-10-07"
+        },
+        "TSLA": {
+          "stage": "hold",
+          "date": "2026-10-07"
+        },
+        "TWST": {
+          "stage": "hold",
+          "date": "2026-10-07"
+        },
+        "TXG": {
+          "stage": "hold",
+          "date": "2026-10-07"
+        },
+        "TXN": {
+          "stage": "hold",
+          "date": "2026-10-07"
+        },
+        "US10Y": {
+          "stage": "unavailable",
+          "date": null
+        },
+        "US30Y": {
+          "stage": "unavailable",
+          "date": null
+        },
+        "VEEV": {
+          "stage": "hold",
+          "date": "2026-10-07"
+        },
+        "VST": {
+          "stage": "hold",
+          "date": "2026-10-07"
+        },
+        "XBI": {
+          "stage": "hold",
+          "date": "2026-10-07"
+        },
+        "XLV": {
+          "stage": "setup",
+          "date": "2026-10-07"
+        },
+        "YEXT": {
+          "stage": "hold",
+          "date": "2026-10-07"
+        },
+        "ZBRA": {
+          "stage": "hold",
+          "date": "2026-10-07"
+        },
+        "ZETA": {
+          "stage": "hold",
+          "date": "2026-10-07"
+        }
+      },
+      "completed_at": "2026-10-08T09:49+09:00"
+    },
+    "W": {
+      "scan_day": "2026-10-07",
+      "tickers": [
+        "AAPL",
+        "ALAB",
+        "AMAT",
+        "AMD",
+        "AMPL",
+        "AMZN",
+        "ANET",
+        "APPN",
+        "BA",
+        "BE",
+        "BITO",
+        "BNY",
+        "BOTZ",
+        "CAKE",
+        "CBRS",
+        "CCJ",
+        "CEG",
+        "CGNX",
+        "COHR",
+        "COIN",
+        "CRDO",
+        "CRM",
+        "CRWD",
+        "CRWV",
+        "DELL",
+        "DGX",
+        "EME",
+        "EROC",
+        "ETN",
+        "EXE",
+        "FCX",
+        "FIX",
+        "FORM",
+        "GE",
+        "GFS",
+        "GH",
+        "GLD",
+        "GOOGL",
+        "GS",
+        "HOOD",
+        "HWM",
+        "HYPEUSD",
+        "ILMN",
+        "INIO",
+        "INTA",
+        "INTC",
+        "IREN",
+        "JNJ",
+        "JPM",
+        "KLAC",
+        "LMT",
+        "LRCX",
+        "MRK",
+        "MRNA",
+        "MRVL",
+        "MSFT",
+        "MU",
+        "NBIS",
+        "NOC",
+        "NOW",
+        "NSIT",
+        "NTAP",
+        "NTRA",
+        "NTSK",
+        "NVDA",
+        "NVT",
+        "ON",
+        "ORCL",
+        "OUST",
+        "PANW",
+        "PLTR",
+        "POWL",
+        "PURR",
+        "PWR",
+        "QLYS",
+        "QQQ",
+        "RKLB",
+        "RTX",
+        "SNOW",
+        "SOXX",
+        "SPCX",
+        "SPY",
+        "STM",
+        "STRL",
+        "TEAM",
+        "TEM",
+        "TER",
+        "TLN",
+        "TMO",
+        "TSLA",
+        "TWST",
+        "TXG",
+        "TXN",
+        "US10Y",
+        "US30Y",
+        "VEEV",
+        "VST",
+        "XBI",
+        "XLV",
+        "YEXT",
+        "ZBRA",
+        "ZETA"
+      ],
+      "results": {
+        "AAPL": {
+          "stage": "setup",
+          "date": "2026-09-28",
+          "reason": "상승 추세에서 20주 고점 5% 이내이며 주봉 손절 관찰선이 있습니다.",
+          "close": 333.69,
+          "ma13": 323.1575,
+          "ma26": 306.9904,
+          "ma52": 284.7367,
+          "pivot": 345.34,
+          "stop": 323.1575,
+          "risk_pct": 3.2,
+          "volume_ratio": 0.77
+        },
+        "ALAB": {
+          "stage": "watch",
+          "date": "2026-09-28",
+          "reason": "중기 상승 구조를 관찰합니다. 주봉 돌파·거래량·위험 조건은 아직 확인되지 않았습니다.",
+          "close": 350.33,
+          "ma13": 320.7262,
+          "ma26": 303.45,
+          "ma52": 227.6075,
+          "pivot": 499.4762,
+          "stop": 320.7262,
+          "risk_pct": 8.5,
+          "volume_ratio": 0.74
+        },
+        "AMAT": {
+          "stage": "watch",
+          "date": "2026-09-28",
+          "reason": "중기 상승 구조를 관찰합니다. 주봉 돌파·거래량·위험 조건은 아직 확인되지 않았습니다.",
+          "close": 540.04,
+          "ma13": 504.1353,
+          "ma26": 491.0816,
+          "ma52": 390.2345,
+          "pivot": 738.88,
+          "stop": 504.1353,
+          "risk_pct": 6.6,
+          "volume_ratio": 0.76
+        },
+        "AMD": {
+          "stage": "watch",
+          "date": "2026-09-28",
+          "reason": "중기 상승 구조를 관찰합니다. 주봉 돌파·거래량·위험 조건은 아직 확인되지 않았습니다.",
+          "close": 633.91,
+          "ma13": 523.5685,
+          "ma26": 479.0688,
+          "ma52": 349.0246,
+          "pivot": 639.0,
+          "stop": 523.5685,
+          "risk_pct": 17.4,
+          "volume_ratio": 0.71
+        },
+        "AMPL": {
+          "stage": "watch",
+          "date": "2026-09-28",
+          "reason": "중기 상승 구조를 관찰합니다. 주봉 돌파·거래량·위험 조건은 아직 확인되지 않았습니다.",
+          "close": 14.52,
+          "ma13": 11.8669,
+          "ma26": 9.4619,
+          "ma52": 9.371,
+          "pivot": 14.76,
+          "stop": 11.8669,
+          "risk_pct": 18.3,
+          "volume_ratio": 0.8
+        },
+        "AMZN": {
+          "stage": "hold",
+          "date": "2026-09-28",
+          "reason": "26주·52주 추세 또는 현재 주가 위치가 주봉 진입 기준에 미달합니다.",
+          "close": 251.52,
+          "ma13": 256.0492,
+          "ma26": 254.9208,
+          "ma52": 239.0465,
+          "pivot": 287.2,
+          "stop": 226.16,
+          "risk_pct": 10.1,
+          "volume_ratio": 0.82
+        },
+        "ANET": {
+          "stage": "setup",
+          "date": "2026-09-28",
+          "reason": "상승 추세에서 20주 고점 5% 이내이며 주봉 손절 관찰선이 있습니다.",
+          "close": 207.35,
+          "ma13": 191.3915,
+          "ma26": 175.0496,
+          "ma52": 154.7181,
+          "pivot": 214.89,
+          "stop": 191.3915,
+          "risk_pct": 7.7,
+          "volume_ratio": 0.57
+        },
+        "APPN": {
+          "stage": "hold",
+          "date": "2026-09-28",
+          "reason": "26주·52주 추세 또는 현재 주가 위치가 주봉 진입 기준에 미달합니다.",
+          "close": 36.68,
+          "ma13": 33.5677,
+          "ma26": 27.8894,
+          "ma52": 29.6003,
+          "pivot": 44.06,
+          "stop": 33.5677,
+          "risk_pct": 8.5,
+          "volume_ratio": 0.92
+        },
+        "BA": {
+          "stage": "hold",
+          "date": "2026-09-28",
+          "reason": "26주·52주 추세 또는 현재 주가 위치가 주봉 진입 기준에 미달합니다.",
+          "close": 193.56,
+          "ma13": 212.6623,
+          "ma26": 218.2469,
+          "ma52": 217.1412,
+          "pivot": 244.07,
+          "stop": null,
+          "risk_pct": null,
+          "volume_ratio": 2.21
+        },
+        "BE": {
+          "stage": "watch",
+          "date": "2026-09-28",
+          "reason": "중기 상승 구조를 관찰합니다. 주봉 돌파·거래량·위험 조건은 아직 확인되지 않았습니다.",
+          "close": 289.15,
+          "ma13": 237.2208,
+          "ma26": 249.24,
+          "ma52": 187.1892,
+          "pivot": 351.28,
+          "stop": 237.2208,
+          "risk_pct": 18.0,
+          "volume_ratio": 1.14
+        },
+        "BITO": {
+          "stage": "hold",
+          "date": "2026-09-28",
+          "reason": "26주·52주 추세 또는 현재 주가 위치가 주봉 진입 기준에 미달합니다.",
+          "close": 11.28,
+          "ma13": 9.7693,
+          "ma26": 9.7026,
+          "ma52": 10.7588,
+          "pivot": 11.6618,
+          "stop": 9.7693,
+          "risk_pct": 13.4,
+          "volume_ratio": 0.44
+        },
+        "BNY": {
+          "stage": "unavailable",
+          "date": null,
+          "reason": "완료된 주봉 자료가 부족합니다."
+        },
+        "BOTZ": {
+          "stage": "hold",
+          "date": "2026-09-28",
+          "reason": "26주·52주 추세 또는 현재 주가 위치가 주봉 진입 기준에 미달합니다.",
+          "close": 36.03,
+          "ma13": 35.79,
+          "ma26": 37.0319,
+          "ma52": 36.6517,
+          "pivot": 41.6891,
+          "stop": 35.79,
+          "risk_pct": 0.7,
+          "volume_ratio": 0.64
+        },
+        "CAKE": {
+          "stage": "watch",
+          "date": "2026-09-28",
+          "reason": "중기 상승 구조를 관찰합니다. 주봉 돌파·거래량·위험 조건은 아직 확인되지 않았습니다.",
+          "close": 109.65,
+          "ma13": 101.5526,
+          "ma26": 84.0986,
+          "ma52": 69.0452,
+          "pivot": 118.46,
+          "stop": 101.5526,
+          "risk_pct": 7.4,
+          "volume_ratio": 0.87
+        },
+        "CBRS": {
+          "stage": "unavailable",
+          "date": null,
+          "reason": "완료된 주봉 자료가 부족합니다."
+        },
+        "CCJ": {
+          "stage": "hold",
+          "date": "2026-09-28",
+          "reason": "26주·52주 추세 또는 현재 주가 위치가 주봉 진입 기준에 미달합니다.",
+          "close": 85.18,
+          "ma13": 93.5223,
+          "ma26": 101.8796,
+          "ma52": 101.7992,
+          "pivot": 122.3,
+          "stop": 83.5,
+          "risk_pct": 2.0,
+          "volume_ratio": 0.99
+        },
+        "CEG": {
+          "stage": "hold",
+          "date": "2026-09-28",
+          "reason": "26주·52주 추세 또는 현재 주가 위치가 주봉 진입 기준에 미달합니다.",
+          "close": 257.49,
+          "ma13": 269.2021,
+          "ma26": 274.3974,
+          "ma52": 301.6179,
+          "pivot": 316.7615,
+          "stop": 250.55,
+          "risk_pct": 2.7,
+          "volume_ratio": 1.01
+        },
+        "CGNX": {
+          "stage": "watch",
+          "date": "2026-09-28",
+          "reason": "중기 상승 구조를 관찰합니다. 주봉 돌파·거래량·위험 조건은 아직 확인되지 않았습니다.",
+          "close": 64.97,
+          "ma13": 63.2917,
+          "ma26": 62.579,
+          "ma52": 52.8396,
+          "pivot": 72.7778,
+          "stop": 63.2917,
+          "risk_pct": 2.6,
+          "volume_ratio": 0.78
+        },
+        "COHR": {
+          "stage": "watch",
+          "date": "2026-09-28",
+          "reason": "중기 상승 구조를 관찰합니다. 주봉 돌파·거래량·위험 조건은 아직 확인되지 않았습니다.",
+          "close": 337.04,
+          "ma13": 304.5015,
+          "ma26": 330.7265,
+          "ma52": 261.1779,
+          "pivot": 440.0,
+          "stop": 304.5015,
+          "risk_pct": 9.7,
+          "volume_ratio": 1.29
+        },
+        "COIN": {
+          "stage": "hold",
+          "date": "2026-09-28",
+          "reason": "26주·52주 추세 또는 현재 주가 위치가 주봉 진입 기준에 미달합니다.",
+          "close": 183.0,
+          "ma13": 170.7846,
+          "ma26": 174.8458,
+          "ma52": 207.5477,
+          "pivot": 222.352,
+          "stop": 170.7846,
+          "risk_pct": 6.7,
+          "volume_ratio": 0.91
+        },
+        "CRDO": {
+          "stage": "watch",
+          "date": "2026-09-28",
+          "reason": "중기 상승 구조를 관찰합니다. 주봉 돌파·거래량·위험 조건은 아직 확인되지 않았습니다.",
+          "close": 218.64,
+          "ma13": 214.8262,
+          "ma26": 210.6537,
+          "ma52": 173.7993,
+          "pivot": 308.6699,
+          "stop": 214.8262,
+          "risk_pct": 1.7,
+          "volume_ratio": 1.11
+        },
+        "CRM": {
+          "stage": "hold",
+          "date": "2026-09-28",
+          "reason": "26주·52주 추세 또는 현재 주가 위치가 주봉 진입 기준에 미달합니다.",
+          "close": 234.69,
+          "ma13": 211.2218,
+          "ma26": 192.3513,
+          "ma52": 208.5751,
+          "pivot": 267.7989,
+          "stop": 211.2218,
+          "risk_pct": 10.0,
+          "volume_ratio": 0.73
+        },
+        "CRWD": {
+          "stage": "watch",
+          "date": "2026-09-28",
+          "reason": "중기 상승 구조를 관찰합니다. 주봉 돌파·거래량·위험 조건은 아직 확인되지 않았습니다.",
+          "close": 270.04,
+          "ma13": 214.2908,
+          "ma26": 181.5563,
+          "ma52": 148.5246,
+          "pivot": 263.87,
+          "stop": 214.2908,
+          "risk_pct": 20.6,
+          "volume_ratio": 1.05
+        },
+        "CRWV": {
+          "stage": "hold",
+          "date": "2026-09-28",
+          "reason": "26주·52주 추세 또는 현재 주가 위치가 주봉 진입 기준에 미달합니다.",
+          "close": 89.62,
+          "ma13": 85.4362,
+          "ma26": 95.8598,
+          "ma52": 93.8586,
+          "pivot": 132.15,
+          "stop": 85.4362,
+          "risk_pct": 4.7,
+          "volume_ratio": 0.81
+        },
+        "DELL": {
+          "stage": "watch",
+          "date": "2026-09-28",
+          "reason": "중기 상승 구조를 관찰합니다. 주봉 돌파·거래량·위험 조건은 아직 확인되지 않았습니다.",
+          "close": 562.52,
+          "ma13": 484.6622,
+          "ma26": 396.3563,
+          "ma52": 266.7245,
+          "pivot": 595.51,
+          "stop": 484.6622,
+          "risk_pct": 13.8,
+          "volume_ratio": 0.71
+        },
+        "DGX": {
+          "stage": "watch",
+          "date": "2026-09-28",
+          "reason": "중기 상승 구조를 관찰합니다. 주봉 돌파·거래량·위험 조건은 아직 확인되지 않았습니다.",
+          "close": 232.466,
+          "ma13": 231.9954,
+          "ma26": 213.8322,
+          "ma52": 199.8115,
+          "pivot": 247.9185,
+          "stop": 231.9954,
+          "risk_pct": 0.2,
+          "volume_ratio": 1.26
+        },
+        "EME": {
+          "stage": "hold",
+          "date": "2026-09-28",
+          "reason": "26주·52주 추세 또는 현재 주가 위치가 주봉 진입 기준에 미달합니다.",
+          "close": 786.61,
+          "ma13": 774.7328,
+          "ma26": 807.9877,
+          "ma52": 746.9864,
+          "pivot": 939.505,
+          "stop": 774.7328,
+          "risk_pct": 1.5,
+          "volume_ratio": 0.97
+        },
+        "EROC": {
+          "stage": "unavailable",
+          "date": null,
+          "reason": "완료된 주봉 자료가 부족합니다."
+        },
+        "ETN": {
+          "stage": "watch",
+          "date": "2026-09-28",
+          "reason": "중기 상승 구조를 관찰합니다. 주봉 돌파·거래량·위험 조건은 아직 확인되지 않았습니다.",
+          "close": 436.11,
+          "ma13": 421.6768,
+          "ma26": 412.5464,
+          "ma52": 381.4045,
+          "pivot": 478.0,
+          "stop": 421.6768,
+          "risk_pct": 3.3,
+          "volume_ratio": 0.9
+        },
+        "EXE": {
+          "stage": "hold",
+          "date": "2026-09-28",
+          "reason": "26주·52주 추세 또는 현재 주가 위치가 주봉 진입 기준에 미달합니다.",
+          "close": 85.52,
+          "ma13": 91.7446,
+          "ma26": 92.4773,
+          "ma52": 99.7709,
+          "pivot": 100.3471,
+          "stop": 85.295,
+          "risk_pct": 0.3,
+          "volume_ratio": 1.06
+        },
+        "FCX": {
+          "stage": "watch",
+          "date": "2026-09-28",
+          "reason": "중기 상승 구조를 관찰합니다. 주봉 돌파·거래량·위험 조건은 아직 확인되지 않았습니다.",
+          "close": 72.04,
+          "ma13": 68.7609,
+          "ma26": 66.2915,
+          "ma52": 58.9913,
+          "pivot": 80.24,
+          "stop": 68.7609,
+          "risk_pct": 4.6,
+          "volume_ratio": 0.9
+        },
+        "FIX": {
+          "stage": "hold",
+          "date": "2026-09-28",
+          "reason": "26주·52주 추세 또는 현재 주가 위치가 주봉 진입 기준에 미달합니다.",
+          "close": 1728.01,
+          "ma13": 1682.4147,
+          "ma26": 1753.0065,
+          "ma52": 1430.4094,
+          "pivot": 2072.1014,
+          "stop": 1682.4147,
+          "risk_pct": 2.6,
+          "volume_ratio": 0.69
+        },
+        "FORM": {
+          "stage": "watch",
+          "date": "2026-09-28",
+          "reason": "중기 상승 구조를 관찰합니다. 주봉 돌파·거래량·위험 조건은 아직 확인되지 않았습니다.",
+          "close": 149.15,
+          "ma13": 116.4804,
+          "ma26": 125.2006,
+          "ma52": 97.4387,
+          "pivot": 160.27,
+          "stop": 116.4804,
+          "risk_pct": 21.9,
+          "volume_ratio": 1.08
+        },
+        "GE": {
+          "stage": "hold",
+          "date": "2026-09-28",
+          "reason": "26주·52주 추세 또는 현재 주가 위치가 주봉 진입 기준에 미달합니다.",
+          "close": 309.0901,
+          "ma13": 342.7873,
+          "ma26": 330.8111,
+          "ma52": 318.0226,
+          "pivot": 388.2497,
+          "stop": 306.3343,
+          "risk_pct": 0.9,
+          "volume_ratio": 0.94
+        },
+        "GFS": {
+          "stage": "hold",
+          "date": "2026-09-28",
+          "reason": "26주·52주 추세 또는 현재 주가 위치가 주봉 진입 기준에 미달합니다.",
+          "close": 50.17,
+          "ma13": 51.4623,
+          "ma26": 61.5019,
+          "ma52": 50.5304,
+          "pivot": 92.1855,
+          "stop": 42.0445,
+          "risk_pct": 16.2,
+          "volume_ratio": 0.65
+        },
+        "GH": {
+          "stage": "setup",
+          "date": "2026-09-28",
+          "reason": "상승 추세에서 20주 고점 5% 이내이며 주봉 손절 관찰선이 있습니다.",
+          "close": 177.8,
+          "ma13": 164.3338,
+          "ma26": 139.5108,
+          "ma52": 117.8985,
+          "pivot": 183.51,
+          "stop": 164.3338,
+          "risk_pct": 7.6,
+          "volume_ratio": 0.7
+        },
+        "GLD": {
+          "stage": "hold",
+          "date": "2026-09-28",
+          "reason": "26주·52주 추세 또는 현재 주가 위치가 주봉 진입 기준에 미달합니다.",
+          "close": 380.14,
+          "ma13": 392.4092,
+          "ma26": 401.7104,
+          "ma52": 408.6838,
+          "pivot": 436.04,
+          "stop": 366.526,
+          "risk_pct": 3.6,
+          "volume_ratio": 1.12
+        },
+        "GOOGL": {
+          "stage": "hold",
+          "date": "2026-09-28",
+          "reason": "26주·52주 추세 또는 현재 주가 위치가 주봉 진입 기준에 미달합니다.",
+          "close": 343.5,
+          "ma13": 344.8901,
+          "ma26": 354.6918,
+          "ma52": 327.5028,
+          "pivot": 408.1039,
+          "stop": 314.6978,
+          "risk_pct": 8.4,
+          "volume_ratio": 0.93
+        },
+        "GS": {
+          "stage": "hold",
+          "date": "2026-09-28",
+          "reason": "26주·52주 추세 또는 현재 주가 위치가 주봉 진입 기준에 미달합니다.",
+          "close": 902.56,
+          "ma13": 1012.2616,
+          "ma26": 995.9203,
+          "ma52": 918.1121,
+          "pivot": 1148.3655,
+          "stop": null,
+          "risk_pct": null,
+          "volume_ratio": 0.95
+        },
+        "HOOD": {
+          "stage": "hold",
+          "date": "2026-09-28",
+          "reason": "26주·52주 추세 또는 현재 주가 위치가 주봉 진입 기준에 미달합니다.",
+          "close": 112.74,
+          "ma13": 106.2523,
+          "ma26": 96.805,
+          "ma52": 101.2438,
+          "pivot": 126.74,
+          "stop": 106.2523,
+          "risk_pct": 5.8,
+          "volume_ratio": 0.93
+        },
+        "HWM": {
+          "stage": "hold",
+          "date": "2026-09-28",
+          "reason": "26주·52주 추세 또는 현재 주가 위치가 주봉 진입 기준에 미달합니다.",
+          "close": 231.27,
+          "ma13": 261.8578,
+          "ma26": 260.4469,
+          "ma52": 238.6256,
+          "pivot": 309.8503,
+          "stop": 223.03,
+          "risk_pct": 3.6,
+          "volume_ratio": 0.82
+        },
+        "HYPEUSD": {
+          "stage": "unavailable",
+          "date": null,
+          "reason": "완료된 주봉 자료가 부족합니다."
+        },
+        "ILMN": {
+          "stage": "watch",
+          "date": "2026-09-28",
+          "reason": "중기 상승 구조를 관찰합니다. 주봉 돌파·거래량·위험 조건은 아직 확인되지 않았습니다.",
+          "close": 273.04,
+          "ma13": 215.17,
+          "ma26": 183.0208,
+          "ma52": 154.1673,
+          "pivot": 277.95,
+          "stop": 215.17,
+          "risk_pct": 21.2,
+          "volume_ratio": 1.14
+        },
+        "INIO": {
+          "stage": "unavailable",
+          "date": null,
+          "reason": "완료된 주봉 자료가 부족합니다."
+        },
+        "INTA": {
+          "stage": "hold",
+          "date": "2026-09-28",
+          "reason": "26주·52주 추세 또는 현재 주가 위치가 주봉 진입 기준에 미달합니다.",
+          "close": 36.49,
+          "ma13": 35.9808,
+          "ma26": 29.5654,
+          "ma52": 32.4227,
+          "pivot": 44.33,
+          "stop": 35.9808,
+          "risk_pct": 1.4,
+          "volume_ratio": 0.49
+        },
+        "INTC": {
+          "stage": "watch",
+          "date": "2026-09-28",
+          "reason": "중기 상승 구조를 관찰합니다. 주봉 돌파·거래량·위험 조건은 아직 확인되지 않았습니다.",
+          "close": 119.33,
+          "ma13": 101.5969,
+          "ma26": 104.1696,
+          "ma52": 73.0406,
+          "pivot": 142.35,
+          "stop": 101.5969,
+          "risk_pct": 14.9,
+          "volume_ratio": 0.88
+        },
+        "IREN": {
+          "stage": "hold",
+          "date": "2026-09-28",
+          "reason": "26주·52주 추세 또는 현재 주가 위치가 주봉 진입 기준에 미달합니다.",
+          "close": 41.76,
+          "ma13": 40.9481,
+          "ma26": 46.5648,
+          "ma52": 46.7324,
+          "pivot": 70.7066,
+          "stop": 40.9481,
+          "risk_pct": 1.9,
+          "volume_ratio": 0.76
+        },
+        "JNJ": {
+          "stage": "watch",
+          "date": "2026-09-28",
+          "reason": "중기 상승 구조를 관찰합니다. 주봉 돌파·거래량·위험 조건은 아직 확인되지 않았습니다.",
+          "close": 256.03,
+          "ma13": 262.8276,
+          "ma26": 247.9757,
+          "ma52": 230.6598,
+          "pivot": 281.07,
+          "stop": 244.2851,
+          "risk_pct": 4.6,
+          "volume_ratio": 1.05
+        },
+        "JPM": {
+          "stage": "watch",
+          "date": "2026-09-28",
+          "reason": "중기 상승 구조를 관찰합니다. 주봉 돌파·거래량·위험 조건은 아직 확인되지 않았습니다.",
+          "close": 330.7301,
+          "ma13": 348.4241,
+          "ma26": 329.2116,
+          "ma52": 315.1486,
+          "pivot": 364.6807,
+          "stop": null,
+          "risk_pct": null,
+          "volume_ratio": 1.04
+        },
+        "KLAC": {
+          "stage": "watch",
+          "date": "2026-09-28",
+          "reason": "중기 상승 구조를 관찰합니다. 주봉 돌파·거래량·위험 조건은 아직 확인되지 않았습니다.",
+          "close": 206.89,
+          "ma13": 195.047,
+          "ma26": 199.6074,
+          "ma52": 165.6159,
+          "pivot": 307.0273,
+          "stop": 195.047,
+          "risk_pct": 5.7,
+          "volume_ratio": 0.88
+        },
+        "LMT": {
+          "stage": "hold",
+          "date": "2026-09-28",
+          "reason": "26주·52주 추세 또는 현재 주가 위치가 주봉 진입 기준에 미달합니다.",
+          "close": 505.41,
+          "ma13": 546.2621,
+          "ma26": 537.5955,
+          "ma52": 539.3149,
+          "pivot": 608.9839,
+          "stop": 484.1555,
+          "risk_pct": 4.2,
+          "volume_ratio": 0.98
+        },
+        "LRCX": {
+          "stage": "watch",
+          "date": "2026-09-28",
+          "reason": "중기 상승 구조를 관찰합니다. 주봉 돌파·거래량·위험 조건은 아직 확인되지 않았습니다.",
+          "close": 347.49,
+          "ma13": 313.4251,
+          "ma26": 312.1486,
+          "ma52": 250.9856,
+          "pivot": 438.0348,
+          "stop": 313.4251,
+          "risk_pct": 9.8,
+          "volume_ratio": 0.81
+        },
+        "MRK": {
+          "stage": "watch",
+          "date": "2026-09-28",
+          "reason": "중기 상승 구조를 관찰합니다. 주봉 돌파·거래량·위험 조건은 아직 확인되지 않았습니다.",
+          "close": 144.3,
+          "ma13": 138.7531,
+          "ma26": 127.9549,
+          "ma52": 115.7637,
+          "pivot": 155.9991,
+          "stop": 138.7531,
+          "risk_pct": 3.8,
+          "volume_ratio": 0.87
+        },
+        "MRNA": {
+          "stage": "watch",
+          "date": "2026-09-28",
+          "reason": "중기 상승 구조를 관찰합니다. 주봉 돌파·거래량·위험 조건은 아직 확인되지 않았습니다.",
+          "close": 190.01,
+          "ma13": 113.6185,
+          "ma26": 83.9854,
+          "ma52": 60.6385,
+          "pivot": 202.67,
+          "stop": 113.6185,
+          "risk_pct": 40.2,
+          "volume_ratio": 1.1
+        },
+        "MRVL": {
+          "stage": "watch",
+          "date": "2026-09-28",
+          "reason": "중기 상승 구조를 관찰합니다. 주봉 돌파·거래량·위험 조건은 아직 확인되지 않았습니다.",
+          "close": 272.29,
+          "ma13": 226.0619,
+          "ma26": 217.2975,
+          "ma52": 151.8512,
+          "pivot": 329.7985,
+          "stop": 226.0619,
+          "risk_pct": 17.0,
+          "volume_ratio": 0.49
+        },
+        "MSFT": {
+          "stage": "hold",
+          "date": "2026-09-28",
+          "reason": "26주·52주 추세 또는 현재 주가 위치가 주봉 진입 기준에 미달합니다.",
+          "close": 517.53,
+          "ma13": 471.9527,
+          "ma26": 438.8062,
+          "ma52": 444.7086,
+          "pivot": 519.4,
+          "stop": 471.9527,
+          "risk_pct": 8.8,
+          "volume_ratio": 0.64
+        },
+        "MU": {
+          "stage": "watch",
+          "date": "2026-09-28",
+          "reason": "중기 상승 구조를 관찰합니다. 주봉 돌파·거래량·위험 조건은 아직 확인되지 않았습니다.",
+          "close": 1074.89,
+          "ma13": 960.4554,
+          "ma26": 872.3042,
+          "ma52": 593.9642,
+          "pivot": 1254.8067,
+          "stop": 960.4554,
+          "risk_pct": 10.6,
+          "volume_ratio": 0.71
+        },
+        "NBIS": {
+          "stage": "watch",
+          "date": "2026-09-28",
+          "reason": "중기 상승 구조를 관찰합니다. 주봉 돌파·거래량·위험 조건은 아직 확인되지 않았습니다.",
+          "close": 242.81,
+          "ma13": 217.24,
+          "ma26": 210.5196,
+          "ma52": 155.3731,
+          "pivot": 299.86,
+          "stop": 217.24,
+          "risk_pct": 10.5,
+          "volume_ratio": 0.68
+        },
+        "NOC": {
+          "stage": "hold",
+          "date": "2026-09-28",
+          "reason": "26주·52주 추세 또는 현재 주가 위치가 주봉 진입 기준에 미달합니다.",
+          "close": 478.0,
+          "ma13": 533.0701,
+          "ma26": 547.4277,
+          "ma52": 589.2213,
+          "pivot": 591.8187,
+          "stop": 476.8515,
+          "risk_pct": 0.2,
+          "volume_ratio": 1.52
+        },
+        "NOW": {
+          "stage": "hold",
+          "date": "2026-09-28",
+          "reason": "26주·52주 추세 또는 현재 주가 위치가 주봉 진입 기준에 미달합니다.",
+          "close": 134.38,
+          "ma13": 124.7915,
+          "ma26": 111.9358,
+          "ma52": 126.8447,
+          "pivot": 149.6,
+          "stop": 124.7915,
+          "risk_pct": 7.1,
+          "volume_ratio": 0.45
+        },
+        "NSIT": {
+          "stage": "setup",
+          "date": "2026-09-28",
+          "reason": "상승 추세에서 20주 고점 5% 이내이며 주봉 손절 관찰선이 있습니다.",
+          "close": 160.66,
+          "ma13": 145.3285,
+          "ma26": 120.0262,
+          "ma52": 103.0875,
+          "pivot": 168.5003,
+          "stop": 145.3285,
+          "risk_pct": 9.5,
+          "volume_ratio": 0.67
+        },
+        "NTAP": {
+          "stage": "watch",
+          "date": "2026-09-28",
+          "reason": "중기 상승 구조를 관찰합니다. 주봉 돌파·거래량·위험 조건은 아직 확인되지 않았습니다.",
+          "close": 226.27,
+          "ma13": 189.6119,
+          "ma26": 162.5928,
+          "ma52": 134.3474,
+          "pivot": 209.06,
+          "stop": 189.6119,
+          "risk_pct": 16.2,
+          "volume_ratio": 1.13
+        },
+        "NTRA": {
+          "stage": "watch",
+          "date": "2026-09-28",
+          "reason": "중기 상승 구조를 관찰합니다. 주봉 돌파·거래량·위험 조건은 아직 확인되지 않았습니다.",
+          "close": 410.35,
+          "ma13": 323.9092,
+          "ma26": 270.4023,
+          "ma52": 241.4767,
+          "pivot": 415.75,
+          "stop": 323.9092,
+          "risk_pct": 21.1,
+          "volume_ratio": 1.37
+        },
+        "NTSK": {
+          "stage": "unavailable",
+          "date": null,
+          "reason": "완료된 주봉 자료가 부족합니다."
+        },
+        "NVDA": {
+          "stage": "setup",
+          "date": "2026-09-28",
+          "reason": "상승 추세에서 20주 고점 5% 이내이며 주봉 손절 관찰선이 있습니다.",
+          "close": 233.95,
+          "ma13": 217.733,
+          "ma26": 211.4602,
+          "ma52": 197.2104,
+          "pivot": 236.0005,
+          "stop": 217.733,
+          "risk_pct": 6.9,
+          "volume_ratio": 0.89
+        },
+        "NVT": {
+          "stage": "watch",
+          "date": "2026-09-28",
+          "reason": "중기 상승 구조를 관찰합니다. 주봉 돌파·거래량·위험 조건은 아직 확인되지 않았습니다.",
+          "close": 169.56,
+          "ma13": 159.0494,
+          "ma26": 158.5489,
+          "ma52": 133.4461,
+          "pivot": 184.3957,
+          "stop": 159.0494,
+          "risk_pct": 6.2,
+          "volume_ratio": 0.83
+        },
+        "ON": {
+          "stage": "hold",
+          "date": "2026-09-28",
+          "reason": "26주·52주 추세 또는 현재 주가 위치가 주봉 진입 기준에 미달합니다.",
+          "close": 84.89,
+          "ma13": 80.3838,
+          "ma26": 91.875,
+          "ma52": 74.3965,
+          "pivot": 134.92,
+          "stop": 80.3838,
+          "risk_pct": 5.3,
+          "volume_ratio": 1.12
+        },
+        "ORCL": {
+          "stage": "hold",
+          "date": "2026-09-28",
+          "reason": "26주·52주 추세 또는 현재 주가 위치가 주봉 진입 기준에 미달합니다.",
+          "close": 142.3,
+          "ma13": 141.7569,
+          "ma26": 160.41,
+          "ma52": 176.6461,
+          "pivot": 249.3824,
+          "stop": 141.7569,
+          "risk_pct": 0.4,
+          "volume_ratio": 1.13
+        },
+        "OUST": {
+          "stage": "watch",
+          "date": "2026-09-28",
+          "reason": "중기 상승 구조를 관찰합니다. 주봉 돌파·거래량·위험 조건은 아직 확인되지 않았습니다.",
+          "close": 44.39,
+          "ma13": 39.4954,
+          "ma26": 37.4658,
+          "ma52": 30.434,
+          "pivot": 63.79,
+          "stop": 39.4954,
+          "risk_pct": 11.0,
+          "volume_ratio": 0.67
+        },
+        "PANW": {
+          "stage": "watch",
+          "date": "2026-09-28",
+          "reason": "중기 상승 구조를 관찰합니다. 주봉 돌파·거래량·위험 조건은 아직 확인되지 않았습니다.",
+          "close": 403.24,
+          "ma13": 355.6362,
+          "ma26": 299.66,
+          "ma52": 241.2252,
+          "pivot": 398.88,
+          "stop": 355.6362,
+          "risk_pct": 11.8,
+          "volume_ratio": 0.77
+        },
+        "PLTR": {
+          "stage": "hold",
+          "date": "2026-09-28",
+          "reason": "26주·52주 추세 또는 현재 주가 위치가 주봉 진입 기준에 미달합니다.",
+          "close": 188.75,
+          "ma13": 162.6962,
+          "ma26": 149.0804,
+          "ma52": 156.9229,
+          "pivot": 194.68,
+          "stop": 162.6962,
+          "risk_pct": 13.8,
+          "volume_ratio": 0.47
+        },
+        "POWL": {
+          "stage": "hold",
+          "date": "2026-09-28",
+          "reason": "26주·52주 추세 또는 현재 주가 위치가 주봉 진입 기준에 미달합니다.",
+          "close": 196.1,
+          "ma13": 203.3817,
+          "ma26": 238.8644,
+          "ma52": 188.965,
+          "pivot": 327.7422,
+          "stop": 167.31,
+          "risk_pct": 14.7,
+          "volume_ratio": 0.67
+        },
+        "PURR": {
+          "stage": "unavailable",
+          "date": null,
+          "reason": "완료된 주봉 자료가 부족합니다."
+        },
+        "PWR": {
+          "stage": "watch",
+          "date": "2026-09-28",
+          "reason": "중기 상승 구조를 관찰합니다. 주봉 돌파·거래량·위험 조건은 아직 확인되지 않았습니다.",
+          "close": 676.56,
+          "ma13": 647.3874,
+          "ma26": 668.4217,
+          "ma52": 573.571,
+          "pivot": 782.428,
+          "stop": 647.3874,
+          "risk_pct": 4.3,
+          "volume_ratio": 0.78
+        },
+        "QLYS": {
+          "stage": "setup",
+          "date": "2026-09-28",
+          "reason": "상승 추세에서 20주 고점 5% 이내이며 주봉 손절 관찰선이 있습니다.",
+          "close": 193.0,
+          "ma13": 168.8638,
+          "ma26": 135.6638,
+          "ma52": 129.2292,
+          "pivot": 201.54,
+          "stop": 168.8638,
+          "risk_pct": 12.5,
+          "volume_ratio": 0.8
+        },
+        "QQQ": {
+          "stage": "watch",
+          "date": "2026-09-28",
+          "reason": "중기 상승 구조를 관찰합니다. 주봉 돌파·거래량·위험 조건은 아직 확인되지 않았습니다.",
+          "close": 749.58,
+          "ma13": 716.7876,
+          "ma26": 706.1737,
+          "ma52": 655.8388,
+          "pivot": 748.349,
+          "stop": 716.7876,
+          "risk_pct": 4.4,
+          "volume_ratio": 0.88
+        },
+        "RKLB": {
+          "stage": "hold",
+          "date": "2026-09-28",
+          "reason": "26주·52주 추세 또는 현재 주가 위치가 주봉 진입 기준에 미달합니다.",
+          "close": 73.92,
+          "ma13": 70.5546,
+          "ma26": 86.2592,
+          "ma52": 76.392,
+          "pivot": 150.9999,
+          "stop": 70.5546,
+          "risk_pct": 4.6,
+          "volume_ratio": 0.96
+        },
+        "RTX": {
+          "stage": "hold",
+          "date": "2026-09-28",
+          "reason": "26주·52주 추세 또는 현재 주가 위치가 주봉 진입 기준에 미달합니다.",
+          "close": 184.68,
+          "ma13": 203.7058,
+          "ma26": 193.203,
+          "ma52": 189.1867,
+          "pivot": 226.41,
+          "stop": null,
+          "risk_pct": null,
+          "volume_ratio": 0.79
+        },
+        "SNOW": {
+          "stage": "watch",
+          "date": "2026-09-28",
+          "reason": "중기 상승 구조를 관찰합니다. 주봉 돌파·거래량·위험 조건은 아직 확인되지 않았습니다.",
+          "close": 341.04,
+          "ma13": 314.42,
+          "ma26": 253.23,
+          "ma52": 232.114,
+          "pivot": 384.56,
+          "stop": 314.42,
+          "risk_pct": 7.8,
+          "volume_ratio": 0.72
+        },
+        "SOXX": {
+          "stage": "watch",
+          "date": "2026-09-28",
+          "reason": "중기 상승 구조를 관찰합니다. 주봉 돌파·거래량·위험 조건은 아직 확인되지 않았습니다.",
+          "close": 588.9,
+          "ma13": 538.1174,
+          "ma26": 530.2053,
+          "ma52": 423.7755,
+          "pivot": 655.5217,
+          "stop": 538.1174,
+          "risk_pct": 8.6,
+          "volume_ratio": 0.67
+        },
+        "SPCX": {
+          "stage": "unavailable",
+          "date": null,
+          "reason": "완료된 주봉 자료가 부족합니다."
+        },
+        "SPY": {
+          "stage": "setup",
+          "date": "2026-09-28",
+          "reason": "상승 추세에서 20주 고점 5% 이내이며 주봉 손절 관찰선이 있습니다.",
+          "close": 769.64,
+          "ma13": 760.5536,
+          "ma26": 744.1502,
+          "ma52": 707.0912,
+          "pivot": 777.4395,
+          "stop": 760.5536,
+          "risk_pct": 1.2,
+          "volume_ratio": 1.01
+        },
+        "STM": {
+          "stage": "hold",
+          "date": "2026-09-28",
+          "reason": "26주·52주 추세 또는 현재 주가 위치가 주봉 진입 기준에 미달합니다.",
+          "close": 57.26,
+          "ma13": 54.6039,
+          "ma26": 58.4818,
+          "ma52": 43.29,
+          "pivot": 81.1866,
+          "stop": 54.6039,
+          "risk_pct": 4.6,
+          "volume_ratio": 0.96
+        },
+        "STRL": {
+          "stage": "hold",
+          "date": "2026-09-28",
+          "reason": "26주·52주 추세 또는 현재 주가 위치가 주봉 진입 기준에 미달합니다.",
+          "close": 533.42,
+          "ma13": 557.7958,
+          "ma26": 637.9783,
+          "ma52": 501.9149,
+          "pivot": 1005.6802,
+          "stop": 444.5208,
+          "risk_pct": 16.7,
+          "volume_ratio": 0.65
+        },
+        "TEAM": {
+          "stage": "hold",
+          "date": "2026-09-28",
+          "reason": "26주·52주 추세 또는 현재 주가 위치가 주봉 진입 기준에 미달합니다.",
+          "close": 187.89,
+          "ma13": 152.3454,
+          "ma26": 118.0919,
+          "ma52": 121.4579,
+          "pivot": 200.0,
+          "stop": 152.3454,
+          "risk_pct": 18.9,
+          "volume_ratio": 0.67
+        },
+        "TEM": {
+          "stage": "hold",
+          "date": "2026-09-28",
+          "reason": "26주·52주 추세 또는 현재 주가 위치가 주봉 진입 기준에 미달합니다.",
+          "close": 76.63,
+          "ma13": 61.6346,
+          "ma26": 56.12,
+          "ma52": 60.901,
+          "pivot": 85.46,
+          "stop": 61.6346,
+          "risk_pct": 19.6,
+          "volume_ratio": 0.94
+        },
+        "TER": {
+          "stage": "watch",
+          "date": "2026-09-28",
+          "reason": "중기 상승 구조를 관찰합니다. 주봉 돌파·거래량·위험 조건은 아직 확인되지 않았습니다.",
+          "close": 449.04,
+          "ma13": 375.607,
+          "ma26": 377.9779,
+          "ma52": 302.6257,
+          "pivot": 487.7226,
+          "stop": 375.607,
+          "risk_pct": 16.4,
+          "volume_ratio": 0.63
+        },
+        "TLN": {
+          "stage": "hold",
+          "date": "2026-09-28",
+          "reason": "26주·52주 추세 또는 현재 주가 위치가 주봉 진입 기준에 미달합니다.",
+          "close": 320.77,
+          "ma13": 332.3396,
+          "ma26": 352.0679,
+          "ma52": 359.1624,
+          "pivot": 449.8409,
+          "stop": 279.77,
+          "risk_pct": 12.8,
+          "volume_ratio": 1.55
+        },
+        "TMO": {
+          "stage": "hold",
+          "date": "2026-09-28",
+          "reason": "26주·52주 추세 또는 현재 주가 위치가 주봉 진입 기준에 미달합니다.",
+          "close": 654.8,
+          "ma13": 602.784,
+          "ma26": 541.3706,
+          "ma52": 545.776,
+          "pivot": 682.98,
+          "stop": 602.784,
+          "risk_pct": 7.9,
+          "volume_ratio": 0.95
+        },
+        "TSLA": {
+          "stage": "hold",
+          "date": "2026-09-28",
+          "reason": "26주·52주 추세 또는 현재 주가 위치가 주봉 진입 기준에 미달합니다.",
+          "close": 370.59,
+          "ma13": 355.5223,
+          "ma26": 377.7673,
+          "ma52": 400.226,
+          "pivot": 453.4,
+          "stop": 355.5223,
+          "risk_pct": 4.1,
+          "volume_ratio": 0.97
+        },
+        "TWST": {
+          "stage": "watch",
+          "date": "2026-09-28",
+          "reason": "중기 상승 구조를 관찰합니다. 주봉 돌파·거래량·위험 조건은 아직 확인되지 않았습니다.",
+          "close": 188.67,
+          "ma13": 129.0727,
+          "ma26": 98.9421,
+          "ma52": 68.4493,
+          "pivot": 186.2,
+          "stop": 129.0727,
+          "risk_pct": 31.6,
+          "volume_ratio": 1.66
+        },
+        "TXG": {
+          "stage": "watch",
+          "date": "2026-09-28",
+          "reason": "중기 상승 구조를 관찰합니다. 주봉 돌파·거래량·위험 조건은 아직 확인되지 않았습니다.",
+          "close": 93.5,
+          "ma13": 61.68,
+          "ma26": 44.6492,
+          "ma52": 31.2363,
+          "pivot": 86.16,
+          "stop": 61.68,
+          "risk_pct": 34.0,
+          "volume_ratio": 1.13
+        },
+        "TXN": {
+          "stage": "watch",
+          "date": "2026-09-28",
+          "reason": "중기 상승 구조를 관찰합니다. 주봉 돌파·거래량·위험 조건은 아직 확인되지 않았습니다.",
+          "close": 293.8,
+          "ma13": 276.9733,
+          "ma26": 279.71,
+          "ma52": 231.6659,
+          "pivot": 332.3285,
+          "stop": 276.9733,
+          "risk_pct": 5.7,
+          "volume_ratio": 0.61
+        },
+        "US10Y": {
+          "stage": "unavailable",
+          "date": null,
+          "reason": "완료된 주봉 자료가 부족합니다."
+        },
+        "US30Y": {
+          "stage": "unavailable",
+          "date": null,
+          "reason": "완료된 주봉 자료가 부족합니다."
+        },
+        "VEEV": {
+          "stage": "hold",
+          "date": "2026-09-28",
+          "reason": "26주·52주 추세 또는 현재 주가 위치가 주봉 진입 기준에 미달합니다.",
+          "close": 273.33,
+          "ma13": 240.4646,
+          "ma26": 203.3619,
+          "ma52": 214.5985,
+          "pivot": 296.24,
+          "stop": 240.4646,
+          "risk_pct": 12.0,
+          "volume_ratio": 0.61
+        },
+        "VST": {
+          "stage": "hold",
+          "date": "2026-09-28",
+          "reason": "26주·52주 추세 또는 현재 주가 위치가 주봉 진입 기준에 미달합니다.",
+          "close": 140.02,
+          "ma13": 146.3124,
+          "ma26": 150.5068,
+          "ma52": 159.7713,
+          "pivot": 171.0698,
+          "stop": 134.2801,
+          "risk_pct": 4.1,
+          "volume_ratio": 1.56
+        },
+        "XBI": {
+          "stage": "watch",
+          "date": "2026-09-28",
+          "reason": "중기 상승 구조를 관찰합니다. 주봉 돌파·거래량·위험 조건은 아직 확인되지 않았습니다.",
+          "close": 154.43,
+          "ma13": 156.9123,
+          "ma26": 147.0384,
+          "ma52": 133.5689,
+          "pivot": 169.89,
+          "stop": 143.775,
+          "risk_pct": 6.9,
+          "volume_ratio": 1.01
+        },
+        "XLV": {
+          "stage": "watch",
+          "date": "2026-09-28",
+          "reason": "중기 상승 구조를 관찰합니다. 주봉 돌파·거래량·위험 조건은 아직 확인되지 않았습니다.",
+          "close": 166.18,
+          "ma13": 166.229,
+          "ma26": 157.6959,
+          "ma52": 153.8691,
+          "pivot": 175.9215,
+          "stop": 156.6303,
+          "risk_pct": 5.7,
+          "volume_ratio": 0.96
+        },
+        "YEXT": {
+          "stage": "hold",
+          "date": "2026-09-28",
+          "reason": "26주·52주 추세 또는 현재 주가 위치가 주봉 진입 기준에 미달합니다.",
+          "close": 6.51,
+          "ma13": 5.9877,
+          "ma26": 4.9746,
+          "ma52": 6.0285,
+          "pivot": 7.88,
+          "stop": 5.9877,
+          "risk_pct": 8.0,
+          "volume_ratio": 0.84
+        },
+        "ZBRA": {
+          "stage": "setup",
+          "date": "2026-09-28",
+          "reason": "상승 추세에서 20주 고점 5% 이내이며 주봉 손절 관찰선이 있습니다.",
+          "close": 375.86,
+          "ma13": 336.6754,
+          "ma26": 287.9965,
+          "ma52": 267.7205,
+          "pivot": 386.23,
+          "stop": 336.6754,
+          "risk_pct": 10.4,
+          "volume_ratio": 0.55
+        },
+        "ZETA": {
+          "stage": "watch",
+          "date": "2026-09-28",
+          "reason": "중기 상승 구조를 관찰합니다. 주봉 돌파·거래량·위험 조건은 아직 확인되지 않았습니다.",
+          "close": 32.63,
+          "ma13": 27.1569,
+          "ma26": 23.0223,
+          "ma52": 20.689,
+          "pivot": 32.81,
+          "stop": 27.1569,
+          "risk_pct": 16.8,
+          "volume_ratio": 0.8
+        }
+      },
+      "completed_at": "2026-10-08T09:52+09:00"
+    }
+  }
+}
