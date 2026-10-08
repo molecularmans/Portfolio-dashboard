@@ -8,6 +8,7 @@ from unittest.mock import patch
 import pandas as pd
 
 from src.db.screen_snapshot import ScreenRuntime, ScreenSnapshotStore
+from src.indicators.weekly_screen import completed_week_start
 
 
 class _NoGitHub:
@@ -39,6 +40,19 @@ class ScreenSnapshotTests(unittest.TestCase):
             self.assertFalse(runtime.status()["running"])
             self.assertEqual(runtime.screen("D")["scan_day"], "2026-10-08")
             self.assertEqual(runtime.screen("W")["results"]["TWST"]["stage"], "unavailable")
+
+    def test_scheduled_refresh_skips_weekly_when_same_week_is_saved(self):
+        with tempfile.TemporaryDirectory() as folder:
+            store = ScreenSnapshotStore(Path(folder) / "screen.json", github_sync=_NoGitHub())
+            store.save({"W": {"week_start": completed_week_start("AAPL").isoformat(), "results": {}}})
+            with patch("src.db.screen_snapshot.scan_day", side_effect=["2026-10-07", "2026-10-08"]):
+                runtime = ScreenRuntime(store)
+                self.assertTrue(runtime.start(["TWST"], lambda *_args, **_kwargs: pd.DataFrame(), None, None, scheduled=True))
+            self.assertEqual(runtime.status()["total"], 1)
+            deadline = time.monotonic() + 2
+            while runtime.status()["running"] and time.monotonic() < deadline:
+                time.sleep(0.01)
+            self.assertFalse(runtime.status()["running"])
 
 
 if __name__ == "__main__":

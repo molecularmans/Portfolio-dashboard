@@ -119,7 +119,7 @@ def render_weekly_assessment(df: pd.DataFrame, ticker: str) -> None:
         st.write(result["reason"])
         w1, w2, w3, w4 = st.columns(4)
         w1.metric("주봉 종가", f"{currency}{result['close']:,.2f}")
-        w2.metric("13주 / 26주선", f"{currency}{result['ma13']:,.2f} / {currency}{result['ma26']:,.2f}")
+        w2.metric("13주 / 26주선", f"{currency}{result['ma13']:,.2f} / {result['ma26']:,.2f}")
         w3.metric("52주선", f"{currency}{result['ma52']:,.2f}")
         w4.metric("이번 주 / 지난 20주 평균 거래량", f"{result['volume_ratio']:.2f}배" if result["volume_ratio"] is not None else "확인 불가")
         st.write(f"**진입 관찰선:** 직전 20주 고점 {currency}{result['pivot']:,.2f} 위 완료 주봉 종가와 거래량 1.2배 이상")

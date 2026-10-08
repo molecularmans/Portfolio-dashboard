@@ -183,7 +183,7 @@ def schedule_watchlist_screen(db: StockDB, client: KISClient) -> None:
 def render_watchlist_screen(db: StockDB, client: KISClient, refresh_requested: bool = False) -> None:
     """Show the saved screen; run a worker only at the active 09:30 rollover or on request."""
     st.markdown("##### 📅 관심종목 종가 판정")
-    st.caption("일봉·주봉 마지막 저장 결과를 즉시 표시합니다. 앱이 켜져 있으면 오전 9시 30분(한국시간)에 갱신하고, 원할 때 아래 버튼으로 다시 계산할 수 있습니다.")
+    st.caption("일봉·주봉 마지막 저장 결과를 즉시 표시합니다. 앱이 켜져 있으면 오전 9시 30분(한국시간)에 일봉을, 새 완료 주가 생기면 주봉도 갱신합니다. 아래 버튼으로 언제든 다시 계산할 수 있습니다.")
     if not client.is_configured():
         st.info("KIS 실전 시세가 연결되면 관심종목 판정을 시작합니다.")
         return

@@ -15,7 +15,7 @@ import requests
 
 from src.db.github_sync import GitHubSync
 from src.indicators.daily_screen import evaluate_daily_ticker, scan_day
-from src.indicators.weekly_screen import evaluate_weekly_ticker
+from src.indicators.weekly_screen import completed_week_start, evaluate_weekly_ticker
 
 
 SNAPSHOT_PATH = Path(__file__).resolve().parents[2] / "data" / "watchlist_screen.json"
@@ -99,16 +99,20 @@ class ScreenRuntime:
                 return False
             if scheduled:
                 self._auto_day = day
-            self._job = {"running": True, "done": 0, "total": len(tickers) * 2, "ticker": "", "error": None}
-        Thread(target=self._run, args=(tuple(tickers), day, load_data, db, client), daemon=True).start()
+            weekly_due = not scheduled or (self._screens.get("W") or {}).get("week_start") != completed_week_start("AAPL").isoformat()
+            periods = ("D", "W") if weekly_due else ("D",)
+            self._job = {"running": True, "done": 0, "total": len(tickers) * len(periods), "ticker": "", "error": None}
+        Thread(target=self._run, args=(tuple(tickers), day, periods, load_data, db, client), daemon=True).start()
         return True
 
-    def _run(self, tickers: tuple[str, ...], day: str, load_data: Callable, db, client) -> None:
+    def _run(self, tickers: tuple[str, ...], day: str, periods: tuple[str, ...], load_data: Callable, db, client) -> None:
         try:
             for timeframe, label, evaluator in (
                 ("D", "일봉", evaluate_daily_ticker),
                 ("W", "주봉", evaluate_weekly_ticker),
             ):
+                if timeframe not in periods:
+                    continue
                 results = {}
                 for ticker in tickers:
                     with self._lock:
@@ -126,6 +130,8 @@ class ScreenRuntime:
                     "results": results,
                     "completed_at": datetime.now(ZoneInfo("Asia/Seoul")).isoformat(timespec="minutes"),
                 }
+                if timeframe == "W":
+                    screen["week_start"] = completed_week_start("AAPL").isoformat()
                 with self._lock:
                     self._screens[timeframe] = screen
                     self.store.save(self._screens)
