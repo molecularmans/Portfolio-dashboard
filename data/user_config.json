@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-10-08 05:42:55",
+  "updated_at": "2026-10-08 08:10:04",
   "groups": [
     {
       "group_name": "지수",
@@ -201,6 +201,11 @@
     },
     {
       "ticker": "LHX",
+      "name": "",
+      "group_name": "방산.항공"
+    },
+    {
+      "ticker": "KTOS",
       "name": "",
       "group_name": "방산.항공"
     },
