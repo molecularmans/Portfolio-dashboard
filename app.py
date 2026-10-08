@@ -1,15 +1,19 @@
 import streamlit as st
 import pandas as pd
+from html import escape
 
 from src.db.database import StockDB
 from src.api.kis_rest import KISClient, looks_like_mock_ohlcv
 from src.indicators.technicals import calc_indicators
-from src.indicators.daily_screen import STAGE_LABELS, evaluate_daily_ticker, scan_day
+from src.indicators.daily_screen import STAGE_LABELS, scan_day
+from src.indicators.weekly_screen import WEEKLY_STAGE_LABELS
+from src.db.screen_snapshot import ScreenRuntime, ScreenSnapshotStore
 from src.ui.charts import create_detail_chart, CHART_CONFIG
 from src.ui.tradingview import render_tradingview_chart, render_tradingview_mini_chart
 from src.ui.sidebar import render_sidebar
 from src.ui.vcp_view import render_vcp_analysis_panel
 from src.ui.pattern_view import render_pattern_analysis_dashboard
+from src.ui.pattern_view import render_weekly_assessment
 
 # 1. Streamlit 페이지 기본 설정
 st.set_page_config(
@@ -85,6 +89,21 @@ st.markdown("""
         letter-spacing: -0.3px;
         white-space: nowrap;
     }
+    .holdings-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(128px, 1fr));
+        gap: 7px;
+    }
+    .holding-card {
+        background: rgba(255, 255, 255, 0.04);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        border-radius: 8px;
+        padding: 7px 10px;
+        min-width: 0;
+    }
+    .holding-name {font-size: .78rem; color: #cbd5e1; font-weight: 600;}
+    .holding-price {font-size: 1rem; color: #f8fafc; font-weight: 600; white-space: nowrap;}
+    .holding-return {font-size: .78rem; font-weight: 600;}
     
     .positive-text {
         color: #26a69a;
@@ -109,6 +128,11 @@ def init_services():
     db = StockDB()
     client = KISClient()
     return db, client
+
+
+@st.cache_resource
+def get_screen_runtime():
+    return ScreenRuntime(ScreenSnapshotStore())
 
 
 def load_and_calc_stock_data(ticker: str, db: StockDB, client: KISClient, force_refresh: bool = False, timeframe: str = "일봉") -> pd.DataFrame:
@@ -143,11 +167,23 @@ def load_and_calc_stock_data(ticker: str, db: StockDB, client: KISClient, force_
     return calc_indicators(df)
 
 
-@st.fragment(run_every="2s")
-def render_daily_watchlist_screen(db: StockDB, client: KISClient) -> None:
-    """Advance the daily screen one ticker at a time without blocking the chart grid."""
-    st.markdown("##### 📅 관심종목 일봉 판정")
-    st.caption("미국 장 마감 후 오전 9시 30분(한국시간)에 거래일별로 자동 분석합니다. 앱이 잠들어 있으면 다시 열 때 진행됩니다.")
+@st.fragment(run_every="15s")
+def schedule_watchlist_screen(db: StockDB, client: KISClient) -> None:
+    """Detect the 09:30 rollover in any open dashboard view."""
+    if not client.is_configured():
+        return
+    runtime = get_screen_runtime()
+    watchlist = db.get_watchlist()
+    tickers = sorted(set(watchlist["ticker"].dropna().astype(str).str.strip().str.upper()) - {""}) if not watchlist.empty else []
+    if tickers:
+        runtime.start(tickers, load_and_calc_stock_data, db, client, scheduled=True)
+
+
+@st.fragment(run_every="15s")
+def render_watchlist_screen(db: StockDB, client: KISClient, refresh_requested: bool = False) -> None:
+    """Show the saved screen; run a worker only at the active 09:30 rollover or on request."""
+    st.markdown("##### 📅 관심종목 종가 판정")
+    st.caption("일봉·주봉 마지막 저장 결과를 즉시 표시합니다. 앱이 켜져 있으면 오전 9시 30분(한국시간)에 갱신하고, 원할 때 아래 버튼으로 다시 계산할 수 있습니다.")
     if not client.is_configured():
         st.info("KIS 실전 시세가 연결되면 관심종목 판정을 시작합니다.")
         return
@@ -158,49 +194,59 @@ def render_daily_watchlist_screen(db: StockDB, client: KISClient) -> None:
         st.info("등록된 관심종목이 없습니다.")
         return
 
-    scan_key = (scan_day(), tuple(tickers))
-    state = st.session_state.get("daily_watchlist_scan")
-    if not state or state["key"] != scan_key:
-        state = {"key": scan_key, "cursor": 0, "results": {}}
-        st.session_state["daily_watchlist_scan"] = state
+    runtime = get_screen_runtime()
+    col_period, col_refresh = st.columns([4, 2])
+    with col_period:
+        selected = st.radio("판정 주기", ["일봉", "주봉"], horizontal=True, key="watchlist_screen_period")
+    with col_refresh:
+        manual = st.button("일봉·주봉 판정 새로고침", use_container_width=True)
+    if manual or refresh_requested:
+        runtime.start(tickers, load_and_calc_stock_data, db, client)
 
-    if state["cursor"] < len(tickers):
-        ticker = tickers[state["cursor"]]
-        try:
-            df = load_and_calc_stock_data(ticker, db, client, force_refresh=True, timeframe="일봉")
-            result = evaluate_daily_ticker(df, ticker)
-        except Exception:
-            result = {"stage": "unavailable", "date": None}
-        state["results"][ticker] = result
-        state["cursor"] += 1
+    job = runtime.status()
+    if job and job["running"]:
+        st.progress(job["done"] / max(job["total"], 1), text=f"판정 갱신 중 · {job['done']}/{job['total']} · {job['ticker']}")
+    elif job and job["error"]:
+        st.warning(job["error"])
 
-    done = state["cursor"]
-    if done < len(tickers):
-        st.progress(done / len(tickers), text=f"자동 판정 진행 중 · {done}/{len(tickers)}종목")
-    else:
-        st.caption(f"{done}종목 판정 완료 · 다음 미국 거래일에 자동 갱신")
+    code = "D" if selected == "일봉" else "W"
+    labels = STAGE_LABELS if code == "D" else WEEKLY_STAGE_LABELS
+    screen = runtime.screen(code)
+    if not screen:
+        st.info(f"저장된 {selected} 판정이 없습니다. ‘일봉·주봉 판정 새로고침’을 눌러 처음 계산해 주세요.")
+        st.divider()
+        return
 
-    results = state["results"]
+    results = {ticker: screen["results"].get(ticker, {"stage": "unavailable", "date": None}) for ticker in tickers}
+    changed = set(tickers) != set(screen["tickers"])
+    if changed:
+        st.caption("관심종목 목록이 변경되었습니다. 새 종목은 자료 부족으로 표시되며, 새로고침 후 반영됩니다.")
+    st.caption(f"마지막 저장: {screen['completed_at'].replace('T', ' ')} (한국시간) · 판정 대상 {len(screen['tickers'])}종목")
+    if screen["scan_day"] != scan_day():
+        st.caption("새 거래일 결과가 아직 저장되지 않아 이전 판정을 표시합니다.")
     dates = sorted({item["date"] for item in results.values() if item.get("date") and item["stage"] != "unavailable"})
     if dates:
         date_text = dates[-1] if len(dates) == 1 else f"{dates[0]} ~ {dates[-1]}"
-        st.caption(f"판정에 사용한 일봉 종가 기준일: {date_text} · 최근 장 마감 일봉이 없는 종목은 제외")
+        st.caption(f"판정에 사용한 {selected} 종가 기준일: {date_text}")
 
     buckets = {
         stage: [ticker for ticker, result in results.items() if result["stage"] == stage]
-        for stage in STAGE_LABELS
+        for stage in labels
     }
     cols = st.columns(3)
     for col, stage in zip(cols, ("ready", "setup", "watch")):
         with col:
-            st.markdown(f"**{STAGE_LABELS[stage]} ({len(buckets[stage])})**")
+            st.markdown(f"**{labels[stage]} ({len(buckets[stage])})**")
             st.write(" · ".join(buckets[stage]) if buckets[stage] else "없음")
-    with st.expander(f"{STAGE_LABELS['hold']} ({len(buckets['hold'])})", expanded=False):
+    with st.expander(f"{labels['hold']} ({len(buckets['hold'])})", expanded=False):
         st.write(" · ".join(buckets["hold"]) if buckets["hold"] else "없음")
     if buckets["unavailable"]:
-        with st.expander(f"{STAGE_LABELS['unavailable']} ({len(buckets['unavailable'])})", expanded=False):
+        with st.expander(f"{labels['unavailable']} ({len(buckets['unavailable'])})", expanded=False):
             st.write(" · ".join(buckets["unavailable"]))
-    st.caption("관심 우선순위와 진입 준비는 매수 신호가 아닙니다. 당일 조건 충족도 최신 가격·거래량과 개인 위험 한도를 확인해야 합니다.")
+    if code == "W":
+        st.caption("주봉은 완료된 주의 13·26·52주선, 직전 20주 고점, 주간 거래량과 손절폭으로 판정합니다. 일봉 [A–D]와는 독립된 참고 기준입니다.")
+    else:
+        st.caption("관심 우선순위와 진입 준비는 매수 신호가 아닙니다. 당일 조건 충족도 최신 가격·거래량과 개인 위험 한도를 확인해야 합니다.")
     st.divider()
 
 
@@ -218,6 +264,7 @@ def main():
     force_refresh = st.session_state.get("force_refresh", False)
     st.session_state["force_refresh"] = False
     timeframe = settings.get("timeframe", "일봉")
+    schedule_watchlist_screen(db, client)
 
     # 대상 티커 목록 및 포트폴리오 결정
     view_mode = settings["view_mode"]
@@ -260,7 +307,7 @@ def main():
     if is_portfolio_mode and portfolio_items:
         total_eval = sum(item["eval_amount"] for item in portfolio_items)
         
-        c_total, c_items = st.columns([1.6, 8.4])
+        c_total, c_items = st.columns([2, 8])
         with c_total:
             st.markdown(f"""
             <div class="total-eval-box">
@@ -270,16 +317,18 @@ def main():
             """, unsafe_allow_html=True)
 
         with c_items:
-            num_show = min(len(portfolio_items), 10)
-            item_cols = st.columns(num_show)
-            for i in range(num_show):
-                it = portfolio_items[i]
-                with item_cols[i]:
-                    st.metric(
-                        label=f"{it['ticker']} ({int(it['qty'])}주)",
-                        value=f"${it['current_price']:,.2f}",
-                        delta=f"{it['profit_rate']:+.2f}%",
-                    )
+            st.caption(f"보유종목 현황 · {len(portfolio_items)}종목 전체")
+            cards = []
+            for it in portfolio_items:
+                rate = float(it["profit_rate"])
+                color = "#26a69a" if rate >= 0 else "#ef5350"
+                currency = "₩" if str(it["ticker"]).isdigit() and len(str(it["ticker"])) == 6 else "$"
+                cards.append(
+                    f'<div class="holding-card"><div class="holding-name">{escape(str(it["ticker"]))} ({int(it["qty"])}주)</div>'
+                    f'<div class="holding-price">{currency}{float(it["current_price"]):,.2f}</div>'
+                    f'<div class="holding-return" style="color:{color}">{rate:+.2f}%</div></div>'
+                )
+            st.markdown('<div class="holdings-grid">' + ''.join(cards) + '</div>', unsafe_allow_html=True)
         st.divider()
 
     # ==========================================
@@ -391,6 +440,8 @@ def main():
             render_tradingview_chart(sel_ticker, timeframe=detail_tf, settings=detail_settings, height=750)
 
         # 종합 진단 엔진 ([A] 지지/저항 & 추세선 + [B] 고전 패턴 + [C] 마크 미너비니 VCP)
+        if detail_tf == "주봉":
+            render_weekly_assessment(df_stock, sel_ticker)
         df_daily = df_stock if detail_tf == "일봉" else load_and_calc_stock_data(sel_ticker, db, client, force_refresh=force_refresh, timeframe="일봉")
         if detail_tf != "일봉" and not df_daily.empty:
             st.caption("아래 [A–D] 분석은 선택한 주봉·월봉 차트와 별도로 일봉 데이터로 계산합니다.")
@@ -406,9 +457,7 @@ def main():
     # ==========================================
     # VIEW 모드 2: 멀티 차트 그리드 (트레이딩뷰 실시간 정품 캔들 엔진 탑재)
     # ==========================================
-    if force_refresh:
-        st.session_state.pop("daily_watchlist_scan", None)
-    render_daily_watchlist_screen(db, client)
+    render_watchlist_screen(db, client, refresh_requested=force_refresh)
     st.markdown(f"##### {view_mode} ({len(tickers)} 종목) · {timeframe}")
 
     if not tickers:

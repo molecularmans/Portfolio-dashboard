@@ -15,6 +15,7 @@ from src.indicators.smart_analysis_v4 import analyze_smart_chart_v4
 from src.indicators.vcp_analyzer import detect_vcp_pattern
 from src.indicators.integrated_assessment import build_integrated_assessment
 from src.indicators.daily_screen import STAGE_LABELS, classify_entry_stage
+from src.indicators.weekly_screen import WEEKLY_STAGE_LABELS, evaluate_weekly_ticker
 from src.indicators.investment_risk_report import build_investment_risk_report
 from src.indicators.relative_performance import calculate_rp_history, current_rp_rating, load_rp_reference
 from src.ui.vcp_view import render_vcp_analysis_panel
@@ -103,6 +104,30 @@ def _stop_scenario_text(summary: Dict[str, Any], currency: str) -> str:
         prefix + " 아래 일봉 종가 마감 시 진입 가정을 재검토합니다. "
         f"가정 진입가 대비 손절 폭은 **{summary['risk_pct']:.1f}%**입니다."
     )
+
+
+def render_weekly_assessment(df: pd.DataFrame, ticker: str) -> None:
+    """Explain the weekly watchlist bucket beside the weekly chart."""
+    result = evaluate_weekly_ticker(df, ticker)
+    currency = "₩" if ticker.isdigit() and len(ticker) == 6 else "$"
+    with st.container(border=True):
+        st.subheader(f"{ticker} 완료 주봉 판정 · {WEEKLY_STAGE_LABELS[result['stage']]}")
+        if result["stage"] == "unavailable":
+            st.caption(result["reason"])
+            return
+        st.caption(f"기준 주봉: {result['date']} · 미완성 이번 주 봉은 제외")
+        st.write(result["reason"])
+        w1, w2, w3, w4 = st.columns(4)
+        w1.metric("주봉 종가", f"{currency}{result['close']:,.2f}")
+        w2.metric("13주 / 26주선", f"{currency}{result['ma13']:,.2f} / {currency}{result['ma26']:,.2f}")
+        w3.metric("52주선", f"{currency}{result['ma52']:,.2f}")
+        w4.metric("이번 주 / 지난 20주 평균 거래량", f"{result['volume_ratio']:.2f}배" if result["volume_ratio"] is not None else "확인 불가")
+        st.write(f"**진입 관찰선:** 직전 20주 고점 {currency}{result['pivot']:,.2f} 위 완료 주봉 종가와 거래량 1.2배 이상")
+        if result["stop"] is not None:
+            st.write(f"**무효화 관찰선:** {currency}{result['stop']:,.2f} 아래 주봉 종가 · 현재 주봉 종가 대비 {result['risk_pct']:.1f}%")
+        else:
+            st.write("현재가 아래 유효한 주봉 손절 관찰선이 없습니다.")
+        st.caption("주봉 판정은 일봉 [A–D] 및 일봉 RP와 별도로 계산한 참고 신호입니다. 진입 실행 전 일봉 상황과 최신 시세를 확인하세요.")
 
 
 def _pattern_reward_risk_result(pattern: Dict[str, Any], entry_price: float) -> Dict[str, Any]:
