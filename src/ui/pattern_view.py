@@ -1,6 +1,7 @@
 import streamlit as st
 import pandas as pd
 import math
+from datetime import timedelta
 from typing import Dict, Any
 
 from src.indicators.trendline_analyzer import analyze_support_resistance_and_trendlines
@@ -115,7 +116,9 @@ def render_weekly_assessment(df: pd.DataFrame, ticker: str) -> None:
         if result["stage"] == "unavailable":
             st.caption(result["reason"])
             return
-        st.caption(f"기준 주봉: {result['date']} · 미완성 이번 주 봉은 제외")
+        bar_date = pd.to_datetime(result["date"]).date()
+        week_start = bar_date - timedelta(days=bar_date.weekday())
+        st.caption(f"완료 주간: {week_start} ~ {week_start + timedelta(days=4)} · 미완성 이번 주 봉은 제외")
         st.write(result["reason"])
         w1, w2, w3, w4 = st.columns(4)
         w1.metric("주봉 종가", f"{currency}{result['close']:,.2f}")

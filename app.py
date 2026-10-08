@@ -1,6 +1,7 @@
 import streamlit as st
 import pandas as pd
 from html import escape
+from datetime import timedelta
 
 from src.db.database import StockDB
 from src.api.kis_rest import KISClient, looks_like_mock_ohlcv
@@ -226,8 +227,12 @@ def render_watchlist_screen(db: StockDB, client: KISClient, refresh_requested: b
         st.caption("새 거래일 결과가 아직 저장되지 않아 이전 판정을 표시합니다.")
     dates = sorted({item["date"] for item in results.values() if item.get("date") and item["stage"] != "unavailable"})
     if dates:
-        date_text = dates[-1] if len(dates) == 1 else f"{dates[0]} ~ {dates[-1]}"
-        st.caption(f"판정에 사용한 {selected} 종가 기준일: {date_text}")
+        if code == "W":
+            starts = [pd.to_datetime(value).date() - timedelta(days=pd.to_datetime(value).weekday()) for value in dates]
+            st.caption(f"판정에 사용한 완료 주간: {min(starts)} ~ {max(starts) + timedelta(days=4)}")
+        else:
+            date_text = dates[-1] if len(dates) == 1 else f"{dates[0]} ~ {dates[-1]}"
+            st.caption(f"판정에 사용한 일봉 종가 기준일: {date_text}")
 
     buckets = {
         stage: [ticker for ticker, result in results.items() if result["stage"] == stage]
