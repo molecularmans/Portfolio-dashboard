@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-10-10 07:38:19",
+  "updated_at": "2026-10-10 13:33:07",
   "groups": [
     {
       "group_name": "지수",
@@ -60,554 +60,664 @@
   ],
   "watchlist": [
     {
-      "ticker": "HOOD",
-      "name": "",
-      "group_name": "금융"
-    },
-    {
-      "ticker": "BNY",
-      "name": "",
-      "group_name": "금융"
-    },
-    {
-      "ticker": "GS",
-      "name": "",
-      "group_name": "금융"
-    },
-    {
-      "ticker": "JPM",
-      "name": "",
-      "group_name": "금융"
-    },
-    {
-      "ticker": "COIN",
-      "name": "",
-      "group_name": "금융"
-    },
-    {
-      "ticker": "PURR",
-      "name": "",
-      "group_name": "금융"
-    },
-    {
-      "ticker": "HYPEUSD",
-      "name": "",
-      "group_name": "금융"
-    },
-    {
-      "ticker": "V",
-      "name": "",
-      "group_name": "금융"
-    },
-    {
-      "ticker": "MA",
-      "name": "",
-      "group_name": "금융"
-    },
-    {
-      "ticker": "CRDO",
-      "name": "",
-      "group_name": "반도체"
-    },
-    {
-      "ticker": "STM",
-      "name": "",
-      "group_name": "반도체"
-    },
-    {
-      "ticker": "TXN",
-      "name": "",
-      "group_name": "반도체"
-    },
-    {
-      "ticker": "ON",
-      "name": "",
-      "group_name": "반도체"
-    },
-    {
-      "ticker": "CBRS",
-      "name": "",
-      "group_name": "반도체"
-    },
-    {
-      "ticker": "DELL",
-      "name": "",
-      "group_name": "반도체"
-    },
-    {
-      "ticker": "AMD",
-      "name": "",
-      "group_name": "반도체"
-    },
-    {
-      "ticker": "MU",
-      "name": "",
-      "group_name": "반도체"
-    },
-    {
-      "ticker": "INTC",
-      "name": "",
-      "group_name": "반도체"
-    },
-    {
-      "ticker": "COHR",
-      "name": "",
-      "group_name": "반도체"
-    },
-    {
-      "ticker": "GFS",
-      "name": "",
-      "group_name": "반도체"
-    },
-    {
-      "ticker": "NVT",
-      "name": "",
-      "group_name": "반도체"
-    },
-    {
-      "ticker": "MRVL",
-      "name": "",
-      "group_name": "반도체"
-    },
-    {
-      "ticker": "ALAB",
-      "name": "",
-      "group_name": "반도체"
-    },
-    {
-      "ticker": "AVGO",
-      "name": "",
-      "group_name": "반도체"
-    },
-    {
-      "ticker": "RTX",
-      "name": "",
-      "group_name": "방산.항공"
-    },
-    {
-      "ticker": "BA",
-      "name": "",
-      "group_name": "방산.항공"
-    },
-    {
-      "ticker": "RKLB",
-      "name": "",
-      "group_name": "방산.항공"
-    },
-    {
-      "ticker": "GE",
-      "name": "",
-      "group_name": "방산.항공"
-    },
-    {
-      "ticker": "LMT",
-      "name": "",
-      "group_name": "방산.항공"
-    },
-    {
-      "ticker": "HWM",
-      "name": "",
-      "group_name": "방산.항공"
-    },
-    {
-      "ticker": "NOC",
-      "name": "",
-      "group_name": "방산.항공"
-    },
-    {
-      "ticker": "LHX",
-      "name": "",
-      "group_name": "방산.항공"
-    },
-    {
-      "ticker": "KTOS",
-      "name": "",
-      "group_name": "방산.항공"
-    },
-    {
-      "ticker": "AVAV",
-      "name": "",
-      "group_name": "방산.항공"
-    },
-    {
-      "ticker": "NVDA",
-      "name": "NVIDIA",
-      "group_name": "빅테크/AI"
-    },
-    {
-      "ticker": "AAPL",
-      "name": "Apple",
-      "group_name": "빅테크/AI"
-    },
-    {
-      "ticker": "MSFT",
-      "name": "Microsoft",
-      "group_name": "빅테크/AI"
-    },
-    {
-      "ticker": "GOOGL",
-      "name": "Alphabet",
-      "group_name": "빅테크/AI"
-    },
-    {
-      "ticker": "AMZN",
-      "name": "Amazon",
-      "group_name": "빅테크/AI"
-    },
-    {
-      "ticker": "TSLA",
-      "name": "Tesla",
-      "group_name": "빅테크/AI"
-    },
-    {
-      "ticker": "BOTZ",
-      "name": "Global X Robotics & AI",
-      "group_name": "빅테크/AI"
-    },
-    {
-      "ticker": "TEAM",
-      "name": "",
-      "group_name": "소프트웨어"
-    },
-    {
-      "ticker": "INTA",
-      "name": "",
-      "group_name": "소프트웨어"
-    },
-    {
-      "ticker": "APPN",
-      "name": "",
-      "group_name": "소프트웨어"
-    },
-    {
-      "ticker": "NTSK",
-      "name": "",
-      "group_name": "소프트웨어"
-    },
-    {
-      "ticker": "AMPL",
-      "name": "",
-      "group_name": "소프트웨어"
-    },
-    {
-      "ticker": "YEXT",
-      "name": "",
-      "group_name": "소프트웨어"
-    },
-    {
-      "ticker": "QLYS",
-      "name": "",
-      "group_name": "소프트웨어"
-    },
-    {
-      "ticker": "CRM",
-      "name": "",
-      "group_name": "소프트웨어"
-    },
-    {
-      "ticker": "PLTR",
-      "name": "",
-      "group_name": "소프트웨어"
-    },
-    {
-      "ticker": "NOW",
-      "name": "",
-      "group_name": "소프트웨어"
-    },
-    {
-      "ticker": "PANW",
-      "name": "",
-      "group_name": "소프트웨어"
-    },
-    {
-      "ticker": "SNOW",
-      "name": "",
-      "group_name": "소프트웨어"
-    },
-    {
-      "ticker": "CRWD",
-      "name": "",
-      "group_name": "소프트웨어"
-    },
-    {
-      "ticker": "OKTA",
-      "name": "",
-      "group_name": "소프트웨어"
-    },
-    {
-      "ticker": "NET",
-      "name": "",
-      "group_name": "소프트웨어"
-    },
-    {
-      "ticker": "GLD",
-      "name": "",
-      "group_name": "원자재"
-    },
-    {
-      "ticker": "FCX",
-      "name": "",
-      "group_name": "원자재"
-    },
-    {
-      "ticker": "AMAT",
-      "name": "",
-      "group_name": "장비"
-    },
-    {
-      "ticker": "LRCX",
-      "name": "",
-      "group_name": "장비"
-    },
-    {
-      "ticker": "KLAC",
-      "name": "",
-      "group_name": "장비"
-    },
-    {
-      "ticker": "TER",
-      "name": "",
-      "group_name": "장비"
-    },
-    {
-      "ticker": "FORM",
-      "name": "",
-      "group_name": "장비"
-    },
-    {
-      "ticker": "BE",
-      "name": "",
-      "group_name": "전력"
-    },
-    {
-      "ticker": "INIO",
-      "name": "",
-      "group_name": "전력"
-    },
-    {
-      "ticker": "STRL",
-      "name": "",
-      "group_name": "전력"
-    },
-    {
-      "ticker": "ETN",
-      "name": "",
-      "group_name": "전력"
-    },
-    {
-      "ticker": "EME",
-      "name": "",
-      "group_name": "전력"
-    },
-    {
-      "ticker": "VST",
-      "name": "",
-      "group_name": "전력"
-    },
-    {
-      "ticker": "TLN",
-      "name": "",
-      "group_name": "전력"
-    },
-    {
-      "ticker": "CCJ",
-      "name": "",
-      "group_name": "전력"
-    },
-    {
-      "ticker": "EROC",
-      "name": "",
-      "group_name": "전력"
-    },
-    {
-      "ticker": "PWR",
-      "name": "",
-      "group_name": "전력"
-    },
-    {
-      "ticker": "EXE",
-      "name": "",
-      "group_name": "전력"
-    },
-    {
-      "ticker": "CEG",
-      "name": "",
-      "group_name": "전력"
-    },
-    {
-      "ticker": "POWL",
-      "name": "",
-      "group_name": "전력"
-    },
-    {
-      "ticker": "FIX",
-      "name": "",
-      "group_name": "전력"
-    },
-    {
-      "ticker": "NTAP",
-      "name": "",
-      "group_name": "주도주후보"
-    },
-    {
-      "ticker": "ZETA",
-      "name": "",
-      "group_name": "주도주후보"
-    },
-    {
-      "ticker": "ANET",
-      "name": "",
-      "group_name": "주도주후보"
-    },
-    {
-      "ticker": "NSIT",
-      "name": "",
-      "group_name": "주도주후보"
-    },
-    {
-      "ticker": "CAKE",
-      "name": "",
-      "group_name": "주도주후보"
-    },
-    {
       "ticker": "QQQ",
       "name": "",
-      "group_name": "지수"
+      "group_name": "지수",
+      "sort_order": 0
     },
     {
       "ticker": "SPY",
       "name": "",
-      "group_name": "지수"
+      "group_name": "지수",
+      "sort_order": 1
     },
     {
       "ticker": "BITO",
       "name": "",
-      "group_name": "지수"
+      "group_name": "지수",
+      "sort_order": 2
     },
     {
       "ticker": "SOXX",
       "name": "",
-      "group_name": "지수"
+      "group_name": "지수",
+      "sort_order": 3
     },
     {
       "ticker": "US10Y",
       "name": "",
-      "group_name": "지수"
+      "group_name": "지수",
+      "sort_order": 4
     },
     {
       "ticker": "US30Y",
       "name": "",
-      "group_name": "지수"
+      "group_name": "지수",
+      "sort_order": 5
+    },
+    {
+      "ticker": "NTAP",
+      "name": "",
+      "group_name": "주도주후보",
+      "sort_order": 0
+    },
+    {
+      "ticker": "ZETA",
+      "name": "",
+      "group_name": "주도주후보",
+      "sort_order": 1
+    },
+    {
+      "ticker": "ANET",
+      "name": "",
+      "group_name": "주도주후보",
+      "sort_order": 2
+    },
+    {
+      "ticker": "NSIT",
+      "name": "",
+      "group_name": "주도주후보",
+      "sort_order": 3
+    },
+    {
+      "ticker": "CAKE",
+      "name": "",
+      "group_name": "주도주후보",
+      "sort_order": 4
+    },
+    {
+      "ticker": "NVDA",
+      "name": "NVIDIA",
+      "group_name": "빅테크/AI",
+      "sort_order": 0
+    },
+    {
+      "ticker": "AAPL",
+      "name": "Apple",
+      "group_name": "빅테크/AI",
+      "sort_order": 1
+    },
+    {
+      "ticker": "MSFT",
+      "name": "Microsoft",
+      "group_name": "빅테크/AI",
+      "sort_order": 2
+    },
+    {
+      "ticker": "GOOGL",
+      "name": "Alphabet",
+      "group_name": "빅테크/AI",
+      "sort_order": 3
+    },
+    {
+      "ticker": "AMZN",
+      "name": "Amazon",
+      "group_name": "빅테크/AI",
+      "sort_order": 4
+    },
+    {
+      "ticker": "TSLA",
+      "name": "Tesla",
+      "group_name": "빅테크/AI",
+      "sort_order": 5
+    },
+    {
+      "ticker": "BOTZ",
+      "name": "Global X Robotics & AI",
+      "group_name": "빅테크/AI",
+      "sort_order": 6
+    },
+    {
+      "ticker": "CRDO",
+      "name": "",
+      "group_name": "반도체",
+      "sort_order": 0
+    },
+    {
+      "ticker": "STM",
+      "name": "",
+      "group_name": "반도체",
+      "sort_order": 1
+    },
+    {
+      "ticker": "TXN",
+      "name": "",
+      "group_name": "반도체",
+      "sort_order": 2
+    },
+    {
+      "ticker": "ON",
+      "name": "",
+      "group_name": "반도체",
+      "sort_order": 3
+    },
+    {
+      "ticker": "CBRS",
+      "name": "",
+      "group_name": "반도체",
+      "sort_order": 4
+    },
+    {
+      "ticker": "DELL",
+      "name": "",
+      "group_name": "반도체",
+      "sort_order": 5
+    },
+    {
+      "ticker": "AMD",
+      "name": "",
+      "group_name": "반도체",
+      "sort_order": 6
+    },
+    {
+      "ticker": "MU",
+      "name": "",
+      "group_name": "반도체",
+      "sort_order": 7
+    },
+    {
+      "ticker": "INTC",
+      "name": "",
+      "group_name": "반도체",
+      "sort_order": 8
+    },
+    {
+      "ticker": "COHR",
+      "name": "",
+      "group_name": "반도체",
+      "sort_order": 9
+    },
+    {
+      "ticker": "GFS",
+      "name": "",
+      "group_name": "반도체",
+      "sort_order": 10
+    },
+    {
+      "ticker": "NVT",
+      "name": "",
+      "group_name": "반도체",
+      "sort_order": 11
+    },
+    {
+      "ticker": "MRVL",
+      "name": "",
+      "group_name": "반도체",
+      "sort_order": 12
+    },
+    {
+      "ticker": "ALAB",
+      "name": "",
+      "group_name": "반도체",
+      "sort_order": 13
+    },
+    {
+      "ticker": "AVGO",
+      "name": "",
+      "group_name": "반도체",
+      "sort_order": 14
+    },
+    {
+      "ticker": "AMAT",
+      "name": "",
+      "group_name": "장비",
+      "sort_order": 0
+    },
+    {
+      "ticker": "LRCX",
+      "name": "",
+      "group_name": "장비",
+      "sort_order": 1
+    },
+    {
+      "ticker": "KLAC",
+      "name": "",
+      "group_name": "장비",
+      "sort_order": 2
+    },
+    {
+      "ticker": "TER",
+      "name": "",
+      "group_name": "장비",
+      "sort_order": 3
+    },
+    {
+      "ticker": "FORM",
+      "name": "",
+      "group_name": "장비",
+      "sort_order": 4
     },
     {
       "ticker": "ORCL",
       "name": "Oracle",
-      "group_name": "클라우드"
+      "group_name": "클라우드",
+      "sort_order": 0
     },
     {
       "ticker": "NBIS",
       "name": "",
-      "group_name": "클라우드"
+      "group_name": "클라우드",
+      "sort_order": 1
     },
     {
       "ticker": "CRWV",
       "name": "",
-      "group_name": "클라우드"
+      "group_name": "클라우드",
+      "sort_order": 2
     },
     {
       "ticker": "SPCX",
       "name": "",
-      "group_name": "클라우드"
+      "group_name": "클라우드",
+      "sort_order": 3
     },
     {
       "ticker": "IREN",
       "name": "",
-      "group_name": "클라우드"
+      "group_name": "클라우드",
+      "sort_order": 4
     },
     {
-      "ticker": "OUST",
+      "ticker": "BE",
       "name": "",
-      "group_name": "피지컬AI"
+      "group_name": "전력",
+      "sort_order": 0
     },
     {
-      "ticker": "CGNX",
+      "ticker": "INIO",
       "name": "",
-      "group_name": "피지컬AI"
+      "group_name": "전력",
+      "sort_order": 1
     },
     {
-      "ticker": "ZBRA",
+      "ticker": "STRL",
       "name": "",
-      "group_name": "피지컬AI"
+      "group_name": "전력",
+      "sort_order": 2
+    },
+    {
+      "ticker": "ETN",
+      "name": "",
+      "group_name": "전력",
+      "sort_order": 3
+    },
+    {
+      "ticker": "EME",
+      "name": "",
+      "group_name": "전력",
+      "sort_order": 4
+    },
+    {
+      "ticker": "VST",
+      "name": "",
+      "group_name": "전력",
+      "sort_order": 5
+    },
+    {
+      "ticker": "TLN",
+      "name": "",
+      "group_name": "전력",
+      "sort_order": 6
+    },
+    {
+      "ticker": "CCJ",
+      "name": "",
+      "group_name": "전력",
+      "sort_order": 7
+    },
+    {
+      "ticker": "EROC",
+      "name": "",
+      "group_name": "전력",
+      "sort_order": 8
+    },
+    {
+      "ticker": "PWR",
+      "name": "",
+      "group_name": "전력",
+      "sort_order": 9
+    },
+    {
+      "ticker": "EXE",
+      "name": "",
+      "group_name": "전력",
+      "sort_order": 10
+    },
+    {
+      "ticker": "CEG",
+      "name": "",
+      "group_name": "전력",
+      "sort_order": 11
+    },
+    {
+      "ticker": "POWL",
+      "name": "",
+      "group_name": "전력",
+      "sort_order": 12
+    },
+    {
+      "ticker": "FIX",
+      "name": "",
+      "group_name": "전력",
+      "sort_order": 13
+    },
+    {
+      "ticker": "TEAM",
+      "name": "",
+      "group_name": "소프트웨어",
+      "sort_order": 0
+    },
+    {
+      "ticker": "INTA",
+      "name": "",
+      "group_name": "소프트웨어",
+      "sort_order": 1
+    },
+    {
+      "ticker": "APPN",
+      "name": "",
+      "group_name": "소프트웨어",
+      "sort_order": 2
+    },
+    {
+      "ticker": "NTSK",
+      "name": "",
+      "group_name": "소프트웨어",
+      "sort_order": 3
+    },
+    {
+      "ticker": "AMPL",
+      "name": "",
+      "group_name": "소프트웨어",
+      "sort_order": 4
+    },
+    {
+      "ticker": "YEXT",
+      "name": "",
+      "group_name": "소프트웨어",
+      "sort_order": 5
+    },
+    {
+      "ticker": "QLYS",
+      "name": "",
+      "group_name": "소프트웨어",
+      "sort_order": 6
+    },
+    {
+      "ticker": "CRM",
+      "name": "",
+      "group_name": "소프트웨어",
+      "sort_order": 7
+    },
+    {
+      "ticker": "PLTR",
+      "name": "",
+      "group_name": "소프트웨어",
+      "sort_order": 8
+    },
+    {
+      "ticker": "NOW",
+      "name": "",
+      "group_name": "소프트웨어",
+      "sort_order": 9
+    },
+    {
+      "ticker": "PANW",
+      "name": "",
+      "group_name": "소프트웨어",
+      "sort_order": 10
+    },
+    {
+      "ticker": "SNOW",
+      "name": "",
+      "group_name": "소프트웨어",
+      "sort_order": 11
+    },
+    {
+      "ticker": "CRWD",
+      "name": "",
+      "group_name": "소프트웨어",
+      "sort_order": 12
+    },
+    {
+      "ticker": "OKTA",
+      "name": "",
+      "group_name": "소프트웨어",
+      "sort_order": 13
+    },
+    {
+      "ticker": "NET",
+      "name": "",
+      "group_name": "소프트웨어",
+      "sort_order": 14
     },
     {
       "ticker": "XLV",
       "name": "",
-      "group_name": "헬스케어,바이오"
+      "group_name": "헬스케어,바이오",
+      "sort_order": 0
     },
     {
       "ticker": "XBI",
       "name": "",
-      "group_name": "헬스케어,바이오"
+      "group_name": "헬스케어,바이오",
+      "sort_order": 1
     },
     {
       "ticker": "MRNA",
       "name": "",
-      "group_name": "헬스케어,바이오"
+      "group_name": "헬스케어,바이오",
+      "sort_order": 2
     },
     {
       "ticker": "TEM",
       "name": "",
-      "group_name": "헬스케어,바이오"
+      "group_name": "헬스케어,바이오",
+      "sort_order": 3
     },
     {
       "ticker": "TMO",
       "name": "",
-      "group_name": "헬스케어,바이오"
+      "group_name": "헬스케어,바이오",
+      "sort_order": 4
     },
     {
       "ticker": "ILMN",
       "name": "",
-      "group_name": "헬스케어,바이오"
+      "group_name": "헬스케어,바이오",
+      "sort_order": 5
     },
     {
       "ticker": "NTRA",
       "name": "",
-      "group_name": "헬스케어,바이오"
+      "group_name": "헬스케어,바이오",
+      "sort_order": 6
     },
     {
       "ticker": "VEEV",
       "name": "",
-      "group_name": "헬스케어,바이오"
+      "group_name": "헬스케어,바이오",
+      "sort_order": 7
     },
     {
       "ticker": "MRK",
       "name": "",
-      "group_name": "헬스케어,바이오"
+      "group_name": "헬스케어,바이오",
+      "sort_order": 8
     },
     {
       "ticker": "GH",
       "name": "",
-      "group_name": "헬스케어,바이오"
+      "group_name": "헬스케어,바이오",
+      "sort_order": 9
     },
     {
       "ticker": "JNJ",
       "name": "",
-      "group_name": "헬스케어,바이오"
+      "group_name": "헬스케어,바이오",
+      "sort_order": 10
     },
     {
       "ticker": "TXG",
       "name": "",
-      "group_name": "헬스케어,바이오"
+      "group_name": "헬스케어,바이오",
+      "sort_order": 11
     },
     {
       "ticker": "TWST",
       "name": "",
-      "group_name": "헬스케어,바이오"
+      "group_name": "헬스케어,바이오",
+      "sort_order": 12
     },
     {
       "ticker": "DGX",
       "name": "",
-      "group_name": "헬스케어,바이오"
+      "group_name": "헬스케어,바이오",
+      "sort_order": 13
+    },
+    {
+      "ticker": "RTX",
+      "name": "",
+      "group_name": "방산.항공",
+      "sort_order": 0
+    },
+    {
+      "ticker": "BA",
+      "name": "",
+      "group_name": "방산.항공",
+      "sort_order": 1
+    },
+    {
+      "ticker": "RKLB",
+      "name": "",
+      "group_name": "방산.항공",
+      "sort_order": 2
+    },
+    {
+      "ticker": "GE",
+      "name": "",
+      "group_name": "방산.항공",
+      "sort_order": 3
+    },
+    {
+      "ticker": "LMT",
+      "name": "",
+      "group_name": "방산.항공",
+      "sort_order": 4
+    },
+    {
+      "ticker": "HWM",
+      "name": "",
+      "group_name": "방산.항공",
+      "sort_order": 5
+    },
+    {
+      "ticker": "NOC",
+      "name": "",
+      "group_name": "방산.항공",
+      "sort_order": 6
+    },
+    {
+      "ticker": "LHX",
+      "name": "",
+      "group_name": "방산.항공",
+      "sort_order": 7
+    },
+    {
+      "ticker": "KTOS",
+      "name": "",
+      "group_name": "방산.항공",
+      "sort_order": 8
+    },
+    {
+      "ticker": "AVAV",
+      "name": "",
+      "group_name": "방산.항공",
+      "sort_order": 9
+    },
+    {
+      "ticker": "GLD",
+      "name": "",
+      "group_name": "원자재",
+      "sort_order": 0
+    },
+    {
+      "ticker": "FCX",
+      "name": "",
+      "group_name": "원자재",
+      "sort_order": 1
+    },
+    {
+      "ticker": "HOOD",
+      "name": "",
+      "group_name": "금융",
+      "sort_order": 0
+    },
+    {
+      "ticker": "MA",
+      "name": "",
+      "group_name": "금융",
+      "sort_order": 1
+    },
+    {
+      "ticker": "BNY",
+      "name": "",
+      "group_name": "금융",
+      "sort_order": 2
+    },
+    {
+      "ticker": "GS",
+      "name": "",
+      "group_name": "금융",
+      "sort_order": 3
+    },
+    {
+      "ticker": "JPM",
+      "name": "",
+      "group_name": "금융",
+      "sort_order": 4
+    },
+    {
+      "ticker": "COIN",
+      "name": "",
+      "group_name": "금융",
+      "sort_order": 5
+    },
+    {
+      "ticker": "PURR",
+      "name": "",
+      "group_name": "금융",
+      "sort_order": 6
+    },
+    {
+      "ticker": "HYPEUSD",
+      "name": "",
+      "group_name": "금융",
+      "sort_order": 7
+    },
+    {
+      "ticker": "V",
+      "name": "",
+      "group_name": "금융",
+      "sort_order": 8
+    },
+    {
+      "ticker": "OUST",
+      "name": "",
+      "group_name": "피지컬AI",
+      "sort_order": 0
+    },
+    {
+      "ticker": "CGNX",
+      "name": "",
+      "group_name": "피지컬AI",
+      "sort_order": 1
+    },
+    {
+      "ticker": "ZBRA",
+      "name": "",
+      "group_name": "피지컬AI",
+      "sort_order": 2
     }
   ],
   "timeframe_ma_settings": {
