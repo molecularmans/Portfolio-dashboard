@@ -7,6 +7,7 @@ from src.indicators.pattern_detector import detect_all_chart_patterns
 from src.indicators.smart_analysis_v2 import analyze_chart_patterns_v2, analyze_support_resistance_v2
 from src.indicators.smart_analysis_v3 import analyze_smart_chart_v3
 from src.indicators.smart_analysis_v4 import analyze_smart_chart_v4
+from src.indicators.smart_analysis_v5 import analyze_smart_chart_v5, analyze_volume_profile
 
 
 # Plotly 모드바 설정
@@ -90,18 +91,21 @@ def add_analysis_overlays_to_fig(fig, plot_df: pd.DataFrame, settings: dict, row
     show_tl = settings.get("show_trendlines", True)
     show_pat = settings.get("show_pattern_lines", True)
 
-    if not (show_sr or show_tl or show_pat):
-        return
-
     # The visible chart is capped at 200 bars, while the A-D panel uses all
     # available daily bars. Analyze the same source for matching levels.
     source_df = analysis_df if analysis_df is not None else plot_df
 
     # 1. 지지/저항선 및 추세선 분석
     engine = settings.get("smart_analysis_engine")
-    if engine not in {"v1", "v2", "v3", "v4"}:
+    if engine not in {"v1", "v2", "v3", "v4", "v5"}:
         engine = "v2" if settings.get("smart_analysis_v2", True) else "v1"
-    v4_bundle = analyze_smart_chart_v4(source_df) if engine == "v4" else None
+    show_structure = engine == "v5" and settings.get("show_v5_structure", True)
+    show_vwap = engine == "v5" and settings.get("show_v5_vwap", True)
+    show_atr = engine == "v5" and settings.get("show_v5_atr", True)
+    if not (show_sr or show_tl or show_pat or show_structure or show_vwap or show_atr):
+        return
+    v5_bundle = analyze_smart_chart_v5(source_df, anchor_date=settings.get("v5_anchor_date")) if engine == "v5" else None
+    v4_bundle = v5_bundle["v4_baseline"] if v5_bundle else analyze_smart_chart_v4(source_df) if engine == "v4" else None
     v3_bundle = v4_bundle["v3_baseline"] if v4_bundle else analyze_smart_chart_v3(source_df) if engine == "v3" else None
     sr_data = (
         v3_bundle["support_resistance"]
@@ -253,6 +257,56 @@ def add_analysis_overlays_to_fig(fig, plot_df: pd.DataFrame, settings: dict, row
                     row=row,
                     col=col,
                 )
+
+    if v5_bundle:
+        visible_offset = len(source_df) - len(plot_df)
+        structure = v5_bundle["market_structure"]
+        if show_structure:
+            for swing in structure.get("swings", []):
+                idx = swing["confirmed_idx"] - visible_offset
+                if not 0 <= idx < len(plot_df):
+                    continue
+                label = swing["kind"]
+                fig.add_trace(
+                    go.Scatter(
+                        x=[plot_df["date_str"].iloc[idx]], y=[swing["price"]],
+                        mode="markers+text", text=[label], textposition="top center" if label in {"HH", "LH", "H"} else "bottom center",
+                        name=f"확정 {label}", marker=dict(size=7, color="#26C6DA" if label in {"HH", "HL", "H", "L"} else "#FF7043"),
+                        hovertemplate=f"{label} 확정 · 기준 봉 {swing['pivot_date']} · 가격 %{{y:,.2f}}<extra></extra>",
+                        showlegend=False,
+                    ), row=row, col=col,
+                )
+            for event in structure.get("breaks", [])[-3:]:
+                idx = event["confirmed_idx"] - visible_offset
+                if 0 <= idx < len(plot_df):
+                    fig.add_trace(
+                        go.Scatter(
+                            x=[plot_df["date_str"].iloc[idx]], y=[event["price"]],
+                            mode="markers", name=f"{event['direction']} {event['kind']}",
+                            marker=dict(size=11, symbol="diamond", color="#66BB6A" if event["direction"] == "상승" else "#EF5350"),
+                            hovertemplate=f"{event['direction']} {event['kind']} · %{{y:,.2f}}<extra></extra>",
+                        ), row=row, col=col,
+                    )
+        vwap = v5_bundle["anchored_vwap"]
+        if show_vwap and vwap.get("is_valid"):
+            fig.add_trace(
+                go.Scatter(
+                    x=plot_df["date_str"], y=vwap["series"].tail(len(plot_df)),
+                    mode="lines", name=f"시작점 VWAP ({vwap['anchor_date']}) · 봉 기준 추정",
+                    line=dict(color="#FBC02D", width=2), connectgaps=False,
+                ), row=row, col=col,
+            )
+        atr_risk = v5_bundle["atr_risk"]
+        if show_atr and atr_risk.get("is_valid"):
+            start = max(0, len(plot_df) - 45)
+            fig.add_trace(
+                go.Scatter(
+                    x=[plot_df["date_str"].iloc[start], plot_df["date_str"].iloc[-1]],
+                    y=[atr_risk["stop"], atr_risk["stop"]], mode="lines",
+                    name=f"확정 저점 · {atr_risk['risk_atr']:.1f} ATR",
+                    line=dict(color="#EC407A", width=1.5, dash="dash"),
+                ), row=row, col=col,
+            )
 
 
 def create_mini_chart(df: pd.DataFrame, ticker: str, settings: dict = None) -> go.Figure:
@@ -479,4 +533,32 @@ def create_detail_chart(df: pd.DataFrame, ticker: str, settings: dict = None) ->
     fig.update_yaxes(side="right", gridcolor="rgba(128,128,128,0.15)")
     fig.update_yaxes(range=[y_lower, y_upper], row=1, col=1)
 
+    return fig
+
+
+def create_volume_profile_chart(df: pd.DataFrame, ticker: str) -> go.Figure:
+    """Show an explicitly approximate, close-bucket volume distribution."""
+    profile = analyze_volume_profile(df)
+    fig = go.Figure()
+    if not profile["is_valid"]:
+        fig.update_layout(title=f"{ticker} · 가격대별 거래량 추정 자료 부족", height=230)
+        return fig
+    fig.add_trace(go.Bar(
+        x=profile["volumes"], y=profile["centers"], orientation="h",
+        name="봉 종가 기준 추정 거래량", marker_color="#42A5F5",
+        hovertemplate="가격대 %{y:,.2f}<br>추정 배분 거래량 %{x:,.0f}<extra></extra>",
+    ))
+    for value, label, color in (
+        (profile["poc"], "POC 추정", "#FFD54F"),
+        (profile["vah"], "70% 구간 상단", "#66BB6A"),
+        (profile["val"], "70% 구간 하단", "#EF5350"),
+    ):
+        fig.add_hline(y=value, line_color=color, line_dash="dash",
+                      annotation_text=f"{label} {value:,.2f}", annotation_position="top left")
+    fig.update_layout(
+        title=f"{ticker} · 최근 {profile['bars']}개 봉의 종가 기반 거래량 분포 (추정)",
+        height=290, margin=dict(l=20, r=20, t=50, b=25),
+        xaxis_title="봉별 거래량 합계", yaxis_title="가격", showlegend=False,
+        plot_bgcolor="rgba(0,0,0,0)", paper_bgcolor="rgba(0,0,0,0)",
+    )
     return fig

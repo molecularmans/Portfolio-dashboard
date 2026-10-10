@@ -9,7 +9,7 @@ from src.indicators.technicals import calc_indicators
 from src.indicators.daily_screen import STAGE_LABELS, scan_day
 from src.indicators.weekly_screen import WEEKLY_STAGE_LABELS
 from src.db.screen_snapshot import ScreenRuntime, ScreenSnapshotStore
-from src.ui.charts import create_detail_chart, CHART_CONFIG
+from src.ui.charts import create_detail_chart, create_volume_profile_chart, CHART_CONFIG
 from src.ui.tradingview import render_tradingview_chart, render_tradingview_mini_chart
 from src.ui.sidebar import render_sidebar
 from src.ui.vcp_view import render_vcp_analysis_panel
@@ -223,6 +223,8 @@ def render_watchlist_screen(db: StockDB, client: KISClient, refresh_requested: b
     if changed:
         st.caption("관심종목 목록이 변경되었습니다. 새 종목은 자료 부족으로 표시되며, 새로고침 후 반영됩니다.")
     st.caption(f"마지막 저장: {screen['completed_at'].replace('T', ' ')} (한국시간) · 판정 대상 {len(screen['tickers'])}종목")
+    if code == "D" and screen.get("engine_version") != "v5":
+        st.caption("이 저장 판정은 V5 도입 전 결과입니다. V5 기준 종목명은 ‘일봉·주봉 판정 새로고침’ 후 표시됩니다.")
     if screen["scan_day"] != scan_day():
         st.caption("새 거래일 결과가 아직 저장되지 않아 이전 판정을 표시합니다.")
     dates = sorted({item["date"] for item in results.values() if item.get("date") and item["stage"] != "unavailable"})
@@ -249,7 +251,7 @@ def render_watchlist_screen(db: StockDB, client: KISClient, refresh_requested: b
         with st.expander(f"{labels['unavailable']} ({len(buckets['unavailable'])})", expanded=False):
             st.write(" · ".join(buckets["unavailable"]))
     if code == "W":
-        st.caption("주봉은 완료된 주의 13·26·52주선, 직전 20주 고점, 주간 거래량과 손절폭으로 판정합니다. 일봉 [A–D]와는 독립된 참고 기준입니다.")
+        st.caption("주봉은 완료된 주의 13·26·52주선, 직전 20주 고점, 주간 거래량과 손절폭으로 판정합니다. 일봉 [A–E]와는 독립된 참고 기준입니다.")
     else:
         st.caption("관심 우선순위와 진입 준비는 매수 신호가 아닙니다. 당일 조건 충족도 최신 가격·거래량과 개인 위험 한도를 확인해야 합니다.")
     st.divider()
@@ -393,7 +395,7 @@ def main():
 
         detail_settings = settings.copy()
         detail_settings["smart_analysis_engine"] = st.session_state.get(
-            f"smart_analysis_engine_{sel_ticker}", "v4"
+            f"smart_analysis_engine_{sel_ticker}", "v5"
         )
         # Keep the old flag for compatibility with any secondary chart paths.
         detail_settings["smart_analysis_v2"] = detail_settings["smart_analysis_engine"] != "v1"
@@ -429,9 +431,35 @@ def main():
             detail_settings["show_trendlines"] = layer_tl
             detail_settings["show_pattern_lines"] = layer_pat
 
+            if detail_settings["smart_analysis_engine"] == "v5":
+                st.caption("V5 차트 레이어 · 확정된 구조와 봉 데이터 기반 추정치를 표시합니다.")
+                v5a, v5b, v5c, v5d = st.columns(4)
+                detail_settings["show_v5_structure"] = v5a.checkbox("고점·저점 구조", value=True, key="inline_v5_structure")
+                detail_settings["show_v5_vwap"] = v5b.checkbox("시작점 VWAP", value=True, key="inline_v5_vwap")
+                detail_settings["show_v5_atr"] = v5c.checkbox("확정 저점·ATR", value=True, key="inline_v5_atr")
+                show_v5_profile = v5d.checkbox("가격대별 거래량", value=True, key="inline_v5_profile")
+                anchor_mode = st.selectbox("VWAP 시작점", ["자동 · 최근 60개 봉", "날짜 지정"], key=f"v5_anchor_mode_{sel_ticker}")
+                if anchor_mode == "날짜 지정" and not df_stock.empty:
+                    dates = pd.to_datetime(df_stock["date"], errors="coerce").dropna()
+                    if not dates.empty:
+                        chosen = st.date_input(
+                            "시작 날짜", value=dates.iloc[max(0, len(dates) - 60)].date(),
+                            min_value=dates.iloc[0].date(), max_value=dates.iloc[-1].date(),
+                            key=f"v5_anchor_date_{sel_ticker}_{detail_tf}",
+                        )
+                        detail_settings["v5_anchor_date"] = chosen
+                else:
+                    detail_settings["v5_anchor_date"] = None
+                st.session_state[f"v5_anchor_date_active_{sel_ticker}"] = detail_settings.get("v5_anchor_date")
+            else:
+                show_v5_profile = False
+
             if not df_stock.empty:
                 fig = create_detail_chart(df_stock, sel_ticker, settings=detail_settings)
                 st.plotly_chart(fig, use_container_width=True, config=CHART_CONFIG)
+                if show_v5_profile:
+                    st.plotly_chart(create_volume_profile_chart(df_stock, sel_ticker), use_container_width=True, config=CHART_CONFIG)
+                    st.caption("가격대별 거래량은 각 봉의 전체 거래량을 그 봉의 종가에 배분한 추정치입니다. 실제 체결 가격별 거래량이 아닙니다.")
                 last_bar = df_stock.iloc[-1]
                 last_bar_date = pd.to_datetime(last_bar["date"]).strftime("%Y-%m-%d")
                 source_label = "KIS" if client.is_configured() else "데모"
@@ -441,7 +469,7 @@ def main():
 
         with tab_chart_tv:
             st.caption("트레이딩뷰 좌측 툴바에서 추세선, 수평선, 피보나치, 채널 등을 마우스로 직접 긋고, 클릭하여 복사/삭제/색상변경을 자유롭게 사용할 수 있습니다.")
-            st.caption("TradingView는 별도 시세원입니다. 아래 [A–D] 분석은 KIS 일봉 종가를 사용하므로 시점·가격 조정 방식에 따라 표시 가격이 다를 수 있습니다.")
+            st.caption("TradingView는 별도 시세원입니다. 아래 [A–E] 분석은 KIS 일봉 종가를 사용하므로 시점·가격 조정 방식에 따라 표시 가격이 다를 수 있습니다.")
             render_tradingview_chart(sel_ticker, timeframe=detail_tf, settings=detail_settings, height=750)
 
         # 종합 진단 엔진 ([A] 지지/저항 & 추세선 + [B] 고전 패턴 + [C] 마크 미너비니 VCP)
@@ -449,13 +477,13 @@ def main():
             render_weekly_assessment(df_stock, sel_ticker)
         df_daily = df_stock if detail_tf == "일봉" else load_and_calc_stock_data(sel_ticker, db, client, force_refresh=force_refresh, timeframe="일봉")
         if detail_tf != "일봉" and not df_daily.empty:
-            st.caption("아래 [A–D] 분석은 선택한 주봉·월봉 차트와 별도로 일봉 데이터로 계산합니다.")
+            st.caption("아래 [A–E] 분석은 선택한 주봉·월봉 차트와 별도로 일봉 데이터로 계산합니다. V5 시작점은 선택한 차트에서 지정한 날짜를 따릅니다.")
         if sel_ticker in portfolio_map and not df_daily.empty:
             quote = float(portfolio_map[sel_ticker]["current_price"])
             daily_close = float(df_daily["close"].iloc[-1])
             if daily_close > 0 and abs(quote / daily_close - 1) >= 0.005:
                 bar_date = pd.to_datetime(df_daily["date"].iloc[-1]).strftime("%Y-%m-%d")
-                st.info(f"잔고 평가 현재가 {currency}{quote:,.2f}와 분석 기준 {bar_date} 일봉 종가 {currency}{daily_close:,.2f}는 시점이 다릅니다. [A–D] 분석은 일봉 종가를 사용합니다.")
+                st.info(f"잔고 평가 현재가 {currency}{quote:,.2f}와 분석 기준 {bar_date} 일봉 종가 {currency}{daily_close:,.2f}는 시점이 다릅니다. [A–E] 분석은 일봉 종가를 사용합니다.")
         render_pattern_analysis_dashboard(df_daily, sel_ticker)
         return
 

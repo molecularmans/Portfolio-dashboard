@@ -13,6 +13,7 @@ from src.indicators.smart_analysis_v2 import (
 )
 from src.indicators.smart_analysis_v3 import analyze_smart_chart_v3
 from src.indicators.smart_analysis_v4 import analyze_smart_chart_v4
+from src.indicators.smart_analysis_v5 import analyze_smart_chart_v5
 from src.indicators.vcp_analyzer import detect_vcp_pattern
 from src.indicators.integrated_assessment import build_integrated_assessment
 from src.indicators.daily_screen import STAGE_LABELS, classify_entry_stage
@@ -33,7 +34,7 @@ PATTERN_HELP = {
 }
 
 DASHBOARD_HELP = {
-    "score": "지지·저항, 가격 패턴, VCP, 시장 흐름과 과거 검증 결과를 합산한 0~100점 참고 점수입니다.",
+    "score": "지지·저항, 가격 패턴, VCP, 시장 흐름을 합산한 0~100점 참고 점수입니다. v5에는 확정 고점·저점 구조, VWAP·거래량 분포 추정, ATR 위험도 포함됩니다. 과거 검증 성과를 점수에 직접 더하지 않습니다.",
     "environment": "최근 가격 방향과 변동성 수준을 함께 요약합니다. 상승·하락·횡보와 변동성 높고 낮음을 구분합니다.",
     "compression": "가격 변동 폭이 평소보다 좁아졌는지 보여줍니다. 압축 뒤에는 움직임이 커질 수 있지만 방향은 보장되지 않습니다.",
     "candle": "최근 캔들 가운데 반전 또는 추세 지속 가능성이 가장 뚜렷한 신호입니다. 단독 매매 신호로 사용하지 않습니다.",
@@ -199,13 +200,14 @@ def render_pattern_analysis_dashboard(df: pd.DataFrame, ticker: str):
 
     engine = st.radio(
         "분석 엔진",
-        options=["v1", "v2", "v3", "v4"],
-        index=3,
+        options=["v1", "v2", "v3", "v4", "v5"],
+        index=4,
         format_func=lambda value: {
             "v1": "Legacy v1",
             "v2": "Experimental v2",
             "v3": "Experimental v3 · 1k+⭐ OSS 검증",
             "v4": "Experimental v4 · 모멘텀·수급·추세",
+            "v5": "Experimental v5 · 구조·VWAP·거래량 분포",
         }[value],
         key=f"smart_analysis_engine_{ticker}",
         horizontal=True,
@@ -218,13 +220,15 @@ def render_pattern_analysis_dashboard(df: pd.DataFrame, ticker: str):
             - **v2**: v1 + ATR 적응형 가격대, 추세선/패턴 품질, 거래량 확인
             - **v3**: v2 + 캔들 패턴, BB/KC 스퀴즈, 시장 국면, 룩어헤드 방지 워크포워드
             - **v4**: v3 + RSI·StochRSI 다이버전스, OBV·CMF·MFI 수급, ADX·DMI 추세 강도, SuperTrend 손절선, v3/v4 비교
+            - **v5**: v4 + 확정 고점·저점 구조, 시작점 VWAP, 종가 기반 거래량 분포 추정, 확정 저점까지의 ATR 위험도
 
             GitHub 별 수는 참고 프로젝트의 인지도 기준이며 수익성을 보장하지 않습니다. 모든 결과는 연구·보조 판단용입니다.
             """
         )
-    use_v2 = engine in {"v2", "v3", "v4"}
+    use_v2 = engine in {"v2", "v3", "v4", "v5"}
     v3_bundle = None
     v4_bundle = None
+    v5_bundle = None
 
     # TrendSpider 화면의 RP(yearly, SPX500)에 대응하는 자체 산출 점수.
     # 국내 6자리 종목코드는 미국 S&P 500과 비교하지 않는다.
@@ -233,7 +237,15 @@ def render_pattern_analysis_dashboard(df: pd.DataFrame, ticker: str):
     rp_rating = current_rp_rating(df, rp_history)
 
     # 1. 알고리즘 분석 실행 — 테스트 단계에서는 기존 엔진과 즉시 A/B 비교 가능
-    if engine == "v4":
+    if engine == "v5":
+        anchor_date = st.session_state.get(f"v5_anchor_date_active_{ticker}")
+        v5_bundle = analyze_smart_chart_v5(df, rp_rating=rp_rating, anchor_date=anchor_date)
+        v4_bundle = v5_bundle["v4_baseline"]
+        v3_bundle = v4_bundle["v3_baseline"]
+        sr_data = v5_bundle["support_resistance"]
+        pattern_data = v5_bundle["patterns"]
+        vcp_data = v5_bundle["vcp"]
+    elif engine == "v4":
         v4_bundle = analyze_smart_chart_v4(df, rp_rating=rp_rating)
         v3_bundle = v4_bundle["v3_baseline"]
         sr_data = v4_bundle["support_resistance"]
@@ -259,7 +271,12 @@ def render_pattern_analysis_dashboard(df: pd.DataFrame, ticker: str):
     primary_pat = pattern_data.get("primary_pattern")
     sr_badge = sr_data.get("status_badge", "분석 완료")
     sr_color = sr_data.get("status_color", "#38bdf8")
-    if engine == "v4" and v4_bundle is not None:
+    if engine == "v5" and v5_bundle is not None:
+        engine_label = (
+            f"Experimental v5 · 진입 참고 {v5_bundle['composite_score']}점/"
+            f"{v5_bundle['grade']}등급 · {v5_bundle['verdict']}"
+        )
+    elif engine == "v4" and v4_bundle is not None:
         engine_label = (
             f"Experimental v4 · 종합 {v4_bundle['composite_score']}점/"
             f"{v4_bundle['grade']}등급 · {v4_bundle['verdict']}"
@@ -282,21 +299,25 @@ def render_pattern_analysis_dashboard(df: pd.DataFrame, ticker: str):
     # -------------------------------------------------------------
     # 탭 구성: 종합판정·위험 점검과 [A]~[D] 세부 근거
     # -------------------------------------------------------------
-    summary = build_integrated_assessment(df, sr_data, pattern_data, vcp_data, v3_bundle, v4_bundle)
-    stage = classify_entry_stage(summary, vcp_data, v3_bundle, v4_bundle)
+    summary = build_integrated_assessment(df, sr_data, pattern_data, vcp_data, v3_bundle, v4_bundle, v5_bundle)
+    stage = classify_entry_stage(summary, vcp_data, v3_bundle, v4_bundle, v5_bundle)
     risk_report = build_investment_risk_report(df, summary)
     currency = "₩" if ticker.isdigit() and len(ticker) == 6 else "$"
-    tab_summary, tab_risk, tab_sr, tab_pattern, tab_vcp, tab_validation = st.tabs([
-        "🎯 [A–D] 종합판정·진입/손절 시나리오",
+    tab_summary, tab_risk, tab_sr, tab_pattern, tab_vcp, tab_validation, tab_v5 = st.tabs([
+        "🎯 [A–E] 종합판정·진입/손절 시나리오",
         "🛡️ 매수 전 위험 점검 리포트",
         "📐 [A] 자동 지지·저항 & 추세선",
         "💎 [B] 가격 패턴 분석 (쌍바닥·삼각수렴)",
         "🧠 [C] 마크 미너비니 VCP 분석",
         "🧪 [D] 추세 환경·캔들 신호·과거 검증",
+        "🧭 [E] V5 거래 근거",
     ])
 
     with tab_summary:
         st.subheader(f"{ticker} 차트 판정 · {STAGE_LABELS[stage['stage']]}")
+        if v5_bundle:
+            st.metric("V5 진입 참고 점수", f"{v5_bundle['composite_score']}점", f"{v5_bundle['grade']}등급")
+            st.caption("V4 기반 65% · 확정 고점·저점 15% · 시작점 VWAP 10% · 거래량 분포 추정 5% · ATR 위험도 5%. 점수는 수익 확률이 아닙니다.")
         last_date = pd.to_datetime(df["date"].iloc[-1]).strftime("%Y-%m-%d") if "date" in df else "최근 일봉"
         st.caption(f"기준: {last_date} 종가 · 현재가 {currency}{summary['current']:,.2f} · 당일 진입 신호: {summary['verdict']}")
         st.info(stage["reason"])
@@ -319,7 +340,22 @@ def render_pattern_analysis_dashboard(df: pd.DataFrame, ticker: str):
         else:
             st.write("유효한 돌파 기준 가격을 찾지 못했습니다. 새로운 지지·저항 또는 패턴이 형성될 때까지 진입 판단을 보류합니다.")
 
+        if v5_bundle and summary.get("v5_pullback"):
+            pullback = summary["v5_pullback"]
+            st.markdown("#### V5 눌림목 관찰 시나리오")
+            if pullback["is_candidate"]:
+                st.markdown(
+                    f"확정된 상승 고점·저점 구조에서 종가가 시작점 VWAP {currency}{pullback['reference']:,.2f} 위 3% 이내입니다. "
+                    f"이 가격대의 지지와 다음 봉의 반응을 확인하는 진입 준비 후보입니다. "
+                    f"확정 저점 {currency}{pullback['invalidation']:,.2f} 이탈 시 이 가정은 무효이며, "
+                    f"현재 종가 기준 위험 폭은 {pullback['risk_pct']:.1f}%입니다."
+                )
+            else:
+                st.caption("현재는 상승 구조·VWAP 근접·확정 저점까지 위험 폭 10% 이내 조건을 함께 충족하지 않습니다.")
+
         st.markdown("#### 손절·무효화 시나리오")
+        if v5_bundle and summary.get("v5_pullback", {}).get("is_candidate"):
+            st.caption("아래 손절 기준은 위의 돌파 진입 시나리오용입니다. V5 눌림목 관찰의 무효화 기준은 바로 위 확정 저점입니다.")
         st.write(_stop_scenario_text(summary, currency))
         if summary["target"]:
             ratio = f" · 참고 손익비 {summary['reward_risk']:.1f}:1" if summary["reward_risk"] is not None else ""
@@ -525,7 +561,9 @@ def render_pattern_analysis_dashboard(df: pd.DataFrame, ticker: str):
             current_rr = _pattern_reward_risk_result(p, current_price)
             entry_rr = _pattern_reward_risk_result(p, float(p["neckline"]))
             engine_score = (
-                float(v4_bundle.get("composite_score", 50))
+                float(v5_bundle.get("composite_score", 50))
+                if v5_bundle
+                else float(v4_bundle.get("composite_score", 50))
                 if v4_bundle
                 else float(v3_bundle.get("composite_score", 50))
                 if v3_bundle
@@ -629,12 +667,13 @@ def render_pattern_analysis_dashboard(df: pd.DataFrame, ticker: str):
             regime = v3_bundle["regime"]
             candles = v3_bundle["candlesticks"]
             squeeze = v3_bundle["squeeze"]
-            analysis_bundle = v4_bundle or v3_bundle
-            validation = analysis_bundle["validation"]
+            analysis_bundle = v5_bundle or v4_bundle or v3_bundle
+            validation = (v4_bundle or v3_bundle)["validation"]
 
             d1, d2, d3, d4 = st.columns(4)
             engine_name = "v4" if v4_bundle else "v3"
-            d1.metric(f"{engine_name} 종합 점수", f"{analysis_bundle['composite_score']}점", f"{analysis_bundle['grade']}등급", help=DASHBOARD_HELP["score"])
+            score_engine_name = "v5" if v5_bundle else engine_name
+            d1.metric(f"{score_engine_name} 종합 점수", f"{analysis_bundle['composite_score']}점", f"{analysis_bundle['grade']}등급", help=DASHBOARD_HELP["score"])
             d2.metric("현재 추세 환경", _friendly_regime_text(regime.get("regime", "분석 불가")), f"평균 변화 {regime.get('slope_pct_per_bar', 0):+.3f}%/봉", help=DASHBOARD_HELP["environment"])
             d3.metric("변동성 압축 상태", "압축 중" if squeeze.get("squeeze_on") else "해제 또는 대기", _friendly_squeeze_text(squeeze.get("summary", "")), help=DASHBOARD_HELP["compression"])
             strongest = candles.get("strongest")
@@ -679,6 +718,8 @@ def render_pattern_analysis_dashboard(df: pd.DataFrame, ticker: str):
                 if not comparison.get("comparable"):
                     st.warning("두 엔진 중 과거 신호가 5건 미만인 경우가 있어 성능 비교는 보류하세요.")
 
+            if v5_bundle:
+                st.info("아래 과거 신호 검증은 V4 돌파 규칙의 결과입니다. V5 점수의 과거 성과로 해석하지 마세요.")
             st.markdown(f"#### {engine_name} 미래 데이터를 보지 않는 과거 순차 검증")
             w1, w2, w3, w4, w5 = st.columns(5)
             w1.metric("중복 제거 신호 수", f"{validation.get('sample_count', 0)}건", help=DASHBOARD_HELP["samples"])
@@ -700,3 +741,38 @@ def render_pattern_analysis_dashboard(df: pd.DataFrame, ticker: str):
                 )
             cost_note = f"왕복 비용 {validation.get('cost_pct', 0):.2f}% 반영" if v4_bundle else "슬리피지·수수료·세금 미반영"
             st.caption(f"연구용 진단이며 자동주문에는 연결되지 않습니다. {cost_note}.")
+
+    with tab_v5:
+        if not v5_bundle:
+            st.info("분석 엔진에서 v5를 선택하면 가격 구조, 시작점 VWAP, 거래량 분포, ATR 위험도를 볼 수 있습니다.")
+        else:
+            structure = v5_bundle["market_structure"]
+            vwap = v5_bundle["anchored_vwap"]
+            profile = v5_bundle["volume_profile"]
+            atr_risk = v5_bundle["atr_risk"]
+            st.subheader("V5 진입 참고 근거")
+            st.caption("확정된 봉의 정보만 사용하며, 지표의 점수는 실제 수익 확률이나 주문 신호가 아닙니다.")
+            c1, c2, c3, c4 = st.columns(4)
+            c1.metric("고점·저점 구조", structure.get("trend", "자료 부족"), f"{structure.get('score', 50)}점")
+            c2.metric("시작점 VWAP", f"{currency}{vwap['vwap']:,.2f}" if vwap["is_valid"] else "자료 부족",
+                      f"종가 대비 {vwap['distance_pct']:+.1f}%" if vwap["is_valid"] else None)
+            c3.metric("가격대별 거래 집중 추정", f"{currency}{profile['poc']:,.2f}" if profile["is_valid"] else "자료 부족",
+                      "POC 추정치" if profile["is_valid"] else None)
+            c4.metric("확정 저점까지 변동폭", f"{atr_risk['risk_atr']:.1f} ATR" if atr_risk["is_valid"] else "자료 부족",
+                      f"저점 {currency}{atr_risk['stop']:,.2f}" if atr_risk["is_valid"] else None)
+            st.write(f"**구조:** {structure.get('summary', '자료 부족')}")
+            st.write(f"**VWAP:** {vwap.get('summary', '자료 부족')}")
+            st.write(f"**가격대별 거래량:** {profile.get('summary', '자료 부족')}")
+            st.write(f"**ATR 위험도:** {atr_risk.get('summary', '자료 부족')}")
+            st.caption("VWAP은 봉의 대표가격과 거래량으로 계산한 근사치입니다. 가격대별 거래량은 각 봉의 전체 거래량을 종가 구간에 배분한 추정치로, 실제 체결 가격별 거래량이 아닙니다.")
+            weight_pct = {"v4_baseline": 65, "market_structure": 15, "anchored_vwap": 10,
+                          "volume_profile_estimate": 5, "atr_risk": 5}
+            labels = {"v4_baseline": "V4 기존 분석", "market_structure": "확정 고점·저점",
+                      "anchored_vwap": "시작점 VWAP", "volume_profile_estimate": "가격대별 거래량 추정", "atr_risk": "ATR 위험도"}
+            score_rows = [
+                {"항목": labels[key], "비중": f"{weight_pct[key]}%", "항목 점수": v5_bundle["score_inputs"][key],
+                 "반영 점수": v5_bundle["score_components"][key]}
+                for key in weight_pct
+            ]
+            st.dataframe(pd.DataFrame(score_rows), hide_index=True, use_container_width=True)
+            st.caption("VWAP 시작점을 바꾸면 이 화면의 V5 점수가 다시 계산됩니다. 메인 관심종목의 매일 판정은 자동 시작점(최근 60개 일봉)을 사용합니다.")

@@ -23,6 +23,7 @@ def build_integrated_assessment(
     vcp: dict[str, Any] | None,
     v3: dict[str, Any] | None = None,
     v4: dict[str, Any] | None = None,
+    v5: dict[str, Any] | None = None,
 ) -> dict[str, Any]:
     """Describe chart setup, conditional entry and invalidation without forecasting returns."""
     if df.empty or "close" not in df:
@@ -179,8 +180,29 @@ def build_integrated_assessment(
         ("[A] 지지·저항", sr.get("status_badge") or "분석 없음"),
         ("[B] 가격 패턴", f"{pattern.get('name')} · {'돌파 확인' if pattern.get('is_breakout') else '형성/대기'}" if pattern else "뚜렷한 패턴 없음"),
         ("[C] 추세·VCP", f"템플릿 {template.get('pass_count', '–')}/{template.get('total_count', '–')}{rp_text} · {vcp.get('status_badge', '분석 없음')}"),
-        ("[D] 추세·수급", f"{regime.get('regime', '엔진 v3/v4에서 제공')} · 수급 {flow.get('state', '미제공')} · 모멘텀 {momentum.get('direction', '미제공')}{validation_text}"),
+        ("[D] 추세·수급", f"{regime.get('regime', '엔진 v3~v5에서 제공')} · 수급 {flow.get('state', '미제공')} · 모멘텀 {momentum.get('direction', '미제공')}{validation_text}"),
     ]
+    pullback = None
+    if v5:
+        structure = v5.get("market_structure") or {}
+        vwap = v5.get("anchored_vwap") or {}
+        profile = v5.get("volume_profile") or {}
+        swing_low = _price((structure.get("last_swing_low") or {}).get("price"))
+        vwap_price = _price(vwap.get("vwap"))
+        distance_vwap = vwap.get("distance_pct")
+        pullback_risk = (current - swing_low) / current * 100 if swing_low and swing_low < current else None
+        pullback = {
+            "is_candidate": bool(
+                structure.get("trend") == "상승 구조" and vwap.get("is_valid")
+                and isinstance(distance_vwap, (int, float)) and 0 <= distance_vwap <= 3
+                and pullback_risk is not None and pullback_risk <= 10
+            ),
+            "reference": vwap_price,
+            "invalidation": swing_low if swing_low and swing_low < current else None,
+            "risk_pct": round(pullback_risk, 1) if pullback_risk is not None else None,
+        }
+        profile_text = f" · POC 추정 {profile['poc']:,.2f}" if profile.get("is_valid") else ""
+        evidence.append(("[E] V5 거래 근거", f"{structure.get('trend', '구조 미확인')} · VWAP {vwap_price:,.2f}{profile_text} · V5 {v5.get('composite_score', 50)}점" if vwap_price else f"{structure.get('trend', '구조 미확인')} · VWAP 자료 부족 · V5 {v5.get('composite_score', 50)}점"))
     return {
         "verdict": verdict,
         "current": current,
@@ -199,4 +221,5 @@ def build_integrated_assessment(
         "reward_risk": reward_risk,
         "blockers": blockers,
         "d_available": bool(v3),
+        "v5_pullback": pullback,
     }

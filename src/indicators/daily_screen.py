@@ -10,7 +10,7 @@ import pandas as pd
 
 from src.indicators.integrated_assessment import build_integrated_assessment
 from src.indicators.relative_performance import calculate_rp_history, current_rp_rating, load_rp_reference
-from src.indicators.smart_analysis_v4 import analyze_smart_chart_v4
+from src.indicators.smart_analysis_v5 import analyze_smart_chart_v5
 
 
 STAGE_LABELS = {
@@ -61,6 +61,7 @@ def classify_entry_stage(
     vcp: dict[str, Any] | None,
     v3: dict[str, Any] | None,
     v4: dict[str, Any] | None,
+    v5: dict[str, Any] | None = None,
 ) -> dict[str, str]:
     """Separate research priority, setup readiness, and the strict daily trigger."""
     if summary.get("verdict") == "자료 부족":
@@ -77,7 +78,7 @@ def classify_entry_stage(
     trend = ((v3 or {}).get("regime") or {}).get("trend")
     stage_two = bool(template.get("is_stage_2"))
     rp = template.get("rp_rating")
-    score = (v4 or {}).get("composite_score")
+    score = (v5 or v4 or {}).get("composite_score")
     rp_strong = isinstance(rp, (int, float)) and rp >= 70
     score_strong = isinstance(score, (int, float)) and score >= 70
     rising = trend == "상승 추세"
@@ -85,6 +86,12 @@ def classify_entry_stage(
     entry = summary.get("entry")
     current = summary.get("current")
     close_to_entry = bool(entry and current and abs(entry / current - 1) <= 0.05)
+    pullback = summary.get("v5_pullback") or {}
+    if pullback.get("is_candidate") and not any(
+        any(blocker.startswith(warning) for warning in _DIRECTIONAL_WARNINGS)
+        for blocker in blockers
+    ):
+        return {"stage": "setup", "reason": "V5 상승 구조와 시작점 VWAP 근처의 눌림 후보입니다. 지지 확인과 위험 한도 점검이 필요합니다."}
     if (
         close_to_entry
         and summary.get("stop")
@@ -100,7 +107,7 @@ def classify_entry_stage(
 
 
 def evaluate_daily_ticker(df: pd.DataFrame, ticker: str) -> dict[str, Any]:
-    """Use the exact v4 inputs shown in a ticker's detailed A–D report."""
+    """Use the default V5 anchor and the same closed bars as detailed analysis."""
     if df.empty or len(df) < 30 or "date" not in df:
         return {"stage": "unavailable", "date": None}
     cutoff = latest_closed_session_date(ticker)
@@ -117,10 +124,11 @@ def evaluate_daily_ticker(df: pd.DataFrame, ticker: str) -> dict[str, Any]:
 
     reference = None if ticker.isdigit() and len(ticker) == 6 else load_rp_reference()
     rp = current_rp_rating(closed_df, calculate_rp_history(closed_df, reference))
-    v4 = analyze_smart_chart_v4(closed_df, rp_rating=rp)
+    v5 = analyze_smart_chart_v5(closed_df, rp_rating=rp)
+    v4 = v5["v4_baseline"]
     v3 = v4["v3_baseline"]
     summary = build_integrated_assessment(
-        closed_df, v4["support_resistance"], v4["patterns"], v4["vcp"], v3, v4
+        closed_df, v5["support_resistance"], v5["patterns"], v5["vcp"], v3, v4, v5
     )
-    stage = classify_entry_stage(summary, v4["vcp"], v3, v4)["stage"]
+    stage = classify_entry_stage(summary, v5["vcp"], v3, v4, v5)["stage"]
     return {"stage": stage, "date": last_date.date().isoformat()}

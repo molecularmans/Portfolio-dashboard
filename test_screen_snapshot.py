@@ -39,6 +39,7 @@ class ScreenSnapshotTests(unittest.TestCase):
                 time.sleep(0.01)
             self.assertFalse(runtime.status()["running"])
             self.assertEqual(runtime.screen("D")["scan_day"], "2026-10-08")
+            self.assertEqual(runtime.screen("D")["engine_version"], "v5")
             self.assertEqual(runtime.screen("W")["results"]["TWST"]["stage"], "unavailable")
 
     def test_scheduled_refresh_skips_weekly_when_same_week_is_saved(self):

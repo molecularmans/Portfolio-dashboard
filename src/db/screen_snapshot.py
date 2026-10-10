@@ -130,6 +130,8 @@ class ScreenRuntime:
                     "results": results,
                     "completed_at": datetime.now(ZoneInfo("Asia/Seoul")).isoformat(timespec="minutes"),
                 }
+                if timeframe == "D":
+                    screen["engine_version"] = "v5"
                 if timeframe == "W":
                     screen["week_start"] = completed_week_start("AAPL").isoformat()
                 with self._lock:

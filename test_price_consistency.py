@@ -57,7 +57,8 @@ class PriceConsistencyTests(unittest.TestCase):
 
         with patch("src.api.kis_rest.requests.get", side_effect=reply):
             result = client.get_us_ohlcv("EME", count=5)
-        self.assertEqual(pd.Timestamp(result["date"].iloc[-1]).normalize(), today)
+        latest_business_day = pd.bdate_range(end=today, periods=1)[-1]
+        self.assertEqual(pd.Timestamp(result["date"].iloc[-1]).normalize(), latest_business_day)
 
     def test_old_demo_cache_is_replaced_by_real_history(self):
         demo = KISClient()._generate_mock_ohlcv("TWST", count=300)
