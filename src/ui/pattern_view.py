@@ -104,7 +104,7 @@ def _stop_scenario_text(summary: Dict[str, Any], currency: str) -> str:
         return prefix + "는 현재 차트의 지지 이탈 관찰선입니다. 진입 기준 가격이 없어 손절 폭은 아직 계산할 수 없습니다."
     return (
         prefix + " 아래 일봉 종가 마감 시 진입 가정을 재검토합니다. "
-        f"가정 진입가 대비 손절 폭은 **{summary['risk_pct']:.1f}%**입니다."
+        f"가정 진입가 대비 손절 폭은 {summary['risk_pct']:.1f}%입니다."
     )
 
 
@@ -113,25 +113,31 @@ def render_weekly_assessment(df: pd.DataFrame, ticker: str) -> None:
     result = evaluate_weekly_ticker(df, ticker)
     currency = "₩" if ticker.isdigit() and len(ticker) == 6 else "$"
     with st.container(border=True):
-        st.subheader(f"{ticker} 완료 주봉 판정 · {WEEKLY_STAGE_LABELS[result['stage']]}")
+        st.subheader(f"{ticker} · 완료 주봉 판정")
         if result["stage"] == "unavailable":
             st.caption(result["reason"])
             return
         bar_date = pd.to_datetime(result["date"]).date()
         week_start = bar_date - timedelta(days=bar_date.weekday())
         st.caption(f"완료 주간: {week_start} ~ {week_start + timedelta(days=4)} · 미완성 이번 주 봉은 제외")
-        st.write(result["reason"])
-        w1, w2, w3, w4 = st.columns(4)
-        w1.metric("주봉 종가", f"{currency}{result['close']:,.2f}")
-        w2.metric("13주 / 26주선", f"{currency}{result['ma13']:,.2f} / {result['ma26']:,.2f}")
-        w3.metric("52주선", f"{currency}{result['ma52']:,.2f}")
-        w4.metric("이번 주 / 지난 20주 평균 거래량", f"{result['volume_ratio']:.2f}배" if result["volume_ratio"] is not None else "확인 불가")
-        st.write(f"**진입 관찰선:** 직전 20주 고점 {currency}{result['pivot']:,.2f} 위 완료 주봉 종가와 거래량 1.2배 이상")
+        st.metric("주봉 판정", WEEKLY_STAGE_LABELS[result["stage"]])
+        st.info(result["reason"])
+        st.markdown("#### 주봉에서 확인할 가격")
+        w1, w2 = st.columns(2)
+        w1.metric("완료 주봉 종가", f"{currency}{result['close']:,.2f}")
+        w2.metric("직전 20주 고점", f"{currency}{result['pivot']:,.2f}")
+        st.write("진입 관찰: 완료 주봉이 직전 20주 고점 위에서 마감하고, 거래량이 20주 평균의 1.2배 이상인지 확인합니다.")
         if result["stop"] is not None:
-            st.write(f"**무효화 관찰선:** {currency}{result['stop']:,.2f} 아래 주봉 종가 · 현재 주봉 종가 대비 {result['risk_pct']:.1f}%")
+            st.write(f"무효화 관찰: {currency}{result['stop']:,.2f} 아래에서 주봉이 마감하면 재검토합니다. 현재 종가와의 차이는 {result['risk_pct']:.1f}%입니다.")
         else:
             st.write("현재가 아래 유효한 주봉 손절 관찰선이 없습니다.")
-        st.caption("주봉 판정은 일봉 [A–D] 및 일봉 RP와 별도로 계산한 참고 신호입니다. 진입 실행 전 일봉 상황과 최신 시세를 확인하세요.")
+        with st.expander("주간 이동평균선과 거래량"):
+            a, b, c, d = st.columns(4)
+            a.metric("13주선", f"{currency}{result['ma13']:,.2f}")
+            b.metric("26주선", f"{currency}{result['ma26']:,.2f}")
+            c.metric("52주선", f"{currency}{result['ma52']:,.2f}")
+            d.metric("20주 평균 대비 거래량", f"{result['volume_ratio']:.2f}배" if result["volume_ratio"] is not None else "확인 불가")
+        st.caption("주봉 판정은 일봉 [A–E] 및 일봉 RP와 별도로 계산합니다. 진입 전 일봉 상황과 최신 시세를 확인하세요.")
 
 
 def _pattern_reward_risk_result(pattern: Dict[str, Any], entry_price: float) -> Dict[str, Any]:
@@ -203,11 +209,11 @@ def render_pattern_analysis_dashboard(df: pd.DataFrame, ticker: str):
         options=["v1", "v2", "v3", "v4", "v5"],
         index=4,
         format_func=lambda value: {
-            "v1": "Legacy v1",
-            "v2": "Experimental v2",
-            "v3": "Experimental v3 · 1k+⭐ OSS 검증",
-            "v4": "Experimental v4 · 모멘텀·수급·추세",
-            "v5": "Experimental v5 · 구조·VWAP·거래량 분포",
+            "v1": "V1 · 기존",
+            "v2": "V2 · 가격대",
+            "v3": "V3 · 시장 환경",
+            "v4": "V4 · 수급·추세",
+            "v5": "V5 · 구조·VWAP",
         }[value],
         key=f"smart_analysis_engine_{ticker}",
         horizontal=True,
@@ -270,7 +276,6 @@ def render_pattern_analysis_dashboard(df: pd.DataFrame, ticker: str):
     # -------------------------------------------------------------
     primary_pat = pattern_data.get("primary_pattern")
     sr_badge = sr_data.get("status_badge", "분석 완료")
-    sr_color = sr_data.get("status_color", "#38bdf8")
     if engine == "v5" and v5_bundle is not None:
         engine_label = (
             f"Experimental v5 · 진입 참고 {v5_bundle['composite_score']}점/"
@@ -289,128 +294,149 @@ def render_pattern_analysis_dashboard(df: pd.DataFrame, ticker: str):
         engine_label = "Legacy v1"
     quality_label = f" · A품질 {sr_data.get('quality_score', 0)}점" if use_v2 else ""
 
-    with st.container(border=True):
-        st.markdown(f"**🎯 {ticker} 차트 종합 진단 엔진**")
-        st.caption(f"{engine_label}{quality_label} · Support / Resistance · Trendlines · Classic Formations")
-        st.write(sr_badge)
-        if primary_pat:
-            st.write(primary_pat["name"])
-
-    # -------------------------------------------------------------
-    # 탭 구성: 종합판정·위험 점검과 [A]~[D] 세부 근거
-    # -------------------------------------------------------------
     summary = build_integrated_assessment(df, sr_data, pattern_data, vcp_data, v3_bundle, v4_bundle, v5_bundle)
     stage = classify_entry_stage(summary, vcp_data, v3_bundle, v4_bundle, v5_bundle)
     risk_report = build_investment_risk_report(df, summary)
     currency = "₩" if ticker.isdigit() and len(ticker) == 6 else "$"
+    last_date = pd.to_datetime(df["date"].iloc[-1]).strftime("%Y-%m-%d") if "date" in df else "최근 일봉"
+    score_bundle = v5_bundle or v4_bundle or v3_bundle
+
+    with st.container(border=True):
+        st.subheader(f"{ticker} · 일봉 분석 요약")
+        st.caption(f"{last_date} 종가 기준 · 당일 진입 조건: {summary['verdict']}")
+        overview_stage, overview_score, overview_price = st.columns(3)
+        overview_stage.metric("현재 판정", STAGE_LABELS[stage["stage"]])
+        overview_score.metric(
+            "진입 참고 점수",
+            f"{score_bundle['composite_score']}점 · {score_bundle['grade']}등급" if score_bundle else "산출 안 함",
+            help=DASHBOARD_HELP["score"],
+        )
+        overview_price.metric("분석 기준 종가", f"{currency}{summary['current']:,.2f}")
+        st.info(stage["reason"])
+        st.markdown(f"**차트 형태** · {summary['shape']}")
+        with st.expander("분석 엔진과 점수 기준"):
+            st.write(f"사용 엔진: {engine_label}{quality_label}")
+            st.write(f"가격 판단: {sr_badge}" + (f" · 감지 패턴: {primary_pat['name']}" if primary_pat else ""))
+            if v5_bundle:
+                st.caption("V5 점수 비중: V4 65% · 확정 고점·저점 15% · 시작점 VWAP 10% · 거래량 분포 추정 5% · ATR 위험도 5%.")
+            st.caption("점수는 수익 확률이 아니며, 분석은 선택한 일봉 종가까지의 자료를 사용합니다.")
+
     tab_summary, tab_risk, tab_sr, tab_pattern, tab_vcp, tab_validation, tab_v5 = st.tabs([
-        "🎯 [A–E] 종합판정·진입/손절 시나리오",
-        "🛡️ 매수 전 위험 점검 리포트",
-        "📐 [A] 자동 지지·저항 & 추세선",
-        "💎 [B] 가격 패턴 분석 (쌍바닥·삼각수렴)",
-        "🧠 [C] 마크 미너비니 VCP 분석",
-        "🧪 [D] 추세 환경·캔들 신호·과거 검증",
-        "🧭 [E] V5 거래 근거",
+        "판정·계획",
+        "위험 점검",
+        "[A] 가격",
+        "[B] 패턴",
+        "[C] 추세·VCP",
+        "[D] 환경·검증",
+        "[E] V5 근거",
     ])
 
     with tab_summary:
-        st.subheader(f"{ticker} 차트 판정 · {STAGE_LABELS[stage['stage']]}")
-        if v5_bundle:
-            st.metric("V5 진입 참고 점수", f"{v5_bundle['composite_score']}점", f"{v5_bundle['grade']}등급")
-            st.caption("V4 기반 65% · 확정 고점·저점 15% · 시작점 VWAP 10% · 거래량 분포 추정 5% · ATR 위험도 5%. 점수는 수익 확률이 아닙니다.")
-        last_date = pd.to_datetime(df["date"].iloc[-1]).strftime("%Y-%m-%d") if "date" in df else "최근 일봉"
-        st.caption(f"기준: {last_date} 종가 · 현재가 {currency}{summary['current']:,.2f} · 당일 진입 신호: {summary['verdict']}")
-        st.info(stage["reason"])
-        st.markdown(f"**현재 차트 형태:** {summary['shape']}")
-        for label, detail in summary["evidence"]:
-            st.write(f"**{label}** · {detail}")
-
-        st.markdown("#### 진입 시나리오")
+        st.subheader("진입 전에 확인할 계획")
+        st.caption("아래는 조건을 점검할 가격입니다. 판정이 ‘진입 준비’여도 당일 매수 신호와는 다를 수 있습니다.")
         if summary["verdict"] == "신규 진입 보류":
-            st.caption("아래 가격은 향후 관찰 기준이며 현재 신규 진입 실행 신호가 아닙니다.")
-        if summary["entry"]:
-            st.write(
-                f"**{summary['entry_source']} {currency}{summary['entry']:,.2f}** 위 일봉 종가와 "
-                f"직전 20거래일 평균 대비 **{summary['required_volume']:.1f}배 이상 거래량**을 함께 확인합니다."
-            )
-            volume_text = f"{summary['volume_ratio']:.2f}배" if summary["volume_ratio"] is not None else "확인 불가"
-            st.caption(f"현재 거래량: {volume_text} · {'가격·거래량 조건 확인' if summary['confirmed'] else '가격 또는 거래량 조건 대기'}")
-            if summary["current"] > summary["entry"]:
-                st.write("이미 돌파선 위라면 재진입 전에 해당 가격대의 지지 여부와 현재 이격을 다시 확인합니다.")
-        else:
-            st.write("유효한 돌파 기준 가격을 찾지 못했습니다. 새로운 지지·저항 또는 패턴이 형성될 때까지 진입 판단을 보류합니다.")
+            st.warning("현재 신규 진입은 보류 판정입니다. 아래 기준은 다음 기회를 살피기 위한 관찰선입니다.")
 
-        if v5_bundle and summary.get("v5_pullback"):
-            pullback = summary["v5_pullback"]
-            st.markdown("#### V5 눌림목 관찰 시나리오")
-            if pullback["is_candidate"]:
-                st.markdown(
-                    f"확정된 상승 고점·저점 구조에서 종가가 시작점 VWAP {currency}{pullback['reference']:,.2f} 위 3% 이내입니다. "
-                    f"이 가격대의 지지와 다음 봉의 반응을 확인하는 진입 준비 후보입니다. "
-                    f"확정 저점 {currency}{pullback['invalidation']:,.2f} 이탈 시 이 가정은 무효이며, "
-                    f"현재 종가 기준 위험 폭은 {pullback['risk_pct']:.1f}%입니다."
-                )
+        with st.container(border=True):
+            st.markdown("#### 1 · 돌파 진입")
+            if summary["entry"]:
+                entry_price, entry_volume, entry_status = st.columns(3)
+                entry_price.metric("돌파 확인 가격", f"{currency}{summary['entry']:,.2f}")
+                entry_volume.metric("필요 거래량", f"20일 평균의 {summary['required_volume']:.1f}배")
+                volume_text = f"{summary['volume_ratio']:.2f}배" if summary["volume_ratio"] is not None else "확인 불가"
+                entry_status.metric("현재 거래량", volume_text)
+                st.markdown(f"**확인 조건** · {summary['entry_source']} 위에서 일봉이 마감되고, 거래량 기준도 충족해야 합니다.")
+                st.caption("가격·거래량 모두 확인" if summary["confirmed"] else "현재는 가격 또는 거래량 조건을 기다리는 중입니다.")
+                if summary["current"] > summary["entry"]:
+                    st.caption("이미 돌파선 위입니다. 새로 진입하기 전 해당 가격대의 지지와 현재 이격을 다시 확인하세요.")
             else:
-                st.caption("현재는 상승 구조·VWAP 근접·확정 저점까지 위험 폭 10% 이내 조건을 함께 충족하지 않습니다.")
+                st.write("유효한 돌파 기준 가격이 없습니다. 지지·저항 또는 패턴이 새로 형성되는지 관찰합니다.")
 
-        st.markdown("#### 손절·무효화 시나리오")
-        if v5_bundle and summary.get("v5_pullback", {}).get("is_candidate"):
-            st.caption("아래 손절 기준은 위의 돌파 진입 시나리오용입니다. V5 눌림목 관찰의 무효화 기준은 바로 위 확정 저점입니다.")
-        st.write(_stop_scenario_text(summary, currency))
-        if summary["target"]:
-            ratio = f" · 참고 손익비 {summary['reward_risk']:.1f}:1" if summary["reward_risk"] is not None else ""
-            st.caption(f"{summary['target_source']} {currency}{summary['target']:,.2f}{ratio} · 목표가와 손익비는 실현 수익을 보장하지 않습니다.")
-        else:
-            st.caption("현재 가격보다 높은 유효 목표/저항이 없어 참고 손익비를 산출하지 않았습니다.")
+        pullback = summary.get("v5_pullback") if v5_bundle else None
+        if pullback:
+            with st.container(border=True):
+                st.markdown("#### 2 · VWAP 눌림 관찰")
+                if pullback["is_candidate"]:
+                    pb_ref, pb_stop, pb_risk = st.columns(3)
+                    pb_ref.metric("관찰 기준", f"{currency}{pullback['reference']:,.2f}", help="최근 60개 일봉의 자동 시작점 VWAP입니다. 시작점을 직접 지정하면 값이 바뀝니다.")
+                    pb_stop.metric("이 가정의 무효화", f"{currency}{pullback['invalidation']:,.2f}")
+                    pb_risk.metric("현재 종가와 저점 차이", f"{pullback['risk_pct']:.1f}%")
+                    st.info("상승 구조이고 종가가 VWAP 위 3% 이내입니다. VWAP 부근의 지지와 다음 봉의 반응을 확인하는 관찰 후보입니다.")
+                else:
+                    st.write("상승 구조·VWAP 근접·확정 저점까지 위험 폭 10% 이내 조건을 함께 충족하지 않았습니다.")
 
-        st.markdown("#### 당일 진입 조건 점검")
+        with st.container(border=True):
+            st.markdown("#### 3 · 무효화와 목표")
+            st.markdown("**돌파 진입 가정의 손절 관찰선**")
+            st.markdown(_stop_scenario_text(summary, currency))
+            if pullback and pullback["is_candidate"]:
+                st.caption(f"VWAP 눌림 관찰은 별도 기준입니다. 확정 저점 {currency}{pullback['invalidation']:,.2f} 이탈 시 그 가정을 무효로 봅니다.")
+            if summary["target"]:
+                ratio = f" · 참고 손익비 {summary['reward_risk']:.1f}:1" if summary["reward_risk"] is not None else ""
+                st.caption(f"다음 목표·저항: {summary['target_source']} {currency}{summary['target']:,.2f}{ratio}")
+            else:
+                st.caption("현재 가격보다 높은 목표·저항이 없어 참고 손익비를 계산하지 않았습니다.")
+
         if summary["blockers"]:
-            st.warning(" · ".join(summary["blockers"]))
+            with st.container(border=True):
+                st.markdown("#### 당일 진입을 막는 조건")
+                for blocker in summary["blockers"]:
+                    st.markdown(f"- {blocker}")
         elif summary["verdict"] == "조건 충족 · 확인 필요":
-            st.success("A–D의 핵심 조건이 맞아 기술적 진입 후보로 볼 수 있습니다. 실제 체결 전 최신 가격과 수급을 재확인하세요.")
+            st.success("기술적 조건이 충족됐습니다. 실제 주문 전 최신 시세와 개인 위험 한도를 재확인하세요.")
         else:
-            st.info("돌파·거래량·추세·손절 기준이 함께 맞을 때까지 관찰합니다.")
-        if not summary["d_available"]:
-            st.caption("[D] 판단은 v3/v4 엔진에서 제공됩니다. 현재 엔진에서는 종합판정을 보수적으로 표시합니다.")
+            st.info("당일 돌파·거래량·추세·손절 기준이 함께 맞을 때까지 관찰합니다.")
+
+        with st.expander("[A–E] 판정 근거 자세히 보기"):
+            for label, detail in summary["evidence"]:
+                st.markdown(f"- **{label}** · {detail}")
+            if not summary["d_available"]:
+                st.caption("[D] 판단은 v3~v5 엔진에서 제공합니다. 현재 엔진에서는 보수적으로 표시합니다.")
         st.caption("차트 기반 참고 판정입니다. 기업 실적·밸류에이션·뉴스·계좌 위험 한도는 반영하지 않습니다. 손절 기준은 주문 체결가를 보장하지 않습니다.")
 
     with tab_risk:
-        st.subheader(f"{ticker} 매수 전 위험 점검")
+        st.subheader("매수 전 위험 점검")
         if not risk_report["is_valid"]:
             st.warning("최근 종가가 없어 위험 지표를 계산할 수 없습니다.")
         else:
             report_date = risk_report["date"].isoformat() if risk_report["date"] else "날짜 정보 없음"
             age = f" · {risk_report['days_since']}일 경과" if risk_report["days_since"] is not None else ""
             st.caption(f"마지막 일봉 {report_date}{age} · 최근 가격·거래량 기록으로 계산")
-            r1, r2, r3, r4 = st.columns(4)
-            r1.metric("최근 20일 하루 변동성", _report_pct(risk_report["daily_vol_pct"]), help="최근 20개 일간 수익률의 표준편차입니다. 하루 가격 움직임의 과거 크기를 보여줍니다.")
-            r2.metric("14일 ATR / 현재가", _report_pct(risk_report["atr_pct"]), help="갭을 포함한 최근 14개 일봉의 평균 가격 변동폭을 현재가로 나눈 값입니다.")
-            r3.metric("최근 60일 최대 하락 개장 갭", _report_pct(risk_report["max_down_gap_pct"]), help="전일 종가에서 다음 거래일 시가까지의 하락폭 중 최근 60거래일 최대치입니다.")
-            r4.metric("최근 20일 중앙 거래대금", _report_traded_value(risk_report["median_value_20"], currency), help="일별 종가×거래량의 중앙값입니다. 실제 호가 잔량이나 예상 체결가는 반영하지 않습니다.")
+            if risk_report["warnings"]:
+                with st.container(border=True):
+                    st.markdown("#### 먼저 확인할 위험")
+                    for warning in risk_report["warnings"]:
+                        st.markdown(f"- {warning}")
 
-            s1, s2, s3 = st.columns(3)
+            st.markdown("#### 손절선과 평소 변동")
+            r1, r2, r3 = st.columns(3)
+            r1.metric("최근 20일 하루 변동성", _report_pct(risk_report["daily_vol_pct"]), help="최근 20개 일간 수익률의 표준편차입니다.")
+            r2.metric("14일 평균 변동폭 / 현재가", _report_pct(risk_report["atr_pct"]), help="갭을 포함한 14일 ATR을 현재가로 나눈 값입니다.")
+            r3.metric("최근 60일 최대 하락 개장 갭", _report_pct(risk_report["max_down_gap_pct"]), help="전일 종가에서 다음 시가까지 최근 60거래일 중 가장 큰 하락폭입니다.")
+            if risk_report["stop_atr_multiple"] is not None:
+                st.info(
+                    f"돌파 진입 가정의 손절폭 {risk_report['stop_risk_pct']:.1f}%는 "
+                    f"평소 14일 변동폭(ATR)의 {risk_report['stop_atr_multiple']:.1f}배입니다. "
+                    "손실 상한을 뜻하지는 않습니다."
+                )
+            else:
+                st.caption("돌파 손절선 또는 ATR 자료가 부족해 두 폭을 비교할 수 없습니다.")
+
+            st.markdown("#### 가격 흐름과 거래 규모")
+            s1, s2, s3, s4 = st.columns(4)
             s1.metric("최근 20거래일 변화", _report_pct(risk_report["change_20_pct"], signed=True))
             s2.metric("최근 60거래일 변화", _report_pct(risk_report["change_60_pct"], signed=True))
             s3.metric("52주 고점 대비", _report_pct(risk_report["drawdown_52w_pct"], signed=True), help="250개 일봉이 있을 때만 계산합니다.")
-
-            st.markdown("#### 계획 손절폭과 실제 변동 비교")
-            if risk_report["stop_atr_multiple"] is not None:
-                st.write(
-                    f"가정 진입가 대비 손절폭 **{risk_report['stop_risk_pct']:.1f}%**는 "
-                    f"최근 ATR의 **{risk_report['stop_atr_multiple']:.1f}배**입니다. "
-                    "이 비율은 손절선이 평소 변동에 얼마나 가까운지 보는 참고값이며 손실 상한이 아닙니다."
-                )
-            else:
-                st.write("손절선 또는 ATR 자료가 부족해 변동폭과 손절폭을 비교할 수 없습니다.")
-            for warning in risk_report["warnings"]:
-                st.warning(warning)
+            s4.metric("최근 20일 중앙 거래대금", _report_traded_value(risk_report["median_value_20"], currency), help="일별 종가×거래량의 중앙값입니다. 실제 호가 잔량을 뜻하지 않습니다.")
             st.caption("과거 변동성·갭·거래대금은 미래 수익이나 체결 품질을 예측하지 않습니다. 실적 발표 일정, 뉴스, 보유 종목과의 중복 위험은 별도 확인이 필요합니다.")
 
     # -------------------------------------------------------------
     # TAB A: 지지 / 저항선 및 추세선 분석
     # -------------------------------------------------------------
     with tab_sr:
-        c1, c2, c3, c4 = st.columns(4)
+        st.subheader("A · 지지와 저항")
+        st.caption("현재가 아래 지지선과 위쪽 저항선을 먼저 확인합니다. 자세한 추세선·가격대는 아래에 있습니다.")
+        c1, c2 = st.columns(2)
 
         near_sup = sr_data.get("nearest_support")
         near_res = sr_data.get("nearest_resistance")
@@ -421,7 +447,7 @@ def render_pattern_analysis_dashboard(df: pd.DataFrame, ticker: str):
             if near_sup:
                 st.metric(
                     label="핵심 지지선 (Support)",
-                    value=f"${near_sup['price']:,.2f}",
+                    value=f"{currency}{near_sup['price']:,.2f}",
                     delta=f"현재가 대비 -{sr_data['dist_support_pct']:.1f}%",
                     delta_color="normal",
                     help=f"과거 {near_sup['touches']}차례 저점 지지가 확인된 주요 가격대입니다.",
@@ -433,7 +459,7 @@ def render_pattern_analysis_dashboard(df: pd.DataFrame, ticker: str):
             if near_res:
                 st.metric(
                     label="핵심 저항선 (Resistance)",
-                    value=f"${near_res['price']:,.2f}",
+                    value=f"{currency}{near_res['price']:,.2f}",
                     delta=f"현재가 대비 +{sr_data['dist_resistance_pct']:.1f}%",
                     delta_color="inverse",
                     help=f"과거 {near_res['touches']}차례 고점 저항이 확인된 주요 매물대입니다.",
@@ -441,6 +467,8 @@ def render_pattern_analysis_dashboard(df: pd.DataFrame, ticker: str):
             else:
                 st.metric(label="핵심 저항선", value="신고가 영역")
 
+        st.markdown("#### 추세선")
+        c3, c4 = st.columns(2)
         with c3:
             if upper_tl:
                 slope_str = "하향 기울기" if upper_tl["slope"] < 0 else "상승 채널"
@@ -448,7 +476,7 @@ def render_pattern_analysis_dashboard(df: pd.DataFrame, ticker: str):
                     slope_str += f" · 품질 {upper_tl['quality_score']}점"
                 st.metric(
                     label="상단 저항 추세선",
-                    value=f"${upper_tl['current_price']:,.2f}",
+                    value=f"{currency}{upper_tl['current_price']:,.2f}",
                     delta=slope_str,
                     help="최근 주요 고점들을 연결한 상단 저항선입니다. 상향 돌파 시 강한 시세 분출이 기대됩니다.",
                 )
@@ -462,7 +490,7 @@ def render_pattern_analysis_dashboard(df: pd.DataFrame, ticker: str):
                     slope_str += f" · 품질 {lower_tl['quality_score']}점"
                 st.metric(
                     label="하단 지지 추세선",
-                    value=f"${lower_tl['current_price']:,.2f}",
+                    value=f"{currency}{lower_tl['current_price']:,.2f}",
                     delta=slope_str,
                     delta_color="normal" if lower_tl["slope"] > 0 else "inverse",
                     help="최근 주요 저점들을 연결한 하단 지지선입니다. 이탈 시 손절 및 비중 축소가 권장됩니다.",
@@ -476,54 +504,49 @@ def render_pattern_analysis_dashboard(df: pd.DataFrame, ticker: str):
             st.caption(
                 f"🧭 v4 추세 확인: {trend.get('state', '분석 중')} · ADX {trend.get('adx', 0):.1f} · "
                 f"+DI/-DI {trend.get('plus_di', 0):.1f}/{trend.get('minus_di', 0):.1f} · "
-                f"SuperTrend 기준 ${risk.get('supertrend_stop', 0):,.2f}"
+                f"SuperTrend 기준 {currency}{risk.get('supertrend_stop', 0):,.2f}"
             )
 
-        # 진단 해설 및 주요 레벨 목록
-        st.markdown(f"""
-        <div style="background-color: rgba(255, 255, 255, 0.03); border-radius: 8px; padding: 12px 16px; margin-top: 10px;">
-            <b style="color: {sr_color};">📌 추세선 및 매물대 진단:</b> {sr_data.get('status_desc', '')}
-        </div>
-        """, unsafe_allow_html=True)
+        st.info(f"가격대 해석 · {sr_data.get('status_desc', '')}")
 
-        col_sups, col_ress = st.columns(2)
-        with col_sups:
-            st.caption("🛡️ 주요 지지 구간 (과거 반응 횟수 순)")
-            if sr_data["support_levels"]:
-                for s in sr_data["support_levels"]:
-                    zone = (
-                        f" · 가격 구간 ${s['zone_low']:,.2f}~${s['zone_high']:,.2f}"
-                        f" · 강도 {s['strength_score']}점"
-                        if "zone_low" in s
-                        else ""
-                    )
-                    st.write(f"- **${s['price']:,.2f}** · 지지 반응 {s['touches']}회{zone}")
-            else:
-                st.write("- 추가 지지 구간을 분석하고 있습니다.")
-
-        with col_ress:
-            st.caption("🛑 주요 저항 구간 (과거 반응 횟수 순)")
-            if sr_data["resistance_levels"]:
-                for r in sr_data["resistance_levels"]:
-                    zone = (
-                        f" · 가격 구간 ${r['zone_low']:,.2f}~${r['zone_high']:,.2f}"
-                        f" · 강도 {r['strength_score']}점"
-                        if "zone_low" in r
-                        else ""
-                    )
-                    st.write(f"- **${r['price']:,.2f}** · 저항 반응 {r['touches']}회{zone}")
-            else:
-                st.write("- 뚜렷한 상단 저항이 없어 신고가 흐름을 관찰할 구간입니다.")
+        with st.expander("주요 지지·저항 가격대 자세히 보기"):
+            col_sups, col_ress = st.columns(2)
+            with col_sups:
+                st.markdown("**주요 지지 구간**")
+                if sr_data["support_levels"]:
+                    for s in sr_data["support_levels"]:
+                        zone = (
+                            f" · 가격 구간 {currency}{s['zone_low']:,.2f}~{currency}{s['zone_high']:,.2f}"
+                            f" · 강도 {s['strength_score']}점"
+                            if "zone_low" in s else ""
+                        )
+                        st.markdown(f"- **{currency}{s['price']:,.2f}** · 지지 반응 {s['touches']}회{zone}")
+                else:
+                    st.write("추가 지지 구간을 분석하고 있습니다.")
+            with col_ress:
+                st.markdown("**주요 저항 구간**")
+                if sr_data["resistance_levels"]:
+                    for r in sr_data["resistance_levels"]:
+                        zone = (
+                            f" · 가격 구간 {currency}{r['zone_low']:,.2f}~{currency}{r['zone_high']:,.2f}"
+                            f" · 강도 {r['strength_score']}점"
+                            if "zone_low" in r else ""
+                        )
+                        st.markdown(f"- **{currency}{r['price']:,.2f}** · 저항 반응 {r['touches']}회{zone}")
+                else:
+                    st.write("뚜렷한 상단 저항이 없어 신고가 흐름을 관찰할 구간입니다.")
 
     # -------------------------------------------------------------
     # TAB B: 고전 차트 패턴 (쌍바닥, 삼각수렴 등)
     # -------------------------------------------------------------
     with tab_pattern:
-        st.caption("항목 이름 옆 도움말 아이콘에 마우스를 올리면 계산 기준과 해석 방법을 볼 수 있습니다.")
+        st.subheader("B · 가격 패턴")
+        st.caption("패턴은 형태를 설명하는 참고 근거입니다. 돌파 가격과 거래량을 함께 확인합니다.")
         if pattern_data["has_pattern"]:
             p = pattern_data["primary_pattern"]
 
-            p_col1, p_col2, p_col3, p_col4 = st.columns(4)
+            p_col1, p_col2 = st.columns(2)
+            p_col3, p_col4 = st.columns(2)
             with p_col1:
                 quality_suffix = f" · {p.get('quality_grade')}등급" if p.get("quality_grade") else ""
                 st.metric(
@@ -535,7 +558,7 @@ def render_pattern_analysis_dashboard(df: pd.DataFrame, ticker: str):
             with p_col2:
                 st.metric(
                     label="돌파 기준 가격",
-                    value=f"${p['neckline']:,.2f}",
+                    value=f"{currency}{p['neckline']:,.2f}",
                     delta="돌파 완료" if p["is_breakout"] else "돌파 대기",
                     delta_color="normal" if p["is_breakout"] else "off",
                     help=PATTERN_HELP["breakout"],
@@ -543,7 +566,7 @@ def render_pattern_analysis_dashboard(df: pd.DataFrame, ticker: str):
             with p_col3:
                 st.metric(
                     label="예상 목표 가격",
-                    value=f"${p['target_price']:,.2f}",
+                    value=f"{currency}{p['target_price']:,.2f}",
                     delta=f"상승여력 +{p['potential_upside_pct']}%",
                     delta_color="normal",
                     help=PATTERN_HELP["target"],
@@ -551,7 +574,7 @@ def render_pattern_analysis_dashboard(df: pd.DataFrame, ticker: str):
             with p_col4:
                 st.metric(
                     label="위험 관리 가격",
-                    value=f"${p['stop_loss']:,.2f}",
+                    value=f"{currency}{p['stop_loss']:,.2f}",
                     delta=f"리스크 -{p['risk_pct']}%",
                     delta_color="inverse",
                     help=PATTERN_HELP["stop"],
@@ -586,7 +609,7 @@ def render_pattern_analysis_dashboard(df: pd.DataFrame, ticker: str):
             rr_entry_col.metric(
                 label="돌파 기준 진입 손익비",
                 value=f"{entry_rr['ratio']:.2f}:1" if entry_rr["ratio"] is not None else "산출 제외",
-                delta=f"기준 가격 ${p['neckline']:,.2f} 진입 가정" if entry_rr["ratio"] is not None else entry_rr["status"],
+                delta=f"기준 가격 {currency}{p['neckline']:,.2f} 진입 가정" if entry_rr["ratio"] is not None else entry_rr["status"],
                 delta_color="off" if entry_rr["ratio"] is None else "normal",
                 help=PATTERN_HELP["entry_reward_risk"],
             )
@@ -600,14 +623,13 @@ def render_pattern_analysis_dashboard(df: pd.DataFrame, ticker: str):
 
             pattern_description = _friendly_pattern_text(p["description"])
             pattern_status = _friendly_pattern_text(p["status_text"])
-            st.markdown(f"""
-            <div style="background-color: rgba(255, 255, 255, 0.03); border-left: 3px solid {p['badge_color']}; border-radius: 4px; padding: 12px 16px; margin-top: 10px;">
-                <b style="color: {p['badge_color']};">패턴 해석:</b> {pattern_description}<br/>
-                <span style="font-size: 0.85rem; color: #cbd5e1;">
-                    💡 <b>참고 기준:</b> {pattern_status} 상태입니다. 돌파 기준 가격(${p['neckline']:,.2f})을 유지하는지 확인하고 위험 관리 가격(${p['stop_loss']:,.2f})을 참고하세요.
-                </span>
-            </div>
-            """, unsafe_allow_html=True)
+            with st.container(border=True):
+                st.markdown("#### 패턴을 어떻게 읽을까")
+                st.write(pattern_description)
+                st.caption(
+                    f"현재 상태: {pattern_status} · 돌파 기준 {currency}{p['neckline']:,.2f} 유지 여부와 "
+                    f"위험 관리 가격 {currency}{p['stop_loss']:,.2f}을 확인하세요."
+                )
 
             if use_v2:
                 confirm_text = {
@@ -651,6 +673,8 @@ def render_pattern_analysis_dashboard(df: pd.DataFrame, ticker: str):
     # TAB C: 마크 미너비니 VCP 분석
     # -------------------------------------------------------------
     with tab_vcp:
+        st.subheader("C · 추세와 VCP")
+        st.caption("추세 템플릿, 변동성 수축, 거래량 건조를 각각 확인합니다. 세부 계산은 아래 탭에서 볼 수 있습니다.")
         render_vcp_analysis_panel(df, ticker, analysis=vcp_data, rp_rating=rp_rating, rp_history=rp_history)
         if v4_bundle:
             flow = v4_bundle["volume_flow"]
@@ -660,17 +684,20 @@ def render_pattern_analysis_dashboard(df: pd.DataFrame, ticker: str):
     # TAB D: v3 시장 국면·캔들·스퀴즈·워크포워드 검증
     # -------------------------------------------------------------
     with tab_validation:
+        st.subheader("D · 추세 환경과 과거 검증")
         if not v3_bundle:
-            st.info("Experimental v3 또는 v4 엔진을 선택하면 추가 검증 결과를 볼 수 있습니다.")
+            st.info("v3 이상 엔진을 선택하면 추세 환경과 과거 검증 결과를 볼 수 있습니다.")
         else:
-            st.caption("항목 이름 옆 도움말 아이콘에 마우스를 올리면 지표의 뜻과 해석 방법을 볼 수 있습니다.")
+            st.caption("현재 환경과 과거 신호의 기록을 분리해서 읽으세요. 과거 성과는 앞으로의 결과를 보장하지 않습니다.")
             regime = v3_bundle["regime"]
             candles = v3_bundle["candlesticks"]
             squeeze = v3_bundle["squeeze"]
             analysis_bundle = v5_bundle or v4_bundle or v3_bundle
             validation = (v4_bundle or v3_bundle)["validation"]
 
-            d1, d2, d3, d4 = st.columns(4)
+            st.markdown("#### 현재 시장 환경")
+            d1, d2 = st.columns(2)
+            d3, d4 = st.columns(2)
             engine_name = "v4" if v4_bundle else "v3"
             score_engine_name = "v5" if v5_bundle else engine_name
             d1.metric(f"{score_engine_name} 종합 점수", f"{analysis_bundle['composite_score']}점", f"{analysis_bundle['grade']}등급", help=DASHBOARD_HELP["score"])
@@ -683,12 +710,14 @@ def render_pattern_analysis_dashboard(df: pd.DataFrame, ticker: str):
                 momentum = v4_bundle["momentum"]
                 flow = v4_bundle["volume_flow"]
                 trend = v4_bundle["trend_strength"]
-                v41, v42, v43, v44 = st.columns(4)
+                st.markdown("#### 가격·거래량·추세 힘")
+                v41, v42 = st.columns(2)
+                v43, v44 = st.columns(2)
                 v41.metric("가격 상승·하락 힘", f"{momentum.get('score', 0)}점", momentum.get("direction", "중립"), help=DASHBOARD_HELP["momentum"])
                 v42.metric("거래량 기반 매수·매도 흐름", f"{flow.get('score', 0)}점", flow.get("state", "중립"), help=DASHBOARD_HELP["flow"])
                 v43.metric("추세 방향과 강도", f"{trend.get('score', 0)}점", f"추세 강도 수치 {trend.get('adx', 0):.1f}", help=DASHBOARD_HELP["trend"])
                 suggested_stop = v4_bundle["risk_control"].get("suggested_stop", 0)
-                v44.metric("위험 관리 기준 가격", f"${suggested_stop:,.2f}" if suggested_stop else "산출 불가", "가격 구조와 추세선 기준을 함께 반영", help=DASHBOARD_HELP["stop"])
+                v44.metric("위험 관리 기준 가격", f"{currency}{suggested_stop:,.2f}" if suggested_stop else "산출 불가", "가격 구조와 추세선 기준을 함께 반영", help=DASHBOARD_HELP["stop"])
                 st.caption(
                     f"가격 움직임: {momentum.get('summary', '')}  |  "
                     f"거래량 흐름: {flow.get('summary', '')}  |  추세 상태: {trend.get('summary', '')}",
@@ -750,21 +779,36 @@ def render_pattern_analysis_dashboard(df: pd.DataFrame, ticker: str):
             vwap = v5_bundle["anchored_vwap"]
             profile = v5_bundle["volume_profile"]
             atr_risk = v5_bundle["atr_risk"]
-            st.subheader("V5 진입 참고 근거")
-            st.caption("확정된 봉의 정보만 사용하며, 지표의 점수는 실제 수익 확률이나 주문 신호가 아닙니다.")
-            c1, c2, c3, c4 = st.columns(4)
-            c1.metric("고점·저점 구조", structure.get("trend", "자료 부족"), f"{structure.get('score', 50)}점")
-            c2.metric("시작점 VWAP", f"{currency}{vwap['vwap']:,.2f}" if vwap["is_valid"] else "자료 부족",
-                      f"종가 대비 {vwap['distance_pct']:+.1f}%" if vwap["is_valid"] else None)
-            c3.metric("가격대별 거래 집중 추정", f"{currency}{profile['poc']:,.2f}" if profile["is_valid"] else "자료 부족",
-                      "POC 추정치" if profile["is_valid"] else None)
-            c4.metric("확정 저점까지 변동폭", f"{atr_risk['risk_atr']:.1f} ATR" if atr_risk["is_valid"] else "자료 부족",
-                      f"저점 {currency}{atr_risk['stop']:,.2f}" if atr_risk["is_valid"] else None)
-            st.write(f"**구조:** {structure.get('summary', '자료 부족')}")
-            st.write(f"**VWAP:** {vwap.get('summary', '자료 부족')}")
-            st.write(f"**가격대별 거래량:** {profile.get('summary', '자료 부족')}")
-            st.write(f"**ATR 위험도:** {atr_risk.get('summary', '자료 부족')}")
-            st.caption("VWAP은 봉의 대표가격과 거래량으로 계산한 근사치입니다. 가격대별 거래량은 각 봉의 전체 거래량을 종가 구간에 배분한 추정치로, 실제 체결 가격별 거래량이 아닙니다.")
+            st.subheader("E · V5 점수의 근거")
+            st.caption("이 점수는 현재 차트의 상태를 정리한 값입니다. 수익 확률이나 자동 주문 신호가 아닙니다.")
+            if vwap["is_valid"]:
+                st.info(
+                    f"{structure.get('trend', '구조 미확인')} · 현재 종가는 시작점 VWAP 대비 "
+                    f"{vwap['distance_pct']:+.1f}% 위치에 있습니다. "
+                    "확정 저점과 평소 변동폭을 함께 확인하세요."
+                )
+            c1, c2 = st.columns(2)
+            c3, c4 = st.columns(2)
+            with c1:
+                st.metric("고점·저점 구조", structure.get("trend", "자료 부족"))
+                st.caption(f"구조 점수 {structure.get('score', 50)}점")
+            with c2:
+                st.metric("시작점 VWAP", f"{currency}{vwap['vwap']:,.2f}" if vwap["is_valid"] else "자료 부족")
+                if vwap["is_valid"]:
+                    st.caption(f"현재 종가와의 차이 {vwap['distance_pct']:+.1f}%")
+            with c3:
+                st.metric("가격대별 거래 집중 추정", f"{currency}{profile['poc']:,.2f}" if profile["is_valid"] else "자료 부족")
+                st.caption("POC는 봉 종가 기준 추정치입니다.")
+            with c4:
+                st.metric("확정 저점까지 변동폭", f"{atr_risk['risk_atr']:.1f} ATR" if atr_risk["is_valid"] else "자료 부족")
+                if atr_risk["is_valid"]:
+                    st.caption(f"확정 저점 {currency}{atr_risk['stop']:,.2f}")
+            with st.expander("지표별 계산 결과와 추정 방식"):
+                st.markdown(f"- **고점·저점 구조** · {structure.get('summary', '자료 부족')}")
+                st.markdown(f"- **시작점 VWAP** · {vwap.get('summary', '자료 부족')}")
+                st.markdown(f"- **가격대별 거래량** · {profile.get('summary', '자료 부족')}")
+                st.markdown(f"- **ATR 위험도** · {atr_risk.get('summary', '자료 부족')}")
+                st.caption("VWAP은 봉 대표가격과 거래량으로 계산한 근사치입니다. 가격대별 거래량은 각 봉의 전체 거래량을 종가 구간에 배분한 추정치입니다. 실제 체결 가격별 거래량은 아닙니다.")
             weight_pct = {"v4_baseline": 65, "market_structure": 15, "anchored_vwap": 10,
                           "volume_profile_estimate": 5, "atr_risk": 5}
             labels = {"v4_baseline": "V4 기존 분석", "market_structure": "확정 고점·저점",
@@ -774,5 +818,6 @@ def render_pattern_analysis_dashboard(df: pd.DataFrame, ticker: str):
                  "반영 점수": v5_bundle["score_components"][key]}
                 for key in weight_pct
             ]
+            st.markdown("#### 점수는 이렇게 합산됩니다")
             st.dataframe(pd.DataFrame(score_rows), hide_index=True, use_container_width=True)
             st.caption("VWAP 시작점을 바꾸면 이 화면의 V5 점수가 다시 계산됩니다. 메인 관심종목의 매일 판정은 자동 시작점(최근 60개 일봉)을 사용합니다.")

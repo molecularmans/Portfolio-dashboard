@@ -24,43 +24,14 @@ def render_vcp_analysis_panel(df: pd.DataFrame, ticker: str, analysis: dict | No
     status_badge = vcp_data["status_badge"]
     status_color = vcp_data["status_color"]
 
-    # 컨테이너 스타일링
-    st.markdown(f"""
-    <div style="
-        background: linear-gradient(135deg, rgba(30, 41, 59, 0.85) 0%, rgba(15, 23, 42, 0.95) 100%);
-        border: 1.5px solid {status_color}55;
-        border-radius: 12px;
-        padding: 16px 20px;
-        margin-top: 18px;
-        margin-bottom: 20px;
-        box-shadow: 0 4px 20px rgba(0,0,0,0.3);
-    ">
-        <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px;">
-            <div>
-                <span style="font-size: 1.1rem; font-weight: 700; color: #f8fafc; margin-right: 12px;">
-                    🧠 마크 미너비니 VCP(변동성 축소) 차트 패턴 해석
-                </span>
-                <span style="font-size: 0.82rem; color: #94a3b8;">
-                    Trend Template & Volatility Contraction Pattern Analysis
-                </span>
-            </div>
-            <div style="
-                background-color: {status_color}22;
-                border: 1px solid {status_color};
-                color: {status_color};
-                padding: 5px 14px;
-                border-radius: 20px;
-                font-size: 0.88rem;
-                font-weight: 700;
-            ">
-                {status_badge}
-            </div>
-        </div>
-    </div>
-    """, unsafe_allow_html=True)
+    with st.container(border=True):
+        st.markdown("#### VCP · 변동성 수축 패턴")
+        st.write(status_badge)
+        st.caption("수축 파동과 거래량 건조는 돌파 준비 상태를 살피는 근거입니다. 각 조건은 아래에서 따로 확인할 수 있습니다.")
 
     # 핵심 4대 지표 카드
-    c1, c2, c3, c4 = st.columns(4)
+    c1, c2 = st.columns(2)
+    c3, c4 = st.columns(2)
 
     with c1:
         st.metric(
@@ -74,7 +45,7 @@ def render_vcp_analysis_panel(df: pd.DataFrame, ticker: str, analysis: dict | No
     with c2:
         dist_str = f"{pivot['dist_pct']:+.1f}%"
         st.metric(
-            label="피봇 돌파 매수가 (Buy Point)",
+            label="돌파 관찰 가격 (피봇)",
             value=f"${pivot['price']:,.2f}",
             delta=f"현재가 대비 {dist_str}",
             help="마지막 수축 파동의 고점 또는 베이스 상단 저항선입니다. 대량 거래량과 함께 돌파 시 매수 급소입니다.",
@@ -82,7 +53,7 @@ def render_vcp_analysis_panel(df: pd.DataFrame, ticker: str, analysis: dict | No
 
     with c3:
         st.metric(
-            label="추천 손절 기준가 (Stop Loss)",
+            label="패턴 무효화 가격",
             value=f"${pivot['stop_loss']:,.2f}",
             delta=f"리스크 -{pivot['risk_pct']:.1f}%",
             delta_color="inverse",
@@ -92,7 +63,7 @@ def render_vcp_analysis_panel(df: pd.DataFrame, ticker: str, analysis: dict | No
     with c4:
         vdu_delta_str = "매도세 고갈 (VDU)" if vdu["is_vdu"] else "추가 거래량 건조 필요"
         st.metric(
-            label="거래량 건조 지수 (VDU)",
+            label="최근 거래량 / 50일 평균",
             value=f"{vdu['ratio']:.1f}%",
             delta=vdu_delta_str,
             delta_color="normal" if vdu["is_vdu"] else "off",
@@ -110,18 +81,17 @@ def render_vcp_analysis_panel(df: pd.DataFrame, ticker: str, analysis: dict | No
             f"돌파 거래량 {breakout.get('volume_ratio', 0):.2f}×"
         )
 
-    st.markdown("<div style='height: 10px;'></div>", unsafe_allow_html=True)
-
     # 3개 상세 분석 탭
     tab_waves, tab_trend, tab_report = st.tabs([
-        "🌊 변동성 수축 파동 (Contractions)",
-        "📋 미너비니 추세 템플릿 (D·10개 조건)",
-        "💡 미너비니 종합 리포트 & 실전 전략"
+        "수축 파동",
+        "추세 템플릿 10개 조건",
+        "종합 해석"
     ])
 
     # 탭 1: 수축 파동 단계별 시각화
     with tab_waves:
-        st.markdown("##### 🔍 단계별 변동성 수축 파동 상세")
+        st.markdown("#### 수축 파동의 폭")
+        st.caption("이전 파동보다 조정 폭이 작아지는지 확인합니다.")
         if contractions:
             cols = st.columns(len(contractions))
             for idx, c in enumerate(contractions):
@@ -159,7 +129,10 @@ def render_vcp_analysis_panel(df: pd.DataFrame, ticker: str, analysis: dict | No
 
     # 탭 2: 스크린샷의 10개 조건별 추세 템플릿 검증표
     with tab_trend:
-        st.markdown(f"##### 📋 Minervini Trend Template (D) — {tt['pass_count']}/{tt['total_count']}")
+        st.markdown(f"#### 추세 템플릿 · {tt['pass_count']}/{tt['total_count']}개 충족")
+        missed = [check["name"] for check in tt["checks"] if check["passed"] is False]
+        if missed:
+            st.warning("우선 확인할 미달 항목: " + " · ".join(missed))
         
         table_rows = []
         for chk in tt["checks"]:
@@ -175,7 +148,7 @@ def render_vcp_analysis_panel(df: pd.DataFrame, ticker: str, analysis: dict | No
         df_table = pd.DataFrame(table_rows)
         st.dataframe(df_table, use_container_width=True, hide_index=True)
 
-        st.markdown("**현재 값 (Current Values)**")
+        st.markdown("#### 현재 값")
         rp_col, high_col, low_col = st.columns(3)
         rp = tt.get("rp_rating")
         dist_high = tt.get("dist_from_52w_high_pct")
@@ -184,7 +157,8 @@ def render_vcp_analysis_panel(df: pd.DataFrame, ticker: str, analysis: dict | No
         high_col.metric("주가 vs 52주 고점", f"{dist_high:+.1f}%" if dist_high is not None else "데이터 부족")
         low_col.metric("주가 vs 52주 저점", f"{dist_low:+.1f}%" if dist_low is not None else "데이터 부족")
 
-        st.markdown("**RP 상대강도 추이 · S&P 500 종목군 대비**")
+        st.markdown("#### RP 상대강도 추이")
+        st.caption("미국 S&P 500 종목군과 비교한 자체 산출 점수입니다. 70점 이상이면 추세 템플릿의 RP 조건을 충족합니다.")
         if rp_history is not None and not rp_history.empty:
             points = rp_history.tail(60)
             fig = go.Figure()
@@ -204,11 +178,14 @@ def render_vcp_analysis_panel(df: pd.DataFrame, ticker: str, analysis: dict | No
             st.plotly_chart(fig, use_container_width=True)
             latest_rp_date = points["date"].iloc[-1].strftime("%Y-%m-%d")
             reference = load_rp_reference() or {}
-            st.caption(
-                f"자체 산출 RP · 최근 기준일 {latest_rp_date} · 비교 종목 {int(points['peer_count'].iloc[-1])}개 · "
-                "3/6/9/12개월 수익률 40/20/20/20 가중(63/126/189/252거래일 근사). "
-                f"기준 자료 업데이트: {reference.get('as_of', '확인 불가')}. TrendSpider 점수와 다를 수 있습니다."
-            )
+            st.caption(f"최근 RP 기준일 {latest_rp_date} · 비교 종목 {int(points['peer_count'].iloc[-1])}개")
+            with st.expander("RP 계산 기준"):
+                st.write(
+                    "3·6·9·12개월 수익률에 각각 40·20·20·20% 비중을 적용합니다 "
+                    "(63·126·189·252거래일 근사). "
+                    f"비교 자료 업데이트: {reference.get('as_of', '확인 불가')}. "
+                    "TrendSpider 점수와 다를 수 있습니다."
+                )
         elif ticker.isdigit() and len(ticker) == 6:
             st.caption("현재 RP 기준 종목군은 미국 S&P 500입니다. 국내 종목 RP는 제공하지 않습니다.")
         else:
@@ -229,7 +206,7 @@ def render_vcp_analysis_panel(df: pd.DataFrame, ticker: str, analysis: dict | No
 
     # 탭 3: 자연어 해석 리포트 & 실전 전략
     with tab_report:
-        st.markdown("##### 🎙️ 미너비니 투자 관점 종합 브리핑")
+        st.markdown("#### VCP 종합 해석")
         st.markdown(f"""
         <div style="
             background-color: rgba(15, 23, 42, 0.6);

@@ -548,16 +548,16 @@ def create_volume_profile_chart(df: pd.DataFrame, ticker: str) -> go.Figure:
         name="봉 종가 기준 추정 거래량", marker_color="#42A5F5",
         hovertemplate="가격대 %{y:,.2f}<br>추정 배분 거래량 %{x:,.0f}<extra></extra>",
     ))
-    for value, label, color in (
-        (profile["poc"], "POC 추정", "#FFD54F"),
-        (profile["vah"], "70% 구간 상단", "#66BB6A"),
-        (profile["val"], "70% 구간 하단", "#EF5350"),
+    for value, color in (
+        (profile["poc"], "#FFD54F"),
+        (profile["vah"], "#66BB6A"),
+        (profile["val"], "#EF5350"),
     ):
-        fig.add_hline(y=value, line_color=color, line_dash="dash",
-                      annotation_text=f"{label} {value:,.2f}", annotation_position="top left")
+        fig.add_hline(y=value, line_color=color, line_dash="dash")
     fig.update_layout(
-        title=f"{ticker} · 최근 {profile['bars']}개 봉의 종가 기반 거래량 분포 (추정)",
-        height=290, margin=dict(l=20, r=20, t=50, b=25),
+        title=(f"{ticker} · 최근 {profile['bars']}개 봉의 종가 기반 거래량 분포 (추정)"
+               f"<br>노란선 POC {profile['poc']:,.2f} · 초록/빨강선 70% 가격 구간 {profile['val']:,.2f}~{profile['vah']:,.2f}"),
+        title_font_size=15, height=310, margin=dict(l=20, r=20, t=80, b=25),
         xaxis_title="봉별 거래량 합계", yaxis_title="가격", showlegend=False,
         plot_bgcolor="rgba(0,0,0,0)", paper_bgcolor="rgba(0,0,0,0)",
     )

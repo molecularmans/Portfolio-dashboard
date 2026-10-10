@@ -37,7 +37,7 @@ st.markdown("""
         background-color: rgba(255, 255, 255, 0.04);
         border: 1px solid rgba(255, 255, 255, 0.1);
         border-radius: 8px;
-        padding: 8px 12px;
+        padding: 12px 14px;
         min-width: 0;
         height: 100%;
         display: flex;
@@ -45,25 +45,27 @@ st.markdown("""
         justify-content: center;
     }
     [data-testid="stMetricLabel"] {
-        font-size: 0.82rem !important;
-        font-weight: 500 !important;
+        font-size: 0.86rem !important;
+        font-weight: 600 !important;
         color: #cbd5e1 !important;
-        margin-bottom: 4px !important;
-        white-space: nowrap !important;
-        overflow: hidden;
-        text-overflow: ellipsis;
+        margin-bottom: 6px !important;
+        white-space: normal !important;
+        line-height: 1.35 !important;
     }
     [data-testid="stMetricValue"] {
-        font-size: 1.1rem !important;
-        font-weight: 600 !important;
+        font-size: 1.16rem !important;
+        font-weight: 700 !important;
         color: #f8fafc !important;
-        line-height: 1.2 !important;
-        white-space: nowrap !important;
+        line-height: 1.3 !important;
+        white-space: normal !important;
+        overflow-wrap: anywhere;
     }
     [data-testid="stMetricDelta"] {
         font-size: 0.78rem !important;
         line-height: 1.1 !important;
         margin-top: 2px !important;
+        white-space: normal !important;
+        line-height: 1.3 !important;
     }
 
     .total-eval-box {
