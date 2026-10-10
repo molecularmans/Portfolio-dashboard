@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-10-10 06:47:26",
+  "updated_at": "2026-10-10 07:38:19",
   "groups": [
     {
       "group_name": "지수",
@@ -171,6 +171,11 @@
     },
     {
       "ticker": "ALAB",
+      "name": "",
+      "group_name": "반도체"
+    },
+    {
+      "ticker": "AVGO",
       "name": "",
       "group_name": "반도체"
     },
