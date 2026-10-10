@@ -103,6 +103,7 @@
         "GLD",
         "FCX",
         "HOOD",
+        "MA",
         "BNY",
         "GS",
         "JPM",
@@ -110,7 +111,6 @@
         "PURR",
         "HYPEUSD",
         "V",
-        "MA",
         "OUST",
         "CGNX",
         "ZBRA"
@@ -512,6 +512,10 @@
           "stage": "hold",
           "date": "2026-10-09"
         },
+        "MA": {
+          "stage": "hold",
+          "date": "2026-10-09"
+        },
         "BNY": {
           "stage": "hold",
           "date": "2026-10-09"
@@ -540,10 +544,6 @@
           "stage": "hold",
           "date": "2026-10-09"
         },
-        "MA": {
-          "stage": "hold",
-          "date": "2026-10-09"
-        },
         "OUST": {
           "stage": "hold",
           "date": "2026-10-09"
@@ -557,7 +557,7 @@
           "date": "2026-10-09"
         }
       },
-      "completed_at": "2026-10-10T22:38+09:00"
+      "completed_at": "2026-10-10T23:15+09:00"
     },
     "W": {
       "scan_day": "2026-10-09",
@@ -661,6 +661,7 @@
         "GLD",
         "FCX",
         "HOOD",
+        "MA",
         "BNY",
         "GS",
         "JPM",
@@ -668,7 +669,6 @@
         "PURR",
         "HYPEUSD",
         "V",
-        "MA",
         "OUST",
         "CGNX",
         "ZBRA"
@@ -1905,6 +1905,19 @@
           "risk_pct": 2.7,
           "volume_ratio": 0.78
         },
+        "MA": {
+          "stage": "hold",
+          "date": "2026-10-05",
+          "reason": "26주·52주 추세 또는 현재 주가 위치가 주봉 진입 기준에 미달합니다.",
+          "close": 589.14,
+          "ma13": 567.456,
+          "ma26": 534.4657,
+          "ma52": 534.7768,
+          "pivot": 600.3197,
+          "stop": 567.456,
+          "risk_pct": 3.7,
+          "volume_ratio": 0.79
+        },
         "BNY": {
           "stage": "unavailable",
           "date": null,
@@ -1972,19 +1985,6 @@
           "risk_pct": 4.5,
           "volume_ratio": 0.69
         },
-        "MA": {
-          "stage": "hold",
-          "date": "2026-10-05",
-          "reason": "26주·52주 추세 또는 현재 주가 위치가 주봉 진입 기준에 미달합니다.",
-          "close": 589.14,
-          "ma13": 567.456,
-          "ma26": 534.4657,
-          "ma52": 534.7768,
-          "pivot": 600.3197,
-          "stop": 567.456,
-          "risk_pct": 3.7,
-          "volume_ratio": 0.79
-        },
         "OUST": {
           "stage": "watch",
           "date": "2026-10-05",
@@ -2025,7 +2025,7 @@
           "volume_ratio": 0.56
         }
       },
-      "completed_at": "2026-10-10T22:40+09:00",
+      "completed_at": "2026-10-10T23:18+09:00",
       "week_start": "2026-10-05"
     }
   }
