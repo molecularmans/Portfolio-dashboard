@@ -1,3 +1,4 @@
+# Rebuild Streamlit Community Cloud with fresh V5 analysis modules.
 streamlit>=1.55.0
 plotly>=5.18.0
 pandas>=2.0.0
