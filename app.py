@@ -472,18 +472,9 @@ def main():
     # 한 화면에서 생성하는 TradingView 위젯 수를 제한한다.
     charts_per_page = 6
     page_count = (len(tickers) + charts_per_page - 1) // charts_per_page
-    page_index = 0
-    if page_count > 1:
-        page_index = st.selectbox(
-            "차트 페이지",
-            options=range(page_count),
-            format_func=lambda page: (
-                f"{page + 1}/{page_count} 페이지 · "
-                f"{page * charts_per_page + 1}–{min((page + 1) * charts_per_page, len(tickers))}번째 종목"
-            ),
-            key=f"chart_page_{view_mode}",
-        )
-        st.caption("한 페이지에 최대 6개 차트만 불러옵니다.")
+    page_key = f"chart_page_{view_mode}"
+    page_index = min(max(st.session_state.get(page_key, 0), 0), page_count - 1)
+    st.session_state[page_key] = page_index
 
     visible_tickers = tickers[page_index * charts_per_page:(page_index + 1) * charts_per_page]
 
@@ -519,6 +510,33 @@ def main():
                 render_tradingview_mini_chart(ticker, timeframe=timeframe, height=330)
 
         st.markdown("<hr style='margin: 8px 0; border: none; border-top: 1px solid rgba(255,255,255,0.05);'>", unsafe_allow_html=True)
+
+    if page_count > 1:
+        st.caption(
+            f"{page_index * charts_per_page + 1}–"
+            f"{min((page_index + 1) * charts_per_page, len(tickers))} / {len(tickers)}종목"
+        )
+        if page_count <= 7:
+            page_numbers = list(range(page_count))
+        else:
+            page_numbers = sorted(
+                {0, 1, 2, page_index - 1, page_index, page_index + 1, page_count - 1}
+                & set(range(page_count))
+            )
+
+        with st.container(horizontal=True, wrap=True, horizontal_alignment="center"):
+            previous = -1
+            for number in page_numbers:
+                if number - previous > 1:
+                    st.markdown("⋯")
+                if st.button(
+                    str(number + 1),
+                    key=f"chart_page_button_{view_mode}_{number}",
+                    type="primary" if number == page_index else "secondary",
+                ):
+                    st.session_state[page_key] = number
+                    st.rerun()
+                previous = number
 
 
 if __name__ == "__main__":
