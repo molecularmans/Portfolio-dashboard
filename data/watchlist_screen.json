@@ -301,11 +301,11 @@
           "date": "2026-10-09"
         },
         "ETN": {
-          "stage": "hold",
+          "stage": "setup",
           "date": "2026-10-09"
         },
         "EME": {
-          "stage": "hold",
+          "stage": "setup",
           "date": "2026-10-09"
         },
         "VST": {
@@ -341,7 +341,7 @@
           "date": "2026-10-09"
         },
         "FIX": {
-          "stage": "hold",
+          "stage": "setup",
           "date": "2026-10-09"
         },
         "TEAM": {
@@ -545,7 +545,7 @@
           "date": "2026-10-09"
         },
         "OUST": {
-          "stage": "hold",
+          "stage": "setup",
           "date": "2026-10-09"
         },
         "CGNX": {
@@ -557,7 +557,8 @@
           "date": "2026-10-09"
         }
       },
-      "completed_at": "2026-10-10T23:15+09:00"
+      "completed_at": "2026-10-10T23:26+09:00",
+      "engine_version": "v5"
     },
     "W": {
       "scan_day": "2026-10-09",
@@ -2025,7 +2026,7 @@
           "volume_ratio": 0.56
         }
       },
-      "completed_at": "2026-10-10T23:18+09:00",
+      "completed_at": "2026-10-10T23:28+09:00",
       "week_start": "2026-10-05"
     }
   }
