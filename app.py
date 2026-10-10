@@ -470,7 +470,7 @@ def main():
         return
 
     # 한 화면에서 생성하는 TradingView 위젯 수를 제한한다.
-    charts_per_page = 6
+    charts_per_page = 9
     page_count = (len(tickers) + charts_per_page - 1) // charts_per_page
     page_key = f"chart_page_{view_mode}"
     page_index = min(max(st.session_state.get(page_key, 0), 0), page_count - 1)
