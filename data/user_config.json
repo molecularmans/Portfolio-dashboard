@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-10-08 08:12:07",
+  "updated_at": "2026-10-10 05:47:42",
   "groups": [
     {
       "group_name": "지수",
@@ -91,6 +91,11 @@
     },
     {
       "ticker": "HYPEUSD",
+      "name": "",
+      "group_name": "금융"
+    },
+    {
+      "ticker": "V",
       "name": "",
       "group_name": "금융"
     },
