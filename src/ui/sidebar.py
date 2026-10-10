@@ -52,7 +52,7 @@ def render_sidebar(db: StockDB, client: KISClient) -> dict:
 
         # 4. 관심종목 및 그룹 관리
         with st.expander("관심종목 및 그룹 관리", expanded=False):
-            tab_item, tab_grp = st.tabs(["종목 추가/삭제", "그룹 관리"])
+            tab_item, tab_order, tab_grp = st.tabs(["종목 추가/삭제", "종목 순서", "그룹 관리"])
 
             # 탭 1: 종목 추가 및 삭제
             with tab_item:
@@ -67,7 +67,7 @@ def render_sidebar(db: StockDB, client: KISClient) -> dict:
                 st.caption("등록된 종목 목록")
                 all_items = db.get_watchlist()
                 if not all_items.empty:
-                    for grp, df_grp in all_items.groupby("group_name"):
+                    for grp, df_grp in all_items.groupby("group_name", sort=False):
                         st.markdown(f"**{grp}**")
                         for _, row in df_grp.iterrows():
                             t = row["ticker"]
@@ -78,7 +78,37 @@ def render_sidebar(db: StockDB, client: KISClient) -> dict:
                                 st.toast(f"{t} 삭제 완료")
                                 st.rerun()
 
-            # 탭 2: 그룹 관리 (순서 변경)
+            # 탭 2: 그룹 안의 종목을 원하는 위치로 이동
+            with tab_order:
+                order_group = st.selectbox("순서를 변경할 그룹", options=groups, key="watchlist_order_group")
+                group_items = db.get_watchlist(group_name=order_group)
+                ordered_tickers = group_items["ticker"].tolist() if not group_items.empty else []
+                if ordered_tickers:
+                    st.caption("현재 순서: " + " · ".join(f"{i}. {ticker}" for i, ticker in enumerate(ordered_tickers, 1)))
+                    selected_ticker = st.selectbox(
+                        "이동할 종목",
+                        options=ordered_tickers,
+                        format_func=lambda ticker: f"{ordered_tickers.index(ticker) + 1}. {ticker}",
+                        key=f"watchlist_order_ticker_{order_group}",
+                    )
+                    current_position = ordered_tickers.index(selected_ticker) + 1
+                    target_position = st.number_input(
+                        "옮길 위치",
+                        min_value=1,
+                        max_value=len(ordered_tickers),
+                        value=current_position,
+                        step=1,
+                        key=f"watchlist_order_target_{order_group}_{selected_ticker}_{current_position}",
+                    )
+                    if st.button("선택한 위치로 이동", key="watchlist_move_item", use_container_width=True):
+                        if db.move_watchlist_item(selected_ticker, target_position):
+                            st.toast(f"{selected_ticker}: {target_position}번째로 이동했습니다.")
+                            st.rerun()
+                    st.caption("선택한 그룹의 멀티차트와 종목 목록에 같은 순서가 적용됩니다.")
+                else:
+                    st.caption("이 그룹에는 관심종목이 없습니다.")
+
+            # 탭 3: 그룹 관리 (순서 변경)
             with tab_grp:
                 st.markdown("**1) 그룹 순서 변경 (위/아래 이동)**")
                 for i, gname in enumerate(groups):

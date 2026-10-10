@@ -175,7 +175,7 @@ def schedule_watchlist_screen(db: StockDB, client: KISClient) -> None:
         return
     runtime = get_screen_runtime()
     watchlist = db.get_watchlist()
-    tickers = sorted(set(watchlist["ticker"].dropna().astype(str).str.strip().str.upper()) - {""}) if not watchlist.empty else []
+    tickers = list(dict.fromkeys(ticker for ticker in watchlist["ticker"].dropna().astype(str).str.strip().str.upper() if ticker)) if not watchlist.empty else []
     if tickers:
         runtime.start(tickers, load_and_calc_stock_data, db, client, scheduled=True)
 
@@ -190,7 +190,7 @@ def render_watchlist_screen(db: StockDB, client: KISClient, refresh_requested: b
         return
 
     watchlist = db.get_watchlist()
-    tickers = sorted(set(watchlist["ticker"].dropna().astype(str).str.strip().str.upper()) - {""}) if not watchlist.empty else []
+    tickers = list(dict.fromkeys(ticker for ticker in watchlist["ticker"].dropna().astype(str).str.strip().str.upper() if ticker)) if not watchlist.empty else []
     if not tickers:
         st.info("등록된 관심종목이 없습니다.")
         return

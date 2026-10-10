@@ -103,9 +103,15 @@ class StockDB:
                     ticker TEXT PRIMARY KEY,
                     name TEXT,
                     group_name TEXT DEFAULT '빅테크/AI',
+                    sort_order INTEGER DEFAULT 0,
                     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
                 )
             """)
+            cur.execute("PRAGMA table_info(watchlist)")
+            watchlist_columns = [row[1] for row in cur.fetchall()]
+            needs_watchlist_order = "sort_order" not in watchlist_columns
+            if needs_watchlist_order:
+                cur.execute("ALTER TABLE watchlist ADD COLUMN sort_order INTEGER DEFAULT 0")
 
             cur.execute("""
                 CREATE TABLE IF NOT EXISTS trendlines (
@@ -135,6 +141,7 @@ class StockDB:
             cur.execute("SELECT COUNT(*) FROM watchlist")
             count = cur.fetchone()[0]
             if count == 0:
+                needs_watchlist_order = True
                 default_items = [
                     ("NVDA", "NVIDIA", "빅테크/AI"),
                     ("AAPL", "Apple", "빅테크/AI"),
@@ -150,6 +157,13 @@ class StockDB:
                     "INSERT OR IGNORE INTO watchlist (ticker, name, group_name) VALUES (?, ?, ?)",
                     default_items,
                 )
+            if needs_watchlist_order:
+                cur.execute("SELECT ticker, group_name FROM watchlist ORDER BY group_name, created_at, rowid")
+                group_positions = {}
+                for ticker, group_name in cur.fetchall():
+                    position = group_positions.get(group_name, 0)
+                    cur.execute("UPDATE watchlist SET sort_order = ? WHERE ticker = ?", (position, ticker))
+                    group_positions[group_name] = position + 1
             con.commit()
 
     # ==========================================
@@ -191,7 +205,11 @@ class StockDB:
             df_groups = pd.read_sql_query("SELECT group_name, sort_order FROM custom_groups ORDER BY sort_order ASC, created_at ASC", con)
             groups = df_groups.to_dict(orient="records")
 
-            df_wl = pd.read_sql_query("SELECT ticker, name, group_name FROM watchlist ORDER BY group_name, created_at ASC", con)
+            df_wl = pd.read_sql_query("""
+                SELECT w.ticker, w.name, w.group_name, w.sort_order
+                FROM watchlist w LEFT JOIN custom_groups g ON w.group_name = g.group_name
+                ORDER BY COALESCE(g.sort_order, 999999), w.sort_order, w.created_at, w.rowid
+            """, con)
             watchlist = df_wl.to_dict(orient="records")
 
             cur = con.cursor()
@@ -226,13 +244,17 @@ class StockDB:
             # 2. 관심종목 복원
             if "watchlist" in config and config["watchlist"]:
                 cur.execute("DELETE FROM watchlist")
+                group_positions = {}
                 for w in config["watchlist"]:
                     if isinstance(w, dict):
                         ticker = w.get("ticker", "").strip().upper()
                         name = w.get("name", "")
                         group_name = w.get("group_name", "빅테크/AI")
                         if ticker:
-                            cur.execute("INSERT OR REPLACE INTO watchlist (ticker, name, group_name) VALUES (?, ?, ?)", [ticker, name, group_name])
+                            position = group_positions.get(group_name, 0)
+                            sort_order = w.get("sort_order", position)
+                            cur.execute("INSERT OR REPLACE INTO watchlist (ticker, name, group_name, sort_order) VALUES (?, ?, ?, ?)", [ticker, name, group_name, sort_order])
+                            group_positions[group_name] = position + 1
 
             # 3. 타임프레임별 이동평균선 설정 복원
             if "timeframe_ma_settings" in config and config["timeframe_ma_settings"]:
@@ -354,19 +376,54 @@ class StockDB:
     def get_watchlist(self, group_name: str = None) -> pd.DataFrame:
         with self._get_connection() as con:
             if group_name and group_name != "전체 관심종목":
-                return pd.read_sql_query("SELECT * FROM watchlist WHERE group_name = ? ORDER BY created_at ASC", con, params=[group_name])
-            return pd.read_sql_query("SELECT * FROM watchlist ORDER BY group_name, created_at ASC", con)
+                return pd.read_sql_query("SELECT * FROM watchlist WHERE group_name = ? ORDER BY sort_order, created_at, rowid", con, params=[group_name])
+            return pd.read_sql_query("""
+                SELECT w.* FROM watchlist w LEFT JOIN custom_groups g ON w.group_name = g.group_name
+                ORDER BY COALESCE(g.sort_order, 999999), w.sort_order, w.created_at, w.rowid
+            """, con)
 
     def add_watchlist_item(self, ticker: str, name: str = "", group_name: str = "빅테크/AI"):
+        ticker = ticker.upper().strip()
         with self._get_connection() as con:
             cur = con.cursor()
+            cur.execute("SELECT group_name FROM watchlist WHERE ticker = ?", (ticker,))
+            current = cur.fetchone()
+            if current and current["group_name"] == group_name:
+                return
+            cur.execute("SELECT COALESCE(MAX(sort_order), -1) + 1 FROM watchlist WHERE group_name = ?", (group_name,))
+            next_order = cur.fetchone()[0]
             cur.execute("""
-                INSERT INTO watchlist (ticker, name, group_name) 
-                VALUES (?, ?, ?)
-                ON CONFLICT(ticker) DO UPDATE SET group_name = excluded.group_name
-            """, [ticker.upper().strip(), name, group_name])
+                INSERT INTO watchlist (ticker, name, group_name, sort_order)
+                VALUES (?, ?, ?, ?)
+                ON CONFLICT(ticker) DO UPDATE SET
+                    group_name = excluded.group_name,
+                    sort_order = excluded.sort_order
+            """, (ticker, name, group_name, next_order))
             con.commit()
         self.trigger_github_backup()
+
+    def move_watchlist_item(self, ticker: str, target_position: int) -> bool:
+        """종목을 현재 그룹의 1부터 시작하는 위치로 이동한다."""
+        ticker = ticker.upper().strip()
+        with self._get_connection() as con:
+            cur = con.cursor()
+            cur.execute("SELECT group_name FROM watchlist WHERE ticker = ?", (ticker,))
+            row = cur.fetchone()
+            if not row:
+                return False
+            group_name = row["group_name"]
+            cur.execute("SELECT ticker FROM watchlist WHERE group_name = ? ORDER BY sort_order, created_at, rowid", (group_name,))
+            ordered = [item["ticker"] for item in cur.fetchall()]
+            old_index = ordered.index(ticker)
+            new_index = max(0, min(int(target_position) - 1, len(ordered) - 1))
+            if new_index == old_index:
+                return False
+            ordered.pop(old_index)
+            ordered.insert(new_index, ticker)
+            cur.executemany("UPDATE watchlist SET sort_order = ? WHERE ticker = ?", [(index, item) for index, item in enumerate(ordered)])
+            con.commit()
+        self.trigger_github_backup()
+        return True
 
     def remove_watchlist_item(self, ticker: str):
         with self._get_connection() as con:
