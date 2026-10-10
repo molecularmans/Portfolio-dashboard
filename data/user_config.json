@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-10-10 06:25:34",
+  "updated_at": "2026-10-10 06:47:26",
   "groups": [
     {
       "group_name": "지수",
@@ -326,6 +326,11 @@
     },
     {
       "ticker": "OKTA",
+      "name": "",
+      "group_name": "소프트웨어"
+    },
+    {
+      "ticker": "NET",
       "name": "",
       "group_name": "소프트웨어"
     },
