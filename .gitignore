@@ -21,3 +21,4 @@ __pycache__/
 .vscode/
 .idea/
 .streamlit/secrets.toml
+.preview/

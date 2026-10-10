@@ -469,9 +469,27 @@ def main():
         st.info("해당 포트폴리오/그룹에 등록된 종목이 없습니다. 좌측 메뉴에서 종목을 추가해보세요.")
         return
 
+    # 한 화면에서 생성하는 TradingView 위젯 수를 제한한다.
+    charts_per_page = 6
+    page_count = (len(tickers) + charts_per_page - 1) // charts_per_page
+    page_index = 0
+    if page_count > 1:
+        page_index = st.selectbox(
+            "차트 페이지",
+            options=range(page_count),
+            format_func=lambda page: (
+                f"{page + 1}/{page_count} 페이지 · "
+                f"{page * charts_per_page + 1}–{min((page + 1) * charts_per_page, len(tickers))}번째 종목"
+            ),
+            key=f"chart_page_{view_mode}",
+        )
+        st.caption("한 페이지에 최대 6개 차트만 불러옵니다.")
+
+    visible_tickers = tickers[page_index * charts_per_page:(page_index + 1) * charts_per_page]
+
     # 3열 반응형 그리드 레이아웃 (트레이딩뷰 캔들스틱 + 이평선 실시간 위젯)
     NUM_COLS = 3
-    rows = [tickers[i:i + NUM_COLS] for i in range(0, len(tickers), NUM_COLS)]
+    rows = [visible_tickers[i:i + NUM_COLS] for i in range(0, len(visible_tickers), NUM_COLS)]
 
     for row in rows:
         cols = st.columns(NUM_COLS)

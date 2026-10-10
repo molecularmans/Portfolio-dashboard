@@ -51,112 +51,114 @@ def render_sidebar(db: StockDB, client: KISClient) -> dict:
         st.divider()
 
         # 4. 관심종목 및 그룹 관리
-        with st.expander("관심종목 및 그룹 관리", expanded=False):
-            tab_item, tab_order, tab_grp = st.tabs(["종목 추가/삭제", "종목 순서", "그룹 관리"])
+        manager = st.expander("관심종목 및 그룹 관리", expanded=False, key="watchlist_manager", on_change="rerun")
+        if manager.open:
+            with manager:
+                tab_item, tab_order, tab_grp = st.tabs(["종목 추가/삭제", "종목 순서", "그룹 관리"])
 
-            # 탭 1: 종목 추가 및 삭제
-            with tab_item:
-                target_group = st.selectbox("추가할 그룹 선택", options=groups, index=0)
-                c_in, c_btn = st.columns([3, 1])
-                new_ticker = c_in.text_input("티커 입력", placeholder="예: NVDA, TSLA", label_visibility="collapsed").strip().upper()
-                if c_btn.button("추가", use_container_width=True) and new_ticker:
-                    db.add_watchlist_item(new_ticker, group_name=target_group)
-                    st.toast(f"[{target_group}]에 {new_ticker} 추가 완료")
-                    st.rerun()
+                # 탭 1: 종목 추가 및 삭제
+                with tab_item:
+                    target_group = st.selectbox("추가할 그룹 선택", options=groups, index=0)
+                    c_in, c_btn = st.columns([3, 1])
+                    new_ticker = c_in.text_input("티커 입력", placeholder="예: NVDA, TSLA", label_visibility="collapsed").strip().upper()
+                    if c_btn.button("추가", use_container_width=True) and new_ticker:
+                        db.add_watchlist_item(new_ticker, group_name=target_group)
+                        st.toast(f"[{target_group}]에 {new_ticker} 추가 완료")
+                        st.rerun()
 
-                st.caption("등록된 종목 목록")
-                all_items = db.get_watchlist()
-                if not all_items.empty:
-                    for grp, df_grp in all_items.groupby("group_name", sort=False):
-                        st.markdown(f"**{grp}**")
-                        for _, row in df_grp.iterrows():
-                            t = row["ticker"]
-                            c1, c2 = st.columns([3, 1])
-                            c1.write(f"- `{t}`")
-                            if c2.button("삭제", key=f"del_{grp}_{t}", help=f"{t} 삭제"):
-                                db.remove_watchlist_item(t)
-                                st.toast(f"{t} 삭제 완료")
+                    st.caption("등록된 종목 목록")
+                    all_items = db.get_watchlist()
+                    if not all_items.empty:
+                        for grp, df_grp in all_items.groupby("group_name", sort=False):
+                            st.markdown(f"**{grp}**")
+                            for _, row in df_grp.iterrows():
+                                t = row["ticker"]
+                                c1, c2 = st.columns([3, 1])
+                                c1.write(f"- `{t}`")
+                                if c2.button("삭제", key=f"del_{grp}_{t}", help=f"{t} 삭제"):
+                                    db.remove_watchlist_item(t)
+                                    st.toast(f"{t} 삭제 완료")
+                                    st.rerun()
+
+                # 탭 2: 그룹 안의 종목을 원하는 위치로 이동
+                with tab_order:
+                    order_group = st.selectbox("순서를 변경할 그룹", options=groups, key="watchlist_order_group")
+                    group_items = db.get_watchlist(group_name=order_group)
+                    ordered_tickers = group_items["ticker"].tolist() if not group_items.empty else []
+                    if ordered_tickers:
+                        st.caption("현재 순서: " + " · ".join(f"{i}. {ticker}" for i, ticker in enumerate(ordered_tickers, 1)))
+                        selected_ticker = st.selectbox(
+                            "이동할 종목",
+                            options=ordered_tickers,
+                            format_func=lambda ticker: f"{ordered_tickers.index(ticker) + 1}. {ticker}",
+                            key=f"watchlist_order_ticker_{order_group}",
+                        )
+                        current_position = ordered_tickers.index(selected_ticker) + 1
+                        target_position = st.number_input(
+                            "옮길 위치",
+                            min_value=1,
+                            max_value=len(ordered_tickers),
+                            value=current_position,
+                            step=1,
+                            key=f"watchlist_order_target_{order_group}_{selected_ticker}_{current_position}",
+                        )
+                        if st.button("선택한 위치로 이동", key="watchlist_move_item", use_container_width=True):
+                            if db.move_watchlist_item(selected_ticker, target_position):
+                                st.toast(f"{selected_ticker}: {target_position}번째로 이동했습니다.")
                                 st.rerun()
-
-            # 탭 2: 그룹 안의 종목을 원하는 위치로 이동
-            with tab_order:
-                order_group = st.selectbox("순서를 변경할 그룹", options=groups, key="watchlist_order_group")
-                group_items = db.get_watchlist(group_name=order_group)
-                ordered_tickers = group_items["ticker"].tolist() if not group_items.empty else []
-                if ordered_tickers:
-                    st.caption("현재 순서: " + " · ".join(f"{i}. {ticker}" for i, ticker in enumerate(ordered_tickers, 1)))
-                    selected_ticker = st.selectbox(
-                        "이동할 종목",
-                        options=ordered_tickers,
-                        format_func=lambda ticker: f"{ordered_tickers.index(ticker) + 1}. {ticker}",
-                        key=f"watchlist_order_ticker_{order_group}",
-                    )
-                    current_position = ordered_tickers.index(selected_ticker) + 1
-                    target_position = st.number_input(
-                        "옮길 위치",
-                        min_value=1,
-                        max_value=len(ordered_tickers),
-                        value=current_position,
-                        step=1,
-                        key=f"watchlist_order_target_{order_group}_{selected_ticker}_{current_position}",
-                    )
-                    if st.button("선택한 위치로 이동", key="watchlist_move_item", use_container_width=True):
-                        if db.move_watchlist_item(selected_ticker, target_position):
-                            st.toast(f"{selected_ticker}: {target_position}번째로 이동했습니다.")
-                            st.rerun()
-                    st.caption("선택한 그룹의 멀티차트와 종목 목록에 같은 순서가 적용됩니다.")
-                else:
-                    st.caption("이 그룹에는 관심종목이 없습니다.")
-
-            # 탭 3: 그룹 관리 (순서 변경)
-            with tab_grp:
-                st.markdown("**1) 그룹 순서 변경 (위/아래 이동)**")
-                for i, gname in enumerate(groups):
-                    c_name, c_up, c_down = st.columns([3.5, 1, 1])
-                    c_name.markdown(f"`{i + 1}` **{gname}**")
-                    if i > 0:
-                        if c_up.button("▲", key=f"btn_up_{gname}", help=f"{gname} 위로"):
-                            db.move_group_up(gname)
-                            st.rerun()
+                        st.caption("선택한 그룹의 멀티차트와 종목 목록에 같은 순서가 적용됩니다.")
                     else:
-                        c_up.write("")
+                        st.caption("이 그룹에는 관심종목이 없습니다.")
 
-                    if i < len(groups) - 1:
-                        if c_down.button("▼", key=f"btn_down_{gname}", help=f"{gname} 아래로"):
-                            db.move_group_down(gname)
-                            st.rerun()
-                    else:
-                        c_down.write("")
+                # 탭 3: 그룹 관리 (순서 변경)
+                with tab_grp:
+                    st.markdown("**1) 그룹 순서 변경 (위/아래 이동)**")
+                    for i, gname in enumerate(groups):
+                        c_name, c_up, c_down = st.columns([3.5, 1, 1])
+                        c_name.markdown(f"`{i + 1}` **{gname}**")
+                        if i > 0:
+                            if c_up.button("▲", key=f"btn_up_{gname}", help=f"{gname} 위로"):
+                                db.move_group_up(gname)
+                                st.rerun()
+                        else:
+                            c_up.write("")
 
-                st.divider()
+                        if i < len(groups) - 1:
+                            if c_down.button("▼", key=f"btn_down_{gname}", help=f"{gname} 아래로"):
+                                db.move_group_down(gname)
+                                st.rerun()
+                        else:
+                            c_down.write("")
 
-                st.markdown("**2) 새 그룹 생성**")
-                g_col1, g_col2 = st.columns([3, 1])
-                new_gname = g_col1.text_input("새 그룹명", placeholder="예: 바이오, 배당주", label_visibility="collapsed").strip()
-                if g_col2.button("생성", use_container_width=True) and new_gname:
-                    db.add_group(new_gname)
-                    st.toast(f"그룹 '{new_gname}' 생성 완료")
-                    st.rerun()
+                    st.divider()
 
-                st.divider()
+                    st.markdown("**2) 새 그룹 생성**")
+                    g_col1, g_col2 = st.columns([3, 1])
+                    new_gname = g_col1.text_input("새 그룹명", placeholder="예: 바이오, 배당주", label_visibility="collapsed").strip()
+                    if g_col2.button("생성", use_container_width=True) and new_gname:
+                        db.add_group(new_gname)
+                        st.toast(f"그룹 '{new_gname}' 생성 완료")
+                        st.rerun()
 
-                st.markdown("**3) 그룹명 변경**")
-                target_rename_grp = st.selectbox("변경할 그룹 선택", options=groups, key="sel_rename_grp")
-                r_col1, r_col2 = st.columns([3, 1])
-                renamed_title = r_col1.text_input("새 이름", value=target_rename_grp, label_visibility="collapsed").strip()
-                if r_col2.button("변경", use_container_width=True) and renamed_title and renamed_title != target_rename_grp:
-                    db.rename_group(target_rename_grp, renamed_title)
-                    st.toast(f"'{target_rename_grp}' → '{renamed_title}' 변경 완료")
-                    st.rerun()
+                    st.divider()
 
-                st.divider()
+                    st.markdown("**3) 그룹명 변경**")
+                    target_rename_grp = st.selectbox("변경할 그룹 선택", options=groups, key="sel_rename_grp")
+                    r_col1, r_col2 = st.columns([3, 1])
+                    renamed_title = r_col1.text_input("새 이름", value=target_rename_grp, label_visibility="collapsed").strip()
+                    if r_col2.button("변경", use_container_width=True) and renamed_title and renamed_title != target_rename_grp:
+                        db.rename_group(target_rename_grp, renamed_title)
+                        st.toast(f"'{target_rename_grp}' → '{renamed_title}' 변경 완료")
+                        st.rerun()
 
-                st.markdown("**4) 그룹 삭제**")
-                del_grp = st.selectbox("삭제할 그룹 선택", options=groups, key="sel_del_grp")
-                if st.button(f"'{del_grp}' 그룹 삭제", use_container_width=True):
-                    db.delete_group(del_grp)
-                    st.toast(f"'{del_grp}' 그룹 삭제 완료")
-                    st.rerun()
+                    st.divider()
+
+                    st.markdown("**4) 그룹 삭제**")
+                    del_grp = st.selectbox("삭제할 그룹 선택", options=groups, key="sel_del_grp")
+                    if st.button(f"'{del_grp}' 그룹 삭제", use_container_width=True):
+                        db.delete_group(del_grp)
+                        st.toast(f"'{del_grp}' 그룹 삭제 완료")
+                        st.rerun()
 
         st.divider()
 
