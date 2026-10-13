@@ -186,10 +186,10 @@ def schedule_watchlist_screen(db: StockDB, client: KISClient) -> None:
 def render_watchlist_screen(db: StockDB, client: KISClient, refresh_requested: bool = False) -> None:
     """Show the saved screen; run a worker only at the active 09:30 rollover or on request."""
     st.markdown("##### 📅 관심종목 종가 판정")
-    st.caption("일봉·주봉 마지막 저장 결과를 즉시 표시합니다. 앱이 켜져 있으면 오전 9시 30분(한국시간)에 일봉을, 새 완료 주가 생기면 주봉도 갱신합니다. 아래 버튼으로 언제든 다시 계산할 수 있습니다.")
-    if not client.is_configured():
-        st.info("KIS 실전 시세가 연결되면 관심종목 판정을 시작합니다.")
-        return
+    st.caption("일봉·주봉 마지막 저장 결과를 즉시 표시합니다. KIS 연결 시 오전 9시 30분(한국시간)에 일봉을, 새 완료 주가 생기면 주봉도 갱신하며 아래 버튼으로 다시 계산할 수 있습니다.")
+    kis_connected = client.is_configured()
+    if not kis_connected:
+        st.info("KIS 키가 없어 저장된 판정만 표시합니다. 새로고침은 KIS 연결 후 사용할 수 있습니다.")
 
     watchlist = db.get_watchlist()
     tickers = list(dict.fromkeys(ticker for ticker in watchlist["ticker"].dropna().astype(str).str.strip().str.upper() if ticker)) if not watchlist.empty else []
@@ -202,8 +202,8 @@ def render_watchlist_screen(db: StockDB, client: KISClient, refresh_requested: b
     with col_period:
         selected = st.radio("판정 주기", ["일봉", "주봉"], horizontal=True, key="watchlist_screen_period")
     with col_refresh:
-        manual = st.button("일봉·주봉 판정 새로고침", use_container_width=True)
-    if manual or refresh_requested:
+        manual = st.button("일봉·주봉 판정 새로고침", use_container_width=True, disabled=not kis_connected)
+    if kis_connected and (manual or refresh_requested):
         runtime.start(tickers, load_and_calc_stock_data, db, client)
 
     job = runtime.status()
@@ -242,16 +242,27 @@ def render_watchlist_screen(db: StockDB, client: KISClient, refresh_requested: b
         stage: [ticker for ticker, result in results.items() if result["stage"] == stage]
         for stage in labels
     }
+
+    def render_ticker_buttons(stage: str) -> None:
+        if not buckets[stage]:
+            st.write("없음")
+            return
+        with st.container(horizontal=True, wrap=True):
+            for ticker in buckets[stage]:
+                if st.button(ticker, key=f"screen_ticker_{code}_{ticker}", type="tertiary", help=f"{ticker} 자세히 보기"):
+                    st.session_state.selected_ticker = ticker
+                    st.rerun()
+
     cols = st.columns(3)
     for col, stage in zip(cols, ("ready", "setup", "watch")):
         with col:
             st.markdown(f"**{labels[stage]} ({len(buckets[stage])})**")
-            st.write(" · ".join(buckets[stage]) if buckets[stage] else "없음")
+            render_ticker_buttons(stage)
     with st.expander(f"{labels['hold']} ({len(buckets['hold'])})", expanded=False):
-        st.write(" · ".join(buckets["hold"]) if buckets["hold"] else "없음")
+        render_ticker_buttons("hold")
     if buckets["unavailable"]:
         with st.expander(f"{labels['unavailable']} ({len(buckets['unavailable'])})", expanded=False):
-            st.write(" · ".join(buckets["unavailable"]))
+            render_ticker_buttons("unavailable")
     if code == "W":
         st.caption("주봉은 완료된 주의 13·26·52주선, 직전 20주 고점, 주간 거래량과 손절폭으로 판정합니다. 일봉 [A–E]와는 독립된 참고 기준입니다.")
     else:
