@@ -33,5 +33,5 @@ import app as dashboard  # noqa: E402
 dashboard.StockDB = lambda: StockDB(db_path=str(PREVIEW_DIR / "stock_cache.db"))
 dashboard.ScreenSnapshotStore = lambda: ScreenSnapshotStore(path=PREVIEW_DIR / "watchlist_screen.json")
 
-st.info("🧪 테스트 화면 · 그룹 이동과 차트 페이지를 확인해 주세요. 이 화면의 설정 변경은 운영 대시보드에 반영되지 않습니다.")
+st.info("🧪 테스트 화면 · 종가 판정의 종목명을 눌러 상세 화면으로 이동해 보세요. 이 화면의 설정 변경은 운영 대시보드에 반영되지 않습니다.")
 dashboard.main()
