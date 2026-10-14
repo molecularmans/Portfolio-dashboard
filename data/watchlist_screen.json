@@ -2,7 +2,7 @@
   "schema_version": 1,
   "screens": {
     "D": {
-      "scan_day": "2026-10-12",
+      "scan_day": "2026-10-13",
       "tickers": [
         "QQQ",
         "SPY",
@@ -557,7 +557,7 @@
           "date": "2026-10-13"
         }
       },
-      "completed_at": "2026-10-14T09:31+09:00",
+      "completed_at": "2026-10-14T09:39+09:00",
       "engine_version": "v5"
     },
     "W": {
