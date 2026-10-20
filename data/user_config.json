@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-10-20 05:07:19",
+  "updated_at": "2026-10-20 05:07:49",
   "groups": [
     {
       "group_name": "지수",
@@ -492,91 +492,91 @@
       "sort_order": 14
     },
     {
-      "ticker": "XLV",
+      "ticker": "LLY",
       "name": "",
       "group_name": "헬스케어,바이오",
       "sort_order": 0
     },
     {
-      "ticker": "XBI",
+      "ticker": "XLV",
       "name": "",
       "group_name": "헬스케어,바이오",
       "sort_order": 1
     },
     {
-      "ticker": "MRNA",
+      "ticker": "XBI",
       "name": "",
       "group_name": "헬스케어,바이오",
       "sort_order": 2
     },
     {
-      "ticker": "TEM",
+      "ticker": "MRNA",
       "name": "",
       "group_name": "헬스케어,바이오",
       "sort_order": 3
     },
     {
-      "ticker": "TMO",
+      "ticker": "TEM",
       "name": "",
       "group_name": "헬스케어,바이오",
       "sort_order": 4
     },
     {
-      "ticker": "ILMN",
+      "ticker": "TMO",
       "name": "",
       "group_name": "헬스케어,바이오",
       "sort_order": 5
     },
     {
-      "ticker": "NTRA",
+      "ticker": "ILMN",
       "name": "",
       "group_name": "헬스케어,바이오",
       "sort_order": 6
     },
     {
-      "ticker": "VEEV",
+      "ticker": "NTRA",
       "name": "",
       "group_name": "헬스케어,바이오",
       "sort_order": 7
     },
     {
-      "ticker": "MRK",
+      "ticker": "VEEV",
       "name": "",
       "group_name": "헬스케어,바이오",
       "sort_order": 8
     },
     {
-      "ticker": "GH",
+      "ticker": "MRK",
       "name": "",
       "group_name": "헬스케어,바이오",
       "sort_order": 9
     },
     {
-      "ticker": "JNJ",
+      "ticker": "GH",
       "name": "",
       "group_name": "헬스케어,바이오",
       "sort_order": 10
     },
     {
-      "ticker": "TXG",
+      "ticker": "JNJ",
       "name": "",
       "group_name": "헬스케어,바이오",
       "sort_order": 11
     },
     {
-      "ticker": "TWST",
+      "ticker": "TXG",
       "name": "",
       "group_name": "헬스케어,바이오",
       "sort_order": 12
     },
     {
-      "ticker": "DGX",
+      "ticker": "TWST",
       "name": "",
       "group_name": "헬스케어,바이오",
       "sort_order": 13
     },
     {
-      "ticker": "LLY",
+      "ticker": "DGX",
       "name": "",
       "group_name": "헬스케어,바이오",
       "sort_order": 14
