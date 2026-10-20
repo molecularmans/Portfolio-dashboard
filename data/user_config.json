@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-10-12 05:15:02",
+  "updated_at": "2026-10-20 05:07:19",
   "groups": [
     {
       "group_name": "지수",
@@ -574,6 +574,12 @@
       "name": "",
       "group_name": "헬스케어,바이오",
       "sort_order": 13
+    },
+    {
+      "ticker": "LLY",
+      "name": "",
+      "group_name": "헬스케어,바이오",
+      "sort_order": 14
     },
     {
       "ticker": "RTX",
