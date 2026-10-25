@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-10-25 11:19:22",
+  "updated_at": "2026-10-25 11:19:42",
   "groups": [
     {
       "group_name": "지수",
@@ -746,6 +746,12 @@
       "name": "",
       "group_name": "서버",
       "sort_order": 3
+    },
+    {
+      "ticker": "P",
+      "name": "",
+      "group_name": "서버",
+      "sort_order": 4
     }
   ],
   "timeframe_ma_settings": {
