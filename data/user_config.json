@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-10-25 11:18:26",
+  "updated_at": "2026-10-25 11:19:07",
   "groups": [
     {
       "group_name": "지수",
@@ -728,6 +728,12 @@
       "name": "",
       "group_name": "피지컬AI",
       "sort_order": 2
+    },
+    {
+      "ticker": "HPE",
+      "name": "",
+      "group_name": "서버",
+      "sort_order": 0
     }
   ],
   "timeframe_ma_settings": {
