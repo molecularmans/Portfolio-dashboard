@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-10-25 11:19:17",
+  "updated_at": "2026-10-25 11:19:22",
   "groups": [
     {
       "group_name": "지수",
@@ -740,6 +740,12 @@
       "name": "",
       "group_name": "서버",
       "sort_order": 2
+    },
+    {
+      "ticker": "IBM",
+      "name": "",
+      "group_name": "서버",
+      "sort_order": 3
     }
   ],
   "timeframe_ma_settings": {
