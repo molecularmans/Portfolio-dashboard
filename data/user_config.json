@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-10-25 11:19:07",
+  "updated_at": "2026-10-25 11:19:12",
   "groups": [
     {
       "group_name": "지수",
@@ -734,6 +734,12 @@
       "name": "",
       "group_name": "서버",
       "sort_order": 0
+    },
+    {
+      "ticker": "DELL",
+      "name": "",
+      "group_name": "서버",
+      "sort_order": 1
     }
   ],
   "timeframe_ma_settings": {
