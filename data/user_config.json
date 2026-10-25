@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-10-25 11:19:12",
+  "updated_at": "2026-10-25 11:19:17",
   "groups": [
     {
       "group_name": "지수",
@@ -284,12 +284,6 @@
       "name": "",
       "group_name": "장비",
       "sort_order": 4
-    },
-    {
-      "ticker": "SMCI",
-      "name": "",
-      "group_name": "장비",
-      "sort_order": 5
     },
     {
       "ticker": "ORCL",
@@ -740,6 +734,12 @@
       "name": "",
       "group_name": "서버",
       "sort_order": 1
+    },
+    {
+      "ticker": "SMCI",
+      "name": "",
+      "group_name": "서버",
+      "sort_order": 2
     }
   ],
   "timeframe_ma_settings": {
