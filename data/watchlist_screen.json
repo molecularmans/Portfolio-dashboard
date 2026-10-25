@@ -27,7 +27,6 @@
         "TXN",
         "ON",
         "CBRS",
-        "DELL",
         "AMD",
         "MU",
         "INTC",
@@ -114,7 +113,13 @@
         "V",
         "OUST",
         "CGNX",
-        "ZBRA"
+        "ZBRA",
+        "HPE",
+        "DELL",
+        "SMCI",
+        "IBM",
+        "P",
+        "SNDK"
       ],
       "results": {
         "QQQ": {
@@ -206,10 +211,6 @@
           "date": "2026-10-23"
         },
         "CBRS": {
-          "stage": "hold",
-          "date": "2026-10-23"
-        },
-        "DELL": {
           "stage": "hold",
           "date": "2026-10-23"
         },
@@ -560,9 +561,33 @@
         "ZBRA": {
           "stage": "hold",
           "date": "2026-10-23"
+        },
+        "HPE": {
+          "stage": "hold",
+          "date": "2026-10-23"
+        },
+        "DELL": {
+          "stage": "hold",
+          "date": "2026-10-23"
+        },
+        "SMCI": {
+          "stage": "hold",
+          "date": "2026-10-23"
+        },
+        "IBM": {
+          "stage": "hold",
+          "date": "2026-10-23"
+        },
+        "P": {
+          "stage": "hold",
+          "date": "2026-10-23"
+        },
+        "SNDK": {
+          "stage": "hold",
+          "date": "2026-10-23"
         }
       },
-      "completed_at": "2026-10-25T19:54+09:00",
+      "completed_at": "2026-10-25T20:27+09:00",
       "engine_version": "v5"
     },
     "W": {
@@ -591,7 +616,6 @@
         "TXN",
         "ON",
         "CBRS",
-        "DELL",
         "AMD",
         "MU",
         "INTC",
@@ -678,7 +702,13 @@
         "V",
         "OUST",
         "CGNX",
-        "ZBRA"
+        "ZBRA",
+        "HPE",
+        "DELL",
+        "SMCI",
+        "IBM",
+        "P",
+        "SNDK"
       ],
       "results": {
         "QQQ": {
@@ -955,19 +985,6 @@
           "stage": "unavailable",
           "date": null,
           "reason": "완료된 주봉 자료가 부족합니다."
-        },
-        "DELL": {
-          "stage": "watch",
-          "date": "2026-10-19",
-          "reason": "중기 상승 구조를 관찰합니다. 주봉 돌파·거래량·위험 조건은 아직 확인되지 않았습니다.",
-          "close": 456.44,
-          "ma13": 501.4603,
-          "ma26": 430.6265,
-          "ma52": 286.3521,
-          "pivot": 594.6864,
-          "stop": 421.3066,
-          "risk_pct": 7.7,
-          "volume_ratio": 0.76
         },
         "AMD": {
           "stage": "watch",
@@ -2051,9 +2068,79 @@
           "stop": 363.0446,
           "risk_pct": 6.1,
           "volume_ratio": 0.58
+        },
+        "HPE": {
+          "stage": "watch",
+          "date": "2026-10-19",
+          "reason": "중기 상승 구조를 관찰합니다. 주봉 돌파·거래량·위험 조건은 아직 확인되지 않았습니다.",
+          "close": 56.69,
+          "ma13": 58.2335,
+          "ma26": 50.0111,
+          "ma52": 36.4274,
+          "pivot": 73.56,
+          "stop": 45.5851,
+          "risk_pct": 19.6,
+          "volume_ratio": 0.65
+        },
+        "DELL": {
+          "stage": "watch",
+          "date": "2026-10-19",
+          "reason": "중기 상승 구조를 관찰합니다. 주봉 돌파·거래량·위험 조건은 아직 확인되지 않았습니다.",
+          "close": 456.44,
+          "ma13": 501.4603,
+          "ma26": 430.6265,
+          "ma52": 286.3521,
+          "pivot": 594.6864,
+          "stop": 421.3066,
+          "risk_pct": 7.7,
+          "volume_ratio": 0.76
+        },
+        "SMCI": {
+          "stage": "hold",
+          "date": "2026-10-19",
+          "reason": "26주·52주 추세 또는 현재 주가 위치가 주봉 진입 기준에 미달합니다.",
+          "close": 32.94,
+          "ma13": 37.3727,
+          "ma26": 34.7775,
+          "ma52": 33.1182,
+          "pivot": 51.4,
+          "stop": 30.92,
+          "risk_pct": 6.1,
+          "volume_ratio": 0.95
+        },
+        "IBM": {
+          "stage": "hold",
+          "date": "2026-10-19",
+          "reason": "26주·52주 추세 또는 현재 주가 위치가 주봉 진입 기준에 미달합니다.",
+          "close": 253.56,
+          "ma13": 233.2267,
+          "ma26": 243.1272,
+          "ma52": 258.5357,
+          "pivot": 330.0922,
+          "stop": 233.2267,
+          "risk_pct": 8.0,
+          "volume_ratio": 0.94
+        },
+        "P": {
+          "stage": "unavailable",
+          "date": null,
+          "reason": "완료된 주봉 자료가 부족합니다."
+        },
+        "SNDK": {
+          "stage": "hold",
+          "date": "2026-10-19",
+          "reason": "26주·52주 추세 또는 현재 주가 위치가 주봉 진입 기준에 미달합니다.",
+          "close": 1238.03,
+          "ma13": 1533.1785,
+          "ma26": 1597.2738,
+          "ma52": 1041.7862,
+          "pivot": 2354.3899,
+          "stop": 1194.0101,
+          "risk_pct": 3.6,
+          "volume_ratio": 0.68
         }
       },
-      "completed_at": "2026-10-25T19:56+09:00",
+      "completed_at": "2026-10-25T20:29+09:00",
       "week_start": "2026-10-19"
     }
   }
