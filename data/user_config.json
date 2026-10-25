@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-10-25 11:16:32",
+  "updated_at": "2026-10-25 11:18:00",
   "groups": [
     {
       "group_name": "지수",
@@ -196,12 +196,6 @@
       "name": "",
       "group_name": "반도체",
       "sort_order": 4
-    },
-    {
-      "ticker": "DELL",
-      "name": "",
-      "group_name": "반도체",
-      "sort_order": 5
     },
     {
       "ticker": "AMD",
