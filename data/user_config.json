@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-10-25 11:18:00",
+  "updated_at": "2026-10-25 11:18:26",
   "groups": [
     {
       "group_name": "지수",
@@ -56,6 +56,10 @@
     {
       "group_name": "필수소비재",
       "sort_order": 13
+    },
+    {
+      "group_name": "서버",
+      "sort_order": 14
     }
   ],
   "watchlist": [
