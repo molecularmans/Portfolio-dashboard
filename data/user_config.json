@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-10-25 11:19:42",
+  "updated_at": "2026-10-25 11:21:01",
   "groups": [
     {
       "group_name": "지수",
@@ -752,6 +752,12 @@
       "name": "",
       "group_name": "서버",
       "sort_order": 4
+    },
+    {
+      "ticker": "SNDK",
+      "name": "",
+      "group_name": "서버",
+      "sort_order": 5
     }
   ],
   "timeframe_ma_settings": {
