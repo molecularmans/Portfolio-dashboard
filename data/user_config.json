@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-10-25 11:21:01",
+  "updated_at": "2026-10-28 04:56:56",
   "groups": [
     {
       "group_name": "지수",
@@ -254,6 +254,12 @@
       "name": "",
       "group_name": "반도체",
       "sort_order": 14
+    },
+    {
+      "ticker": "ADI",
+      "name": "",
+      "group_name": "반도체",
+      "sort_order": 15
     },
     {
       "ticker": "AMAT",
