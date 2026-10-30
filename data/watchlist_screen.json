@@ -592,11 +592,11 @@
           "date": "2026-10-29"
         }
       },
-      "completed_at": "2026-10-30T09:36+09:00",
+      "completed_at": "2026-10-30T11:02+09:00",
       "engine_version": "v5"
     },
     "W": {
-      "scan_day": "2026-10-27",
+      "scan_day": "2026-10-29",
       "tickers": [
         "QQQ",
         "SPY",
@@ -630,6 +630,7 @@
         "MRVL",
         "ALAB",
         "AVGO",
+        "ADI",
         "AMAT",
         "LRCX",
         "KLAC",
@@ -1107,6 +1108,19 @@
           "stop": null,
           "risk_pct": null,
           "volume_ratio": 0.76
+        },
+        "ADI": {
+          "stage": "hold",
+          "date": "2026-10-19",
+          "reason": "26주·52주 추세 또는 현재 주가 위치가 주봉 진입 기준에 미달합니다.",
+          "close": 391.07,
+          "ma13": 384.3143,
+          "ma26": 391.4585,
+          "ma52": 345.3195,
+          "pivot": 444.5558,
+          "stop": 384.3143,
+          "risk_pct": 1.7,
+          "volume_ratio": 0.92
         },
         "AMAT": {
           "stage": "hold",
@@ -2145,7 +2159,7 @@
           "volume_ratio": 0.68
         }
       },
-      "completed_at": "2026-10-28T13:24+09:00",
+      "completed_at": "2026-10-30T11:05+09:00",
       "week_start": "2026-10-19"
     }
   }
