@@ -2,7 +2,7 @@
   "schema_version": 1,
   "screens": {
     "D": {
-      "scan_day": "2026-10-27",
+      "scan_day": "2026-10-29",
       "tickers": [
         "QQQ",
         "SPY",
@@ -36,6 +36,7 @@
         "MRVL",
         "ALAB",
         "AVGO",
+        "ADI",
         "AMAT",
         "LRCX",
         "KLAC",
@@ -124,19 +125,19 @@
       "results": {
         "QQQ": {
           "stage": "hold",
-          "date": "2026-10-27"
+          "date": "2026-10-29"
         },
         "SPY": {
-          "stage": "hold",
-          "date": "2026-10-27"
+          "stage": "setup",
+          "date": "2026-10-29"
         },
         "BITO": {
           "stage": "hold",
-          "date": "2026-10-27"
+          "date": "2026-10-29"
         },
         "SOXX": {
           "stage": "hold",
-          "date": "2026-10-27"
+          "date": "2026-10-29"
         },
         "US10Y": {
           "stage": "unavailable",
@@ -148,399 +149,403 @@
         },
         "NTAP": {
           "stage": "hold",
-          "date": "2026-10-27"
+          "date": "2026-10-29"
         },
         "ZETA": {
           "stage": "hold",
-          "date": "2026-10-27"
+          "date": "2026-10-29"
         },
         "ANET": {
           "stage": "hold",
-          "date": "2026-10-27"
+          "date": "2026-10-29"
         },
         "NSIT": {
           "stage": "hold",
-          "date": "2026-10-27"
+          "date": "2026-10-29"
         },
         "CAKE": {
-          "stage": "setup",
-          "date": "2026-10-27"
+          "stage": "hold",
+          "date": "2026-10-29"
         },
         "NVDA": {
           "stage": "hold",
-          "date": "2026-10-27"
+          "date": "2026-10-29"
         },
         "AAPL": {
           "stage": "setup",
-          "date": "2026-10-27"
+          "date": "2026-10-29"
         },
         "MSFT": {
-          "stage": "hold",
-          "date": "2026-10-27"
+          "stage": "setup",
+          "date": "2026-10-29"
         },
         "GOOGL": {
           "stage": "hold",
-          "date": "2026-10-27"
+          "date": "2026-10-29"
         },
         "AMZN": {
           "stage": "hold",
-          "date": "2026-10-27"
+          "date": "2026-10-29"
         },
         "TSLA": {
           "stage": "hold",
-          "date": "2026-10-27"
+          "date": "2026-10-29"
         },
         "BOTZ": {
           "stage": "hold",
-          "date": "2026-10-27"
+          "date": "2026-10-29"
         },
         "CRDO": {
           "stage": "hold",
-          "date": "2026-10-27"
+          "date": "2026-10-29"
         },
         "STM": {
           "stage": "hold",
-          "date": "2026-10-27"
+          "date": "2026-10-29"
         },
         "TXN": {
           "stage": "watch",
-          "date": "2026-10-27"
+          "date": "2026-10-29"
         },
         "ON": {
           "stage": "hold",
-          "date": "2026-10-27"
+          "date": "2026-10-29"
         },
         "CBRS": {
           "stage": "hold",
-          "date": "2026-10-27"
+          "date": "2026-10-29"
         },
         "AMD": {
           "stage": "hold",
-          "date": "2026-10-27"
+          "date": "2026-10-29"
         },
         "MU": {
           "stage": "hold",
-          "date": "2026-10-27"
+          "date": "2026-10-29"
         },
         "INTC": {
           "stage": "hold",
-          "date": "2026-10-27"
+          "date": "2026-10-29"
         },
         "COHR": {
           "stage": "hold",
-          "date": "2026-10-27"
+          "date": "2026-10-29"
         },
         "GFS": {
           "stage": "hold",
-          "date": "2026-10-27"
+          "date": "2026-10-29"
         },
         "NVT": {
           "stage": "hold",
-          "date": "2026-10-27"
+          "date": "2026-10-29"
         },
         "MRVL": {
           "stage": "hold",
-          "date": "2026-10-27"
+          "date": "2026-10-29"
         },
         "ALAB": {
           "stage": "hold",
-          "date": "2026-10-27"
+          "date": "2026-10-29"
         },
         "AVGO": {
           "stage": "hold",
-          "date": "2026-10-27"
+          "date": "2026-10-29"
+        },
+        "ADI": {
+          "stage": "hold",
+          "date": "2026-10-29"
         },
         "AMAT": {
-          "stage": "unavailable",
-          "date": null
+          "stage": "hold",
+          "date": "2026-10-29"
         },
         "LRCX": {
           "stage": "hold",
-          "date": "2026-10-27"
+          "date": "2026-10-29"
         },
         "KLAC": {
           "stage": "hold",
-          "date": "2026-10-27"
+          "date": "2026-10-29"
         },
         "TER": {
           "stage": "hold",
-          "date": "2026-10-27"
+          "date": "2026-10-29"
         },
         "FORM": {
           "stage": "hold",
-          "date": "2026-10-27"
+          "date": "2026-10-29"
         },
         "ORCL": {
           "stage": "hold",
-          "date": "2026-10-27"
+          "date": "2026-10-29"
         },
         "NBIS": {
           "stage": "hold",
-          "date": "2026-10-27"
+          "date": "2026-10-29"
         },
         "CRWV": {
           "stage": "hold",
-          "date": "2026-10-27"
+          "date": "2026-10-29"
         },
         "SPCX": {
           "stage": "hold",
-          "date": "2026-10-27"
+          "date": "2026-10-29"
         },
         "IREN": {
           "stage": "hold",
-          "date": "2026-10-27"
+          "date": "2026-10-29"
         },
         "BE": {
           "stage": "hold",
-          "date": "2026-10-27"
+          "date": "2026-10-29"
         },
         "INIO": {
           "stage": "hold",
-          "date": "2026-10-27"
+          "date": "2026-10-29"
         },
         "STRL": {
           "stage": "hold",
-          "date": "2026-10-27"
+          "date": "2026-10-29"
         },
         "ETN": {
           "stage": "hold",
-          "date": "2026-10-27"
+          "date": "2026-10-29"
         },
         "EME": {
           "stage": "hold",
-          "date": "2026-10-27"
+          "date": "2026-10-29"
         },
         "CEG": {
           "stage": "hold",
-          "date": "2026-10-27"
+          "date": "2026-10-29"
         },
         "VST": {
           "stage": "hold",
-          "date": "2026-10-27"
+          "date": "2026-10-29"
         },
         "TLN": {
           "stage": "hold",
-          "date": "2026-10-27"
+          "date": "2026-10-29"
         },
         "CCJ": {
           "stage": "hold",
-          "date": "2026-10-27"
+          "date": "2026-10-29"
         },
         "EROC": {
           "stage": "hold",
-          "date": "2026-10-27"
+          "date": "2026-10-29"
         },
         "PWR": {
           "stage": "hold",
-          "date": "2026-10-27"
+          "date": "2026-10-29"
         },
         "EXE": {
-          "stage": "setup",
-          "date": "2026-10-27"
+          "stage": "hold",
+          "date": "2026-10-29"
         },
         "POWL": {
           "stage": "hold",
-          "date": "2026-10-27"
+          "date": "2026-10-29"
         },
         "FIX": {
           "stage": "hold",
-          "date": "2026-10-27"
+          "date": "2026-10-29"
         },
         "TEAM": {
           "stage": "hold",
-          "date": "2026-10-27"
+          "date": "2026-10-29"
         },
         "INTA": {
           "stage": "hold",
-          "date": "2026-10-27"
+          "date": "2026-10-29"
         },
         "APPN": {
           "stage": "hold",
-          "date": "2026-10-27"
+          "date": "2026-10-29"
         },
         "NTSK": {
           "stage": "watch",
-          "date": "2026-10-27"
+          "date": "2026-10-29"
         },
         "AMPL": {
           "stage": "hold",
-          "date": "2026-10-27"
+          "date": "2026-10-29"
         },
         "YEXT": {
           "stage": "hold",
-          "date": "2026-10-27"
+          "date": "2026-10-29"
         },
         "QLYS": {
           "stage": "hold",
-          "date": "2026-10-27"
+          "date": "2026-10-29"
         },
         "CRM": {
           "stage": "hold",
-          "date": "2026-10-27"
+          "date": "2026-10-29"
         },
         "PLTR": {
           "stage": "hold",
-          "date": "2026-10-27"
+          "date": "2026-10-29"
         },
         "NOW": {
           "stage": "hold",
-          "date": "2026-10-27"
+          "date": "2026-10-29"
         },
         "PANW": {
           "stage": "hold",
-          "date": "2026-10-27"
+          "date": "2026-10-29"
         },
         "SNOW": {
           "stage": "hold",
-          "date": "2026-10-27"
+          "date": "2026-10-29"
         },
         "CRWD": {
           "stage": "hold",
-          "date": "2026-10-27"
+          "date": "2026-10-29"
         },
         "OKTA": {
           "stage": "hold",
-          "date": "2026-10-27"
+          "date": "2026-10-29"
         },
         "NET": {
           "stage": "hold",
-          "date": "2026-10-27"
+          "date": "2026-10-29"
         },
         "LLY": {
-          "stage": "hold",
-          "date": "2026-10-27"
+          "stage": "watch",
+          "date": "2026-10-29"
         },
         "XLV": {
-          "stage": "hold",
-          "date": "2026-10-27"
+          "stage": "setup",
+          "date": "2026-10-29"
         },
         "XBI": {
           "stage": "hold",
-          "date": "2026-10-27"
+          "date": "2026-10-29"
         },
         "MRNA": {
           "stage": "hold",
-          "date": "2026-10-27"
+          "date": "2026-10-29"
         },
         "TEM": {
           "stage": "hold",
-          "date": "2026-10-27"
+          "date": "2026-10-29"
         },
         "TMO": {
           "stage": "setup",
-          "date": "2026-10-27"
+          "date": "2026-10-29"
         },
         "ILMN": {
           "stage": "hold",
-          "date": "2026-10-27"
+          "date": "2026-10-29"
         },
         "NTRA": {
           "stage": "watch",
-          "date": "2026-10-27"
+          "date": "2026-10-29"
         },
         "VEEV": {
           "stage": "hold",
-          "date": "2026-10-27"
+          "date": "2026-10-29"
         },
         "MRK": {
           "stage": "hold",
-          "date": "2026-10-27"
+          "date": "2026-10-29"
         },
         "GH": {
           "stage": "hold",
-          "date": "2026-10-27"
+          "date": "2026-10-29"
         },
         "JNJ": {
-          "stage": "hold",
-          "date": "2026-10-27"
+          "stage": "setup",
+          "date": "2026-10-29"
         },
         "TXG": {
           "stage": "hold",
-          "date": "2026-10-27"
+          "date": "2026-10-29"
         },
         "TWST": {
           "stage": "hold",
-          "date": "2026-10-27"
+          "date": "2026-10-29"
         },
         "DGX": {
           "stage": "hold",
-          "date": "2026-10-27"
+          "date": "2026-10-29"
         },
         "RTX": {
           "stage": "hold",
-          "date": "2026-10-27"
+          "date": "2026-10-29"
         },
         "BA": {
           "stage": "hold",
-          "date": "2026-10-27"
+          "date": "2026-10-29"
         },
         "RKLB": {
           "stage": "hold",
-          "date": "2026-10-27"
+          "date": "2026-10-29"
         },
         "GE": {
           "stage": "hold",
-          "date": "2026-10-27"
+          "date": "2026-10-29"
         },
         "LMT": {
           "stage": "hold",
-          "date": "2026-10-27"
+          "date": "2026-10-29"
         },
         "HWM": {
           "stage": "hold",
-          "date": "2026-10-27"
+          "date": "2026-10-29"
         },
         "NOC": {
           "stage": "hold",
-          "date": "2026-10-27"
+          "date": "2026-10-29"
         },
         "LHX": {
           "stage": "hold",
-          "date": "2026-10-27"
+          "date": "2026-10-29"
         },
         "KTOS": {
           "stage": "hold",
-          "date": "2026-10-27"
+          "date": "2026-10-29"
         },
         "AVAV": {
           "stage": "hold",
-          "date": "2026-10-27"
+          "date": "2026-10-29"
         },
         "GLD": {
           "stage": "hold",
-          "date": "2026-10-27"
+          "date": "2026-10-29"
         },
         "FCX": {
           "stage": "hold",
-          "date": "2026-10-27"
+          "date": "2026-10-29"
         },
         "HOOD": {
           "stage": "hold",
-          "date": "2026-10-27"
+          "date": "2026-10-29"
         },
         "MA": {
           "stage": "hold",
-          "date": "2026-10-27"
+          "date": "2026-10-29"
         },
         "BNY": {
           "stage": "hold",
-          "date": "2026-10-27"
+          "date": "2026-10-29"
         },
         "GS": {
           "stage": "hold",
-          "date": "2026-10-27"
+          "date": "2026-10-29"
         },
         "JPM": {
           "stage": "hold",
-          "date": "2026-10-27"
+          "date": "2026-10-29"
         },
         "COIN": {
           "stage": "hold",
-          "date": "2026-10-27"
+          "date": "2026-10-29"
         },
         "PURR": {
           "stage": "hold",
-          "date": "2026-10-27"
+          "date": "2026-10-29"
         },
         "HYPEUSD": {
           "stage": "unavailable",
@@ -548,46 +553,46 @@
         },
         "V": {
           "stage": "hold",
-          "date": "2026-10-27"
+          "date": "2026-10-29"
         },
         "OUST": {
           "stage": "hold",
-          "date": "2026-10-27"
+          "date": "2026-10-29"
         },
         "CGNX": {
           "stage": "hold",
-          "date": "2026-10-27"
+          "date": "2026-10-29"
         },
         "ZBRA": {
-          "stage": "hold",
-          "date": "2026-10-27"
+          "stage": "setup",
+          "date": "2026-10-29"
         },
         "HPE": {
           "stage": "hold",
-          "date": "2026-10-27"
+          "date": "2026-10-29"
         },
         "DELL": {
           "stage": "hold",
-          "date": "2026-10-27"
+          "date": "2026-10-29"
         },
         "SMCI": {
           "stage": "hold",
-          "date": "2026-10-27"
+          "date": "2026-10-29"
         },
         "IBM": {
           "stage": "hold",
-          "date": "2026-10-27"
+          "date": "2026-10-29"
         },
         "P": {
           "stage": "hold",
-          "date": "2026-10-27"
+          "date": "2026-10-29"
         },
         "SNDK": {
           "stage": "hold",
-          "date": "2026-10-27"
+          "date": "2026-10-29"
         }
       },
-      "completed_at": "2026-10-28T13:22+09:00",
+      "completed_at": "2026-10-30T09:36+09:00",
       "engine_version": "v5"
     },
     "W": {
