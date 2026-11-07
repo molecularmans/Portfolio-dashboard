@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-11-07 11:25:41",
+  "updated_at": "2026-11-07 11:25:46",
   "groups": [
     {
       "group_name": "지수",
@@ -50,11 +50,11 @@
       "sort_order": 11
     },
     {
-      "group_name": "피지컬AI",
+      "group_name": "서버,인프라",
       "sort_order": 12
     },
     {
-      "group_name": "서버,인프라",
+      "group_name": "피지컬AI",
       "sort_order": 13
     },
     {
@@ -730,24 +730,6 @@
       "sort_order": 8
     },
     {
-      "ticker": "OUST",
-      "name": "",
-      "group_name": "피지컬AI",
-      "sort_order": 0
-    },
-    {
-      "ticker": "CGNX",
-      "name": "",
-      "group_name": "피지컬AI",
-      "sort_order": 1
-    },
-    {
-      "ticker": "ZBRA",
-      "name": "",
-      "group_name": "피지컬AI",
-      "sort_order": 2
-    },
-    {
       "ticker": "HPE",
       "name": "",
       "group_name": "서버,인프라",
@@ -782,6 +764,24 @@
       "name": "",
       "group_name": "서버,인프라",
       "sort_order": 5
+    },
+    {
+      "ticker": "OUST",
+      "name": "",
+      "group_name": "피지컬AI",
+      "sort_order": 0
+    },
+    {
+      "ticker": "CGNX",
+      "name": "",
+      "group_name": "피지컬AI",
+      "sort_order": 1
+    },
+    {
+      "ticker": "ZBRA",
+      "name": "",
+      "group_name": "피지컬AI",
+      "sort_order": 2
     }
   ],
   "timeframe_ma_settings": {
