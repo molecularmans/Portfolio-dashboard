@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-11-07 11:16:53",
+  "updated_at": "2026-11-07 11:23:47",
   "groups": [
     {
       "group_name": "지수",
@@ -494,6 +494,12 @@
       "name": "",
       "group_name": "소프트웨어",
       "sort_order": 14
+    },
+    {
+      "ticker": "DDOG",
+      "name": "",
+      "group_name": "소프트웨어",
+      "sort_order": 15
     },
     {
       "ticker": "LLY",
