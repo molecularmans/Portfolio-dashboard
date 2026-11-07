@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-11-07 11:27:08",
+  "updated_at": "2026-11-07 11:27:15",
   "groups": [
     {
       "group_name": "지수",
@@ -446,6 +446,12 @@
       "name": "",
       "group_name": "서버,인프라",
       "sort_order": 6
+    },
+    {
+      "ticker": "MOD",
+      "name": "",
+      "group_name": "서버,인프라",
+      "sort_order": 7
     },
     {
       "ticker": "TEAM",
