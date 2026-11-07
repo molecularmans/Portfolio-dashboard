@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-11-07 11:25:30",
+  "updated_at": "2026-11-07 11:25:41",
   "groups": [
     {
       "group_name": "지수",
@@ -54,11 +54,11 @@
       "sort_order": 12
     },
     {
-      "group_name": "필수소비재",
+      "group_name": "서버,인프라",
       "sort_order": 13
     },
     {
-      "group_name": "서버,인프라",
+      "group_name": "필수소비재",
       "sort_order": 14
     }
   ],
