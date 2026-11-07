@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-11-07 11:27:15",
+  "updated_at": "2026-11-07 11:27:19",
   "groups": [
     {
       "group_name": "지수",
@@ -334,12 +334,6 @@
       "sort_order": 1
     },
     {
-      "ticker": "STRL",
-      "name": "",
-      "group_name": "전력",
-      "sort_order": 2
-    },
-    {
       "ticker": "ETN",
       "name": "",
       "group_name": "전력",
@@ -452,6 +446,12 @@
       "name": "",
       "group_name": "서버,인프라",
       "sort_order": 7
+    },
+    {
+      "ticker": "STRL",
+      "name": "",
+      "group_name": "서버,인프라",
+      "sort_order": 8
     },
     {
       "ticker": "TEAM",
