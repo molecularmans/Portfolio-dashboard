@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-11-07 11:25:46",
+  "updated_at": "2026-11-07 11:25:48",
   "groups": [
     {
       "group_name": "지수",
@@ -46,11 +46,11 @@
       "sort_order": 10
     },
     {
-      "group_name": "금융",
+      "group_name": "서버,인프라",
       "sort_order": 11
     },
     {
-      "group_name": "서버,인프라",
+      "group_name": "금융",
       "sort_order": 12
     },
     {
@@ -676,6 +676,42 @@
       "sort_order": 2
     },
     {
+      "ticker": "HPE",
+      "name": "",
+      "group_name": "서버,인프라",
+      "sort_order": 0
+    },
+    {
+      "ticker": "DELL",
+      "name": "",
+      "group_name": "서버,인프라",
+      "sort_order": 1
+    },
+    {
+      "ticker": "SMCI",
+      "name": "",
+      "group_name": "서버,인프라",
+      "sort_order": 2
+    },
+    {
+      "ticker": "IBM",
+      "name": "",
+      "group_name": "서버,인프라",
+      "sort_order": 3
+    },
+    {
+      "ticker": "P",
+      "name": "",
+      "group_name": "서버,인프라",
+      "sort_order": 4
+    },
+    {
+      "ticker": "SNDK",
+      "name": "",
+      "group_name": "서버,인프라",
+      "sort_order": 5
+    },
+    {
       "ticker": "HOOD",
       "name": "",
       "group_name": "금융",
@@ -728,42 +764,6 @@
       "name": "",
       "group_name": "금융",
       "sort_order": 8
-    },
-    {
-      "ticker": "HPE",
-      "name": "",
-      "group_name": "서버,인프라",
-      "sort_order": 0
-    },
-    {
-      "ticker": "DELL",
-      "name": "",
-      "group_name": "서버,인프라",
-      "sort_order": 1
-    },
-    {
-      "ticker": "SMCI",
-      "name": "",
-      "group_name": "서버,인프라",
-      "sort_order": 2
-    },
-    {
-      "ticker": "IBM",
-      "name": "",
-      "group_name": "서버,인프라",
-      "sort_order": 3
-    },
-    {
-      "ticker": "P",
-      "name": "",
-      "group_name": "서버,인프라",
-      "sort_order": 4
-    },
-    {
-      "ticker": "SNDK",
-      "name": "",
-      "group_name": "서버,인프라",
-      "sort_order": 5
     },
     {
       "ticker": "OUST",
