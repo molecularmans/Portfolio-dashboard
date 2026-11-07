@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-10-28 04:56:56",
+  "updated_at": "2026-11-07 11:16:53",
   "groups": [
     {
       "group_name": "지수",
@@ -656,6 +656,12 @@
       "name": "",
       "group_name": "원자재",
       "sort_order": 1
+    },
+    {
+      "ticker": "MP",
+      "name": "",
+      "group_name": "원자재",
+      "sort_order": 2
     },
     {
       "ticker": "HOOD",
