@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-11-07 11:26:06",
+  "updated_at": "2026-11-07 11:26:21",
   "groups": [
     {
       "group_name": "지수",
@@ -38,11 +38,11 @@
       "sort_order": 8
     },
     {
-      "group_name": "방산.항공",
+      "group_name": "서버,인프라",
       "sort_order": 9
     },
     {
-      "group_name": "서버,인프라",
+      "group_name": "방산.항공",
       "sort_order": 10
     },
     {
@@ -598,6 +598,42 @@
       "sort_order": 14
     },
     {
+      "ticker": "HPE",
+      "name": "",
+      "group_name": "서버,인프라",
+      "sort_order": 0
+    },
+    {
+      "ticker": "DELL",
+      "name": "",
+      "group_name": "서버,인프라",
+      "sort_order": 1
+    },
+    {
+      "ticker": "SMCI",
+      "name": "",
+      "group_name": "서버,인프라",
+      "sort_order": 2
+    },
+    {
+      "ticker": "IBM",
+      "name": "",
+      "group_name": "서버,인프라",
+      "sort_order": 3
+    },
+    {
+      "ticker": "P",
+      "name": "",
+      "group_name": "서버,인프라",
+      "sort_order": 4
+    },
+    {
+      "ticker": "SNDK",
+      "name": "",
+      "group_name": "서버,인프라",
+      "sort_order": 5
+    },
+    {
       "ticker": "RTX",
       "name": "",
       "group_name": "방산.항공",
@@ -656,42 +692,6 @@
       "name": "",
       "group_name": "방산.항공",
       "sort_order": 9
-    },
-    {
-      "ticker": "HPE",
-      "name": "",
-      "group_name": "서버,인프라",
-      "sort_order": 0
-    },
-    {
-      "ticker": "DELL",
-      "name": "",
-      "group_name": "서버,인프라",
-      "sort_order": 1
-    },
-    {
-      "ticker": "SMCI",
-      "name": "",
-      "group_name": "서버,인프라",
-      "sort_order": 2
-    },
-    {
-      "ticker": "IBM",
-      "name": "",
-      "group_name": "서버,인프라",
-      "sort_order": 3
-    },
-    {
-      "ticker": "P",
-      "name": "",
-      "group_name": "서버,인프라",
-      "sort_order": 4
-    },
-    {
-      "ticker": "SNDK",
-      "name": "",
-      "group_name": "서버,인프라",
-      "sort_order": 5
     },
     {
       "ticker": "GLD",
