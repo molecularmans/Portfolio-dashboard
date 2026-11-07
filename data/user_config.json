@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-11-07 11:24:05",
+  "updated_at": "2026-11-07 11:24:15",
   "groups": [
     {
       "group_name": "지수",
@@ -290,12 +290,6 @@
       "name": "",
       "group_name": "장비",
       "sort_order": 4
-    },
-    {
-      "ticker": "MOD",
-      "name": "",
-      "group_name": "장비",
-      "sort_order": 5
     },
     {
       "ticker": "ORCL",
