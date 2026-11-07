@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-11-07 11:26:21",
+  "updated_at": "2026-11-07 11:26:42",
   "groups": [
     {
       "group_name": "지수",
@@ -34,11 +34,11 @@
       "sort_order": 7
     },
     {
-      "group_name": "헬스케어,바이오",
+      "group_name": "서버,인프라",
       "sort_order": 8
     },
     {
-      "group_name": "서버,인프라",
+      "group_name": "헬스케어,바이오",
       "sort_order": 9
     },
     {
@@ -508,6 +508,42 @@
       "sort_order": 16
     },
     {
+      "ticker": "HPE",
+      "name": "",
+      "group_name": "서버,인프라",
+      "sort_order": 0
+    },
+    {
+      "ticker": "DELL",
+      "name": "",
+      "group_name": "서버,인프라",
+      "sort_order": 1
+    },
+    {
+      "ticker": "SMCI",
+      "name": "",
+      "group_name": "서버,인프라",
+      "sort_order": 2
+    },
+    {
+      "ticker": "IBM",
+      "name": "",
+      "group_name": "서버,인프라",
+      "sort_order": 3
+    },
+    {
+      "ticker": "P",
+      "name": "",
+      "group_name": "서버,인프라",
+      "sort_order": 4
+    },
+    {
+      "ticker": "SNDK",
+      "name": "",
+      "group_name": "서버,인프라",
+      "sort_order": 5
+    },
+    {
       "ticker": "LLY",
       "name": "",
       "group_name": "헬스케어,바이오",
@@ -596,42 +632,6 @@
       "name": "",
       "group_name": "헬스케어,바이오",
       "sort_order": 14
-    },
-    {
-      "ticker": "HPE",
-      "name": "",
-      "group_name": "서버,인프라",
-      "sort_order": 0
-    },
-    {
-      "ticker": "DELL",
-      "name": "",
-      "group_name": "서버,인프라",
-      "sort_order": 1
-    },
-    {
-      "ticker": "SMCI",
-      "name": "",
-      "group_name": "서버,인프라",
-      "sort_order": 2
-    },
-    {
-      "ticker": "IBM",
-      "name": "",
-      "group_name": "서버,인프라",
-      "sort_order": 3
-    },
-    {
-      "ticker": "P",
-      "name": "",
-      "group_name": "서버,인프라",
-      "sort_order": 4
-    },
-    {
-      "ticker": "SNDK",
-      "name": "",
-      "group_name": "서버,인프라",
-      "sort_order": 5
     },
     {
       "ticker": "RTX",
