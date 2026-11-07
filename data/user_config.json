@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-11-07 11:27:27",
+  "updated_at": "2026-11-07 11:27:38",
   "groups": [
     {
       "group_name": "지수",
@@ -388,12 +388,6 @@
       "sort_order": 11
     },
     {
-      "ticker": "POWL",
-      "name": "",
-      "group_name": "전력",
-      "sort_order": 12
-    },
-    {
       "ticker": "HPE",
       "name": "",
       "group_name": "서버,인프라",
@@ -452,6 +446,12 @@
       "name": "",
       "group_name": "서버,인프라",
       "sort_order": 9
+    },
+    {
+      "ticker": "POWL",
+      "name": "",
+      "group_name": "서버,인프라",
+      "sort_order": 10
     },
     {
       "ticker": "TEAM",
