@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-11-08 13:01:02",
+  "updated_at": "2026-11-08 13:02:01",
   "groups": [
     {
       "group_name": "지수",
@@ -880,6 +880,12 @@
       "name": "",
       "group_name": "소비재,산업재",
       "sort_order": 2
+    },
+    {
+      "ticker": "HD",
+      "name": "",
+      "group_name": "소비재,산업재",
+      "sort_order": 3
     }
   ],
   "timeframe_ma_settings": {
