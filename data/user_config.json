@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-11-08 12:41:21",
+  "updated_at": "2026-11-08 12:41:36",
   "groups": [
     {
       "group_name": "지수",
@@ -798,6 +798,12 @@
       "name": "",
       "group_name": "피지컬AI",
       "sort_order": 2
+    },
+    {
+      "ticker": "SN",
+      "name": "",
+      "group_name": "주택개발",
+      "sort_order": 0
     }
   ],
   "timeframe_ma_settings": {
