@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-11-08 12:42:45",
+  "updated_at": "2026-11-08 12:43:08",
   "groups": [
     {
       "group_name": "지수",
@@ -828,6 +828,12 @@
       "name": "",
       "group_name": "주택개발",
       "sort_order": 4
+    },
+    {
+      "ticker": "LEN",
+      "name": "",
+      "group_name": "주택개발",
+      "sort_order": 5
     }
   ],
   "timeframe_ma_settings": {
