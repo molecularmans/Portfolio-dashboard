@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-11-08 12:41:53",
+  "updated_at": "2026-11-08 12:42:07",
   "groups": [
     {
       "group_name": "지수",
@@ -800,13 +800,13 @@
       "sort_order": 2
     },
     {
-      "ticker": "SN",
+      "ticker": "XHB",
       "name": "",
       "group_name": "주택개발",
       "sort_order": 0
     },
     {
-      "ticker": "XHB",
+      "ticker": "SN",
       "name": "",
       "group_name": "주택개발",
       "sort_order": 1
