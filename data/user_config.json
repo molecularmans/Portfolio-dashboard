@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-11-08 14:04:00",
+  "updated_at": "2026-11-08 14:04:52",
   "groups": [
     {
       "group_name": "지수",
@@ -956,6 +956,12 @@
       "name": "",
       "group_name": "모기지",
       "sort_order": 4
+    },
+    {
+      "ticker": "AGNC",
+      "name": "",
+      "group_name": "모기지",
+      "sort_order": 5
     }
   ],
   "timeframe_ma_settings": {
