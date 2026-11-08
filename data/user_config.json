@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-11-08 12:43:08",
+  "updated_at": "2026-11-08 12:43:23",
   "groups": [
     {
       "group_name": "지수",
@@ -834,6 +834,12 @@
       "name": "",
       "group_name": "주택개발",
       "sort_order": 5
+    },
+    {
+      "ticker": "DHI",
+      "name": "",
+      "group_name": "주택개발",
+      "sort_order": 6
     }
   ],
   "timeframe_ma_settings": {
