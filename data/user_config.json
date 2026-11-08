@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-11-08 13:28:40",
+  "updated_at": "2026-11-08 13:28:52",
   "groups": [
     {
       "group_name": "지수",
@@ -886,6 +886,12 @@
       "name": "",
       "group_name": "주택개발",
       "sort_order": 14
+    },
+    {
+      "ticker": "RKT",
+      "name": "",
+      "group_name": "주택개발",
+      "sort_order": 15
     },
     {
       "ticker": "WMT",
