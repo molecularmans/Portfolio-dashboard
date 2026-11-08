@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-11-08 13:14:52",
+  "updated_at": "2026-11-08 13:15:01",
   "groups": [
     {
       "group_name": "지수",
@@ -898,6 +898,12 @@
       "name": "",
       "group_name": "소비재,산업재",
       "sort_order": 5
+    },
+    {
+      "ticker": "ROST",
+      "name": "",
+      "group_name": "소비재,산업재",
+      "sort_order": 6
     }
   ],
   "timeframe_ma_settings": {
