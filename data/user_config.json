@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-11-08 14:05:03",
+  "updated_at": "2026-11-08 14:05:15",
   "groups": [
     {
       "group_name": "지수",
@@ -974,6 +974,12 @@
       "name": "",
       "group_name": "모기지",
       "sort_order": 7
+    },
+    {
+      "ticker": "NMIH",
+      "name": "",
+      "group_name": "모기지",
+      "sort_order": 8
     }
   ],
   "timeframe_ma_settings": {
