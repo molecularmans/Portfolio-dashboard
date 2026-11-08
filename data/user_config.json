@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-11-08 14:02:45",
+  "updated_at": "2026-11-08 14:02:55",
   "groups": [
     {
       "group_name": "지수",
@@ -892,12 +892,6 @@
       "sort_order": 14
     },
     {
-      "ticker": "RKT",
-      "name": "",
-      "group_name": "주택개발",
-      "sort_order": 15
-    },
-    {
       "ticker": "WMT",
       "name": "",
       "group_name": "소비재,산업재",
@@ -938,6 +932,12 @@
       "name": "",
       "group_name": "소비재,산업재",
       "sort_order": 8
+    },
+    {
+      "ticker": "RKT",
+      "name": "",
+      "group_name": "모기지",
+      "sort_order": 0
     }
   ],
   "timeframe_ma_settings": {
