@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-11-08 12:58:43",
+  "updated_at": "2026-11-08 12:59:37",
   "groups": [
     {
       "group_name": "지수",
@@ -64,6 +64,10 @@
     {
       "group_name": "주택개발",
       "sort_order": 15
+    },
+    {
+      "group_name": "소비재,산업재",
+      "sort_order": 16
     }
   ],
   "watchlist": [
