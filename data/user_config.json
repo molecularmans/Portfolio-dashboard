@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-11-08 13:28:14",
+  "updated_at": "2026-11-08 13:28:40",
   "groups": [
     {
       "group_name": "지수",
@@ -910,12 +910,6 @@
       "name": "",
       "group_name": "소비재,산업재",
       "sort_order": 3
-    },
-    {
-      "ticker": "RKT",
-      "name": "",
-      "group_name": "소비재,산업재",
-      "sort_order": 4
     },
     {
       "ticker": "ROST",
