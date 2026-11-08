@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-11-08 12:41:36",
+  "updated_at": "2026-11-08 12:41:53",
   "groups": [
     {
       "group_name": "지수",
@@ -804,6 +804,12 @@
       "name": "",
       "group_name": "주택개발",
       "sort_order": 0
+    },
+    {
+      "ticker": "XHB",
+      "name": "",
+      "group_name": "주택개발",
+      "sort_order": 1
     }
   ],
   "timeframe_ma_settings": {
