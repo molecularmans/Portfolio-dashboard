@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-11-08 12:42:40",
+  "updated_at": "2026-11-08 12:42:45",
   "groups": [
     {
       "group_name": "지수",
@@ -822,6 +822,12 @@
       "name": "",
       "group_name": "주택개발",
       "sort_order": 3
+    },
+    {
+      "ticker": "CVCO",
+      "name": "",
+      "group_name": "주택개발",
+      "sort_order": 4
     }
   ],
   "timeframe_ma_settings": {
