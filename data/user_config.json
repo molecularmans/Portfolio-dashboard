@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-11-08 13:15:58",
+  "updated_at": "2026-11-08 13:16:07",
   "groups": [
     {
       "group_name": "지수",
@@ -916,6 +916,12 @@
       "name": "",
       "group_name": "소비재,산업재",
       "sort_order": 6
+    },
+    {
+      "ticker": "HSY",
+      "name": "",
+      "group_name": "소비재,산업재",
+      "sort_order": 7
     }
   ],
   "timeframe_ma_settings": {
