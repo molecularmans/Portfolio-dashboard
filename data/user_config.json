@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-11-08 12:43:23",
+  "updated_at": "2026-11-08 12:43:49",
   "groups": [
     {
       "group_name": "지수",
@@ -840,6 +840,12 @@
       "name": "",
       "group_name": "주택개발",
       "sort_order": 6
+    },
+    {
+      "ticker": "PHM",
+      "name": "",
+      "group_name": "주택개발",
+      "sort_order": 7
     }
   ],
   "timeframe_ma_settings": {
