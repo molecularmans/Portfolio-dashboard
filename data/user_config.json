@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-11-08 14:03:42",
+  "updated_at": "2026-11-08 14:03:51",
   "groups": [
     {
       "group_name": "지수",
@@ -950,6 +950,12 @@
       "name": "",
       "group_name": "모기지",
       "sort_order": 2
+    },
+    {
+      "ticker": "LDI",
+      "name": "",
+      "group_name": "모기지",
+      "sort_order": 3
     }
   ],
   "timeframe_ma_settings": {
