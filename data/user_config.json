@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-11-08 14:16:24",
+  "updated_at": "2026-11-08 14:16:54",
   "groups": [
     {
       "group_name": "지수",
@@ -932,6 +932,12 @@
       "name": "",
       "group_name": "소비재,산업재",
       "sort_order": 10
+    },
+    {
+      "ticker": "TJX",
+      "name": "",
+      "group_name": "소비재,산업재",
+      "sort_order": 11
     },
     {
       "ticker": "RKT",
