@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-11-08 12:43:58",
+  "updated_at": "2026-11-08 12:58:43",
   "groups": [
     {
       "group_name": "지수",
@@ -852,6 +852,12 @@
       "name": "",
       "group_name": "주택개발",
       "sort_order": 8
+    },
+    {
+      "ticker": "EPAM",
+      "name": "",
+      "group_name": "주택개발",
+      "sort_order": 9
     }
   ],
   "timeframe_ma_settings": {
