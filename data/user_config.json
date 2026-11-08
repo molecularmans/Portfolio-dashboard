@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-11-08 13:16:07",
+  "updated_at": "2026-11-08 13:16:13",
   "groups": [
     {
       "group_name": "지수",
@@ -804,12 +804,6 @@
       "sort_order": 2
     },
     {
-      "ticker": "CLX",
-      "name": "",
-      "group_name": "필수소비재",
-      "sort_order": 0
-    },
-    {
       "ticker": "XHB",
       "name": "",
       "group_name": "주택개발",
@@ -922,6 +916,12 @@
       "name": "",
       "group_name": "소비재,산업재",
       "sort_order": 7
+    },
+    {
+      "ticker": "CLX",
+      "name": "",
+      "group_name": "소비재,산업재",
+      "sort_order": 8
     }
   ],
   "timeframe_ma_settings": {
