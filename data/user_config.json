@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-11-08 14:04:57",
+  "updated_at": "2026-11-08 14:05:03",
   "groups": [
     {
       "group_name": "지수",
@@ -968,6 +968,12 @@
       "name": "",
       "group_name": "모기지",
       "sort_order": 6
+    },
+    {
+      "ticker": "MTG",
+      "name": "",
+      "group_name": "모기지",
+      "sort_order": 7
     }
   ],
   "timeframe_ma_settings": {
