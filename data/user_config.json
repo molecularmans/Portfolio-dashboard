@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-11-08 14:05:15",
+  "updated_at": "2026-11-08 14:06:07",
   "groups": [
     {
       "group_name": "지수",
@@ -980,6 +980,12 @@
       "name": "",
       "group_name": "모기지",
       "sort_order": 8
+    },
+    {
+      "ticker": "RITM",
+      "name": "",
+      "group_name": "모기지",
+      "sort_order": 9
     }
   ],
   "timeframe_ma_settings": {
