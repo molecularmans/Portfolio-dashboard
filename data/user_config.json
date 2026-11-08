@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-11-08 14:03:51",
+  "updated_at": "2026-11-08 14:04:00",
   "groups": [
     {
       "group_name": "지수",
@@ -880,12 +880,6 @@
       "sort_order": 11
     },
     {
-      "ticker": "RWT",
-      "name": "",
-      "group_name": "주택개발",
-      "sort_order": 12
-    },
-    {
       "ticker": "QXO",
       "name": "",
       "group_name": "주택개발",
@@ -956,6 +950,12 @@
       "name": "",
       "group_name": "모기지",
       "sort_order": 3
+    },
+    {
+      "ticker": "RWT",
+      "name": "",
+      "group_name": "모기지",
+      "sort_order": 4
     }
   ],
   "timeframe_ma_settings": {
