@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-11-08 14:16:54",
+  "updated_at": "2026-11-09 07:50:19",
   "groups": [
     {
       "group_name": "지수",
@@ -938,6 +938,12 @@
       "name": "",
       "group_name": "소비재,산업재",
       "sort_order": 11
+    },
+    {
+      "ticker": "AZO",
+      "name": "",
+      "group_name": "소비재,산업재",
+      "sort_order": 12
     },
     {
       "ticker": "RKT",
