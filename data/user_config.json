@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-11-20 04:37:15",
+  "updated_at": "2026-11-20 04:37:21",
   "groups": [
     {
       "group_name": "지수",
@@ -178,6 +178,12 @@
       "sort_order": 7
     },
     {
+      "ticker": "SPCX",
+      "name": "",
+      "group_name": "빅테크/AI",
+      "sort_order": 8
+    },
+    {
       "ticker": "CRDO",
       "name": "",
       "group_name": "반도체",
@@ -320,12 +326,6 @@
       "name": "",
       "group_name": "클라우드",
       "sort_order": 2
-    },
-    {
-      "ticker": "SPCX",
-      "name": "",
-      "group_name": "클라우드",
-      "sort_order": 3
     },
     {
       "ticker": "IREN",
