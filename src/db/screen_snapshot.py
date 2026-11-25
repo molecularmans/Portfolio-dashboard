@@ -15,6 +15,7 @@ import requests
 
 from src.db.github_sync import GitHubSync
 from src.indicators.daily_screen import evaluate_daily_ticker, scan_day
+from src.indicators.leader_screen import weekly_cycle
 from src.indicators.weekly_screen import completed_week_start, evaluate_weekly_ticker
 
 
@@ -120,6 +121,8 @@ class ScreenRuntime:
                     try:
                         df = load_data(ticker, db, client, force_refresh=True, timeframe=label)
                         results[ticker] = evaluator(df, ticker)
+                        if timeframe == "W":
+                            results[ticker]["cycle"] = weekly_cycle(df, completed_week_start(ticker))
                     except Exception:
                         results[ticker] = {"stage": "unavailable", "date": None}
                     with self._lock:
@@ -133,6 +136,7 @@ class ScreenRuntime:
                 if timeframe == "D":
                     screen["engine_version"] = "v5"
                 if timeframe == "W":
+                    screen["cycle_version"] = 1
                     screen["week_start"] = completed_week_start("AAPL").isoformat()
                 with self._lock:
                     self._screens[timeframe] = screen

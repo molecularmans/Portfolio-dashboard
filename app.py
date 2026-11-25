@@ -11,6 +11,7 @@ from src.indicators.weekly_screen import WEEKLY_STAGE_LABELS
 from src.db.screen_snapshot import ScreenRuntime, ScreenSnapshotStore
 from src.ui.charts import create_detail_chart, create_volume_profile_chart, CHART_CONFIG
 from src.ui.tradingview import render_tradingview_chart, render_tradingview_mini_chart
+from src.ui.leader_view import render_watchlist_leaders
 from src.ui.sidebar import render_sidebar
 from src.ui.vcp_view import render_vcp_analysis_panel
 from src.ui.pattern_view import render_pattern_analysis_dashboard
@@ -215,7 +216,10 @@ def render_watchlist_screen(db: StockDB, client: KISClient, refresh_requested: b
     code = "D" if selected == "일봉" else "W"
     labels = STAGE_LABELS if code == "D" else WEEKLY_STAGE_LABELS
     screen = runtime.screen(code)
+    daily = screen if code == "D" else runtime.screen("D")
+    weekly = screen if code == "W" else runtime.screen("W")
     if not screen:
+        render_watchlist_leaders(tickers, daily or {}, weekly or {})
         st.info(f"저장된 {selected} 판정이 없습니다. ‘일봉·주봉 판정 새로고침’을 눌러 처음 계산해 주세요.")
         st.divider()
         return
@@ -258,6 +262,7 @@ def render_watchlist_screen(db: StockDB, client: KISClient, refresh_requested: b
         with col:
             st.markdown(f"**{labels[stage]} ({len(buckets[stage])})**")
             render_ticker_buttons(stage)
+    render_watchlist_leaders(tickers, daily or {}, weekly or {})
     with st.expander(f"{labels['hold']} ({len(buckets['hold'])})", expanded=False):
         render_ticker_buttons("hold")
     if buckets["unavailable"]:
