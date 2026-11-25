@@ -3,7 +3,7 @@ import tempfile
 import time
 import unittest
 from pathlib import Path
-from unittest.mock import patch
+from unittest.mock import Mock, patch
 
 import pandas as pd
 
@@ -16,6 +16,25 @@ class _NoGitHub:
 
 
 class ScreenSnapshotTests(unittest.TestCase):
+    def test_old_snapshot_restores_leaders_from_cached_completed_weeks(self):
+        prices = pd.DataFrame({
+            "date": pd.date_range(end="2026-11-27", periods=58, freq="W-FRI"),
+            "close": [100.0] * 55 + [110.0, 120.0, 50.0],
+        })
+        old = {"completed_at": "2026-11-25T16:04+09:00", "results": {"ABC": {"stage": "watch"}}}
+        db = Mock()
+        with tempfile.TemporaryDirectory() as folder:
+            store = ScreenSnapshotStore(Path(folder) / "screen.json", github_sync=_NoGitHub())
+            store.save({"W": old})
+            db.get_prices.return_value = pd.DataFrame()
+            self.assertNotIn("cycle_version", ScreenRuntime(store, db).screen("W"))
+            db.get_prices.return_value = prices
+            weekly = ScreenRuntime(store, db).screen("W")
+            self.assertEqual(weekly["cycle_version"], 1)
+            self.assertEqual(weekly["results"]["ABC"]["stage"], "watch")
+            self.assertEqual(weekly["results"]["ABC"]["cycle"]["state"], "candidate")
+            self.assertEqual(weekly["results"]["ABC"]["cycle"]["date"], "2026-11-20")
+
     def test_saved_screen_is_available_in_a_new_runtime_without_rescanning(self):
         with tempfile.TemporaryDirectory() as folder:
             store = ScreenSnapshotStore(Path(folder) / "screen.json", github_sync=_NoGitHub())

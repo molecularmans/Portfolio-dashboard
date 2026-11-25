@@ -136,7 +136,8 @@ def init_services():
 
 @st.cache_resource
 def get_screen_runtime():
-    return ScreenRuntime(ScreenSnapshotStore())
+    db, _ = init_services()
+    return ScreenRuntime(ScreenSnapshotStore(), price_db=db)
 
 
 def load_and_calc_stock_data(ticker: str, db: StockDB, client: KISClient, force_refresh: bool = False, timeframe: str = "일봉") -> pd.DataFrame:
