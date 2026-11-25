@@ -13,6 +13,7 @@ from zoneinfo import ZoneInfo
 
 import requests
 
+from src.api.kis_rest import looks_like_mock_ohlcv
 from src.db.github_sync import GitHubSync
 from src.indicators.daily_screen import evaluate_daily_ticker, scan_day
 from src.indicators.leader_screen import weekly_cycle
@@ -75,12 +76,27 @@ class ScreenSnapshotStore:
 class ScreenRuntime:
     """One process-wide worker; opening another tab only reads the saved result."""
 
-    def __init__(self, store: ScreenSnapshotStore):
+    def __init__(self, store: ScreenSnapshotStore, price_db=None):
         self.store = store
         self._lock = Lock()
         self._screens = store.load()
         self._auto_day = scan_day()
         self._job: dict | None = None
+        weekly = self._screens.get("W") or {}
+        if price_db is not None and weekly.get("completed_at") and "cycle_version" not in weekly:
+            # Old snapshots retain the weekly decision but omit the cycle. Reuse
+            # cached closes as of that decision, without another market request.
+            as_of = datetime.fromisoformat(weekly["completed_at"])
+            restored = False
+            for ticker, result in weekly.get("results", {}).items():
+                prices = price_db.get_prices(ticker, timeframe="W")
+                if prices.empty or looks_like_mock_ohlcv(prices, ticker, "W"):
+                    continue
+                cycle = weekly_cycle(prices, completed_week_start(ticker, as_of))
+                result["cycle"] = cycle
+                restored = restored or bool(cycle.get("date"))
+            if restored:
+                weekly["cycle_version"] = 1
 
     def screen(self, timeframe: str) -> dict | None:
         with self._lock:
