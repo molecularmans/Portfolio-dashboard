@@ -60,7 +60,7 @@ def weekly_cycle(df: pd.DataFrame, last_monday: date) -> dict:
 def read_final_leaders(path: Path = FINAL_LEADERS) -> tuple[list[dict], str]:
     """Read explicit leader decisions from the research pipeline, with their dates."""
     if not path.is_file():
-        return [], "아직 연결된 실적·공시 검증 결과가 없습니다."
+        return [], "섹터·이익 가속도·공시 위험을 종합한 최종 주도주 판정은 아직 없습니다."
     rows = []
     try:
         with path.open(encoding="utf-8-sig", newline="") as source:

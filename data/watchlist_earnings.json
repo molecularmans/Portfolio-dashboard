@@ -1,0 +1,796 @@
+{
+  "version": 1,
+  "updated_at": "2026-11-25T09:56:54.717000+09:00",
+  "records": {
+    "AAPL": {
+      "reported_on": "2026-11-03",
+      "period": "FY2026 Q4",
+      "eps": 2.1,
+      "eps_estimate": 1.98,
+      "revenue": 114477000000.0,
+      "revenue_estimate": 113202778000.0,
+      "accession": "0000320193-26-000024",
+      "form": "8-K"
+    },
+    "ADI": {
+      "reported_on": "2026-11-24",
+      "period": "FY2026 Q4",
+      "eps": 4.06,
+      "eps_estimate": 3.89,
+      "revenue": 4373000000.0,
+      "revenue_estimate": 4323633984.0,
+      "accession": "0000006281-26-000087",
+      "form": "8-K"
+    },
+    "ALAB": {
+      "reported_on": "2026-11-04",
+      "period": "FY2026 Q3",
+      "eps": 1.32,
+      "eps_estimate": 1.12,
+      "revenue": 584899000.0,
+      "revenue_estimate": 550720416.0,
+      "accession": "0001736297-26-000045",
+      "form": "10-Q"
+    },
+    "AMAT": {
+      "reported_on": "2026-11-13",
+      "period": "FY2026 Q4",
+      "eps": 4.16,
+      "eps_estimate": 4.06,
+      "revenue": 10410000000.0,
+      "revenue_estimate": 10299592864.0,
+      "accession": "0001628280-26-073360",
+      "form": "8-K"
+    },
+    "AMD": {
+      "reported_on": "2026-11-04",
+      "period": "FY2026 Q3",
+      "eps": 2.09,
+      "eps_estimate": 1.89,
+      "revenue": 13377000000.0,
+      "revenue_estimate": 13097669680.0,
+      "accession": "0000002488-26-000191",
+      "form": "10-Q"
+    },
+    "AMZN": {
+      "reported_on": "2026-10-30",
+      "period": "FY2026 Q3",
+      "eps": 1.89,
+      "eps_estimate": 1.97,
+      "revenue": 201944000000.0,
+      "revenue_estimate": 202217312808.0,
+      "accession": "0001018724-26-000040",
+      "form": "10-Q"
+    },
+    "ANET": {
+      "reported_on": "2026-11-04",
+      "period": "FY2026 Q3",
+      "eps": 1.2,
+      "eps_estimate": 1.06,
+      "revenue": 3657600000.0,
+      "revenue_estimate": 3329268656.0,
+      "accession": "0001596532-26-000254",
+      "form": "10-Q"
+    },
+    "BA": {
+      "reported_on": "2026-10-27",
+      "period": "FY2026 Q3",
+      "eps": -0.34,
+      "eps_estimate": -0.2,
+      "revenue": 24188000000.0,
+      "revenue_estimate": 24354973232.0,
+      "accession": "0001628280-26-067508",
+      "form": "10-Q"
+    },
+    "BE": {
+      "reported_on": "2026-10-23",
+      "period": "FY2026 Q3",
+      "eps": 0.94,
+      "eps_estimate": 0.65,
+      "revenue": 1236000000.0,
+      "revenue_estimate": 1070990800.0,
+      "accession": "0001628280-26-066931",
+      "form": "10-Q"
+    },
+    "BNY": {
+      "reported_on": "2026-10-15",
+      "period": "FY2026 Q3",
+      "eps": 2.37,
+      "eps_estimate": 2.26,
+      "revenue": 5676000000.0,
+      "revenue_estimate": 5560761424.0,
+      "accession": "0001390777-26-000120",
+      "form": "10-Q"
+    },
+    "CEG": {
+      "reported_on": "2026-11-09",
+      "period": "FY2026 Q3",
+      "eps": 5.06,
+      "eps_estimate": 3.89,
+      "revenue": 9550000000.0,
+      "revenue_estimate": 9191383280.0,
+      "accession": "0001868275-26-000119",
+      "form": "10-Q"
+    },
+    "CGNX": {
+      "reported_on": "2026-11-05",
+      "period": "FY2026 Q3",
+      "eps": 0.53,
+      "eps_estimate": 0.52,
+      "revenue": 313387000.0,
+      "revenue_estimate": 313231768.0,
+      "accession": "0000851205-26-000082",
+      "form": "10-Q"
+    },
+    "COHR": {
+      "reported_on": "2026-11-05",
+      "period": "FY2027 Q1",
+      "eps": 2.09,
+      "eps_estimate": 1.93,
+      "revenue": 2370000000.0,
+      "revenue_estimate": 2305578336.0,
+      "accession": "0000820318-26-000023",
+      "form": "10-Q"
+    },
+    "COIN": {
+      "reported_on": "2026-10-30",
+      "period": "FY2026 Q3",
+      "eps": 0.269,
+      "eps_estimate": 0.02,
+      "revenue": 1216000000.0,
+      "revenue_estimate": 1212807616.0,
+      "accession": "0001679788-26-000122",
+      "form": "10-Q"
+    },
+    "CRWD": {
+      "reported_on": "2026-11-23",
+      "period": "FY2027 Q3",
+      "eps": 0.34,
+      "eps_estimate": 0.31,
+      "revenue": 1583000000.0,
+      "revenue_estimate": 1528847544.0,
+      "accession": "0001535527-26-000038",
+      "form": "10-Q"
+    },
+    "CRWV": {
+      "reported_on": "2026-11-11",
+      "period": "FY2026 Q3",
+      "eps": -0.946,
+      "eps_estimate": -1.53,
+      "revenue": 3661000000.0,
+      "revenue_estimate": 3540629080.0,
+      "accession": "0001769628-26-000465",
+      "form": "10-Q"
+    },
+    "DDOG": {
+      "reported_on": "2026-11-04",
+      "period": "FY2026 Q3",
+      "eps": 0.81,
+      "eps_estimate": 0.55,
+      "revenue": 1197000000.0,
+      "revenue_estimate": 1145723392.0,
+      "accession": "0001628280-26-070292",
+      "form": "10-Q"
+    },
+    "DELL": {
+      "reported_on": "2026-11-25",
+      "period": "FY2027 Q3",
+      "eps": 9.45,
+      "eps_estimate": 6.55,
+      "revenue": 54937000000.0,
+      "revenue_estimate": 49593137776.0,
+      "accession": "0001571996-26-000050",
+      "form": "8-K"
+    },
+    "DGX": {
+      "reported_on": "2026-10-22",
+      "period": "FY2026 Q3",
+      "eps": 3.0,
+      "eps_estimate": 2.87,
+      "revenue": 3097000000.0,
+      "revenue_estimate": 3049673952.0,
+      "accession": "0001022079-26-000108",
+      "form": "10-Q"
+    },
+    "EME": {
+      "reported_on": "2026-10-29",
+      "period": "FY2026 Q3",
+      "eps": 9.6,
+      "eps_estimate": 8.34,
+      "revenue": 5542000000.0,
+      "revenue_estimate": 5191812840.0,
+      "accession": "0000105634-26-000130",
+      "form": "10-Q"
+    },
+    "EROC": {
+      "reported_on": "2026-11-12",
+      "period": "FY2026 Q3",
+      "eps": 0.04,
+      "eps_estimate": -0.01,
+      "revenue": 152767000.0,
+      "revenue_estimate": 174802544.0,
+      "accession": "0001193125-26-458698",
+      "form": "10-Q"
+    },
+    "ETN": {
+      "reported_on": "2026-11-03",
+      "period": "FY2026 Q3",
+      "eps": 3.68,
+      "eps_estimate": 3.55,
+      "revenue": 8947000000.0,
+      "revenue_estimate": 8515725704.0,
+      "accession": "0001551182-26-000040",
+      "form": "10-Q"
+    },
+    "FORM": {
+      "reported_on": "2026-10-29",
+      "period": "FY2026 Q3",
+      "eps": 1.04,
+      "eps_estimate": 0.84,
+      "revenue": 280547000.0,
+      "revenue_estimate": 270534536.0,
+      "accession": "0001039399-26-000043",
+      "form": "10-Q"
+    },
+    "GH": {
+      "reported_on": "2026-11-06",
+      "period": "FY2026 Q3",
+      "eps": -0.29,
+      "eps_estimate": -0.39,
+      "revenue": 360975000.0,
+      "revenue_estimate": 350679328.0,
+      "accession": "0001576280-26-000044",
+      "form": "10-Q"
+    },
+    "GOOGL": {
+      "reported_on": "2026-10-29",
+      "period": "FY2026 Q3",
+      "eps": 2.12,
+      "eps_estimate": 2.99,
+      "revenue": 127577000000.0,
+      "revenue_estimate": 124626162256.0,
+      "accession": "0001652044-26-000084",
+      "form": "10-Q"
+    },
+    "HOOD": {
+      "reported_on": "2026-10-28",
+      "period": "FY2026 Q3",
+      "eps": 0.6,
+      "eps_estimate": 0.56,
+      "revenue": 1424000000.0,
+      "revenue_estimate": 1433179440.0,
+      "accession": "0001783879-26-000167",
+      "form": "10-Q"
+    },
+    "HPE": {
+      "reported_on": "2026-11-24",
+      "period": "FY2026 Q4",
+      "eps": 1.43,
+      "eps_estimate": 1.27,
+      "revenue": 14547000000.0,
+      "revenue_estimate": 14430329376.0,
+      "accession": "0001645590-26-000097",
+      "form": "8-K"
+    },
+    "HWM": {
+      "reported_on": "2026-10-29",
+      "period": "FY2026 Q3",
+      "eps": 1.46,
+      "eps_estimate": 1.37,
+      "revenue": 2703000000.0,
+      "revenue_estimate": 2591145224.0,
+      "accession": "0000004281-26-000036",
+      "form": "10-Q"
+    },
+    "IBM": {
+      "reported_on": "2026-10-22",
+      "period": "FY2026 Q3",
+      "eps": 2.95,
+      "eps_estimate": 2.87,
+      "revenue": 17103000000.0,
+      "revenue_estimate": 16848367504.0,
+      "accession": "0000051143-26-000095",
+      "form": "10-Q"
+    },
+    "ILMN": {
+      "reported_on": "2026-10-30",
+      "period": "FY2026 Q3",
+      "eps": 1.44,
+      "eps_estimate": 1.36,
+      "revenue": 1129000000.0,
+      "revenue_estimate": 1150227288.0,
+      "accession": "0001110803-26-000207",
+      "form": "10-Q"
+    },
+    "INIO": {
+      "reported_on": "2026-10-27",
+      "period": "FY2026 Q3",
+      "eps": 0.15,
+      "eps_estimate": 0.11,
+      "revenue": 1167900000.0,
+      "revenue_estimate": 1036682560.0,
+      "accession": "0001628280-26-067448",
+      "form": "10-Q"
+    },
+    "INOD": {
+      "reported_on": "2026-11-06",
+      "period": "FY2026 Q3",
+      "eps": 0.29,
+      "eps_estimate": 0.26,
+      "revenue": 95618000.0,
+      "revenue_estimate": 84469200.0,
+      "accession": "0001104659-26-123437",
+      "form": "10-Q"
+    },
+    "INTC": {
+      "reported_on": "2026-10-30",
+      "period": "FY2026 Q3",
+      "eps": 0.52,
+      "eps_estimate": 0.37,
+      "revenue": 16513000000.0,
+      "revenue_estimate": 16477359672.0,
+      "accession": "0000050863-26-000191",
+      "form": "10-Q"
+    },
+    "IREN": {
+      "reported_on": "2026-11-06",
+      "period": "FY2027 Q1",
+      "eps": -0.66,
+      "eps_estimate": -0.63,
+      "revenue": 228000000.0,
+      "revenue_estimate": 221361552.0,
+      "accession": "0001878848-26-000066",
+      "form": "10-Q"
+    },
+    "JNJ": {
+      "reported_on": "2026-10-13",
+      "period": "FY2026 Q3",
+      "eps": 2.59,
+      "eps_estimate": 2.53,
+      "revenue": 25399000000.0,
+      "revenue_estimate": 25393713120.0,
+      "accession": "0000200406-26-000197",
+      "form": "10-Q"
+    },
+    "KLAC": {
+      "reported_on": "2026-10-29",
+      "period": "FY2027 Q1",
+      "eps": 1.22,
+      "eps_estimate": 1.18,
+      "revenue": 4136000000.0,
+      "revenue_estimate": 4040548280.0,
+      "accession": "0000319201-26-000034",
+      "form": "10-Q"
+    },
+    "KTOS": {
+      "reported_on": "2026-11-06",
+      "period": "FY2026 Q3",
+      "eps": 0.24,
+      "eps_estimate": 0.2,
+      "revenue": 471800000.0,
+      "revenue_estimate": 471660680.0,
+      "accession": "0001069258-26-000088",
+      "form": "10-Q"
+    },
+    "LHX": {
+      "reported_on": "2026-10-29",
+      "period": "FY2026 Q3",
+      "eps": 3.28,
+      "eps_estimate": 2.95,
+      "revenue": 6060000000.0,
+      "revenue_estimate": 5921423872.0,
+      "accession": "0000202058-26-000087",
+      "form": "10-Q"
+    },
+    "LLY": {
+      "reported_on": "2026-10-29",
+      "period": "FY2026 Q3",
+      "eps": 7.48,
+      "eps_estimate": 6.36,
+      "revenue": 24397000000.0,
+      "revenue_estimate": 22514492128.0,
+      "accession": "0000059478-26-000108",
+      "form": "10-Q"
+    },
+    "LMT": {
+      "reported_on": "2026-10-22",
+      "period": "FY2026 Q3",
+      "eps": 7.97,
+      "eps_estimate": 7.51,
+      "revenue": 20711000000.0,
+      "revenue_estimate": 20456308240.0,
+      "accession": "0001628280-26-066928",
+      "form": "10-Q"
+    },
+    "LRCX": {
+      "reported_on": "2026-10-22",
+      "period": "FY2027 Q1",
+      "eps": 2.2,
+      "eps_estimate": 2.18,
+      "revenue": 8219000000.0,
+      "revenue_estimate": 8137946440.0,
+      "accession": "0000707549-26-000054",
+      "form": "10-Q"
+    },
+    "MA": {
+      "reported_on": "2026-10-29",
+      "period": "FY2026 Q3",
+      "eps": 5.31,
+      "eps_estimate": 5.16,
+      "revenue": 9807000000.0,
+      "revenue_estimate": 9650991520.0,
+      "accession": "0001141391-26-000124",
+      "form": "10-Q"
+    },
+    "META": {
+      "reported_on": "2026-10-22",
+      "period": "FY2026 Q3",
+      "eps": 7.4,
+      "eps_estimate": 5.74,
+      "revenue": 64601000000.0,
+      "revenue_estimate": 63372577928.0,
+      "accession": "0001628280-26-066773",
+      "form": "10-Q"
+    },
+    "MOD": {
+      "reported_on": "2026-11-04",
+      "period": "FY2027 Q2",
+      "eps": 1.35,
+      "eps_estimate": 1.51,
+      "revenue": 994400000.0,
+      "revenue_estimate": 977534400.0,
+      "accession": "0001104659-26-122523",
+      "form": "10-Q"
+    },
+    "MP": {
+      "reported_on": "2026-11-06",
+      "period": "FY2026 Q3",
+      "eps": 0.04,
+      "eps_estimate": -0.02,
+      "revenue": 147655000.0,
+      "revenue_estimate": 118390704.0,
+      "accession": "0001801368-26-000057",
+      "form": "10-Q"
+    },
+    "MRK": {
+      "reported_on": "2026-10-29",
+      "period": "FY2026 Q3",
+      "eps": 2.49,
+      "eps_estimate": 2.1,
+      "revenue": 18085000000.0,
+      "revenue_estimate": 17321959896.0,
+      "accession": "0000310158-26-000248",
+      "form": "10-Q"
+    },
+    "MRNA": {
+      "reported_on": "2026-11-06",
+      "period": "FY2026 Q3",
+      "eps": 0.38,
+      "eps_estimate": -1.22,
+      "revenue": 1313000000.0,
+      "revenue_estimate": 889933704.0,
+      "accession": "0001682852-26-000197",
+      "form": "10-Q"
+    },
+    "MSFT": {
+      "reported_on": "2026-10-29",
+      "period": "FY2027 Q1",
+      "eps": 4.89,
+      "eps_estimate": 4.72,
+      "revenue": 92279000000.0,
+      "revenue_estimate": 90704756456.0,
+      "accession": "0001193125-26-436133",
+      "form": "10-Q"
+    },
+    "NBIS": {
+      "reported_on": "2026-11-12",
+      "period": "FY2026 Q3",
+      "eps": 0.305,
+      "eps_estimate": -1.11,
+      "revenue": 980800000.0,
+      "revenue_estimate": 909093904.0,
+      "accession": "0001104659-26-126238",
+      "form": "6-K"
+    },
+    "NET": {
+      "reported_on": "2026-11-06",
+      "period": "FY2026 Q3",
+      "eps": 0.38,
+      "eps_estimate": 0.28,
+      "revenue": 782513000.0,
+      "revenue_estimate": 738453960.0,
+      "accession": "0001477333-26-000061",
+      "form": "10-Q"
+    },
+    "NOW": {
+      "reported_on": "2026-10-29",
+      "period": "FY2026 Q3",
+      "eps": 1.0,
+      "eps_estimate": 0.93,
+      "revenue": 4106000000.0,
+      "revenue_estimate": 4093848280.0,
+      "accession": "0001373715-26-000096",
+      "form": "10-Q"
+    },
+    "NSIT": {
+      "reported_on": "2026-11-05",
+      "period": "FY2026 Q3",
+      "eps": 3.59,
+      "eps_estimate": 2.8,
+      "revenue": 2441510000.0,
+      "revenue_estimate": 2144664000.0,
+      "accession": "0000932696-26-000081",
+      "form": "10-Q"
+    },
+    "NTRA": {
+      "reported_on": "2026-11-06",
+      "period": "FY2026 Q3",
+      "eps": -0.42,
+      "eps_estimate": -0.26,
+      "revenue": 793981000.0,
+      "revenue_estimate": 706482712.0,
+      "accession": "0001628280-26-071145",
+      "form": "10-Q"
+    },
+    "NVDA": {
+      "reported_on": "2026-11-18",
+      "period": "FY2027 Q3",
+      "eps": 2.68,
+      "eps_estimate": 2.47,
+      "revenue": 115844000000.0,
+      "revenue_estimate": 108769523120.0,
+      "accession": "0001045810-26-000088",
+      "form": "8-K"
+    },
+    "ON": {
+      "reported_on": "2026-11-03",
+      "period": "FY2026 Q3",
+      "eps": 0.9,
+      "eps_estimate": 0.88,
+      "revenue": 1722000000.0,
+      "revenue_estimate": 1705674472.0,
+      "accession": "0001097864-26-000021",
+      "form": "10-Q"
+    },
+    "OUST": {
+      "reported_on": "2026-11-04",
+      "period": "FY2026 Q3",
+      "eps": -0.2,
+      "eps_estimate": -0.14,
+      "revenue": 59325000.0,
+      "revenue_estimate": 56253336.0,
+      "accession": "0001628280-26-069640",
+      "form": "10-Q"
+    },
+    "P": {
+      "reported_on": "2026-11-19",
+      "period": "FY2027 Q3",
+      "eps": 0.86,
+      "eps_estimate": 0.67,
+      "revenue": 1460000000.0,
+      "revenue_estimate": 1331402416.0,
+      "accession": "0001474432-26-000110",
+      "form": "8-K"
+    },
+    "PANW": {
+      "reported_on": "2026-11-19",
+      "period": "FY2027 Q1",
+      "eps": 1.05,
+      "eps_estimate": 0.88,
+      "revenue": 3445000000.0,
+      "revenue_estimate": 3307966048.0,
+      "accession": "0001327567-26-000033",
+      "form": "10-Q"
+    },
+    "PLTR": {
+      "reported_on": "2026-11-03",
+      "period": "FY2026 Q3",
+      "eps": 0.44,
+      "eps_estimate": 0.39,
+      "revenue": 2313000000.0,
+      "revenue_estimate": 2178353256.0,
+      "accession": "0001321655-26-000048",
+      "form": "10-Q"
+    },
+    "POWL": {
+      "reported_on": "2026-11-17",
+      "period": "FY2026 Q4",
+      "eps": 2.23,
+      "eps_estimate": 1.55,
+      "revenue": 396707000.0,
+      "revenue_estimate": 330785840.0,
+      "accession": "0000080420-26-000139",
+      "form": "8-K"
+    },
+    "PWR": {
+      "reported_on": "2026-10-29",
+      "period": "FY2026 Q3",
+      "eps": 6.06,
+      "eps_estimate": 4.96,
+      "revenue": 12014000000.0,
+      "revenue_estimate": 10981149528.0,
+      "accession": "0001050915-26-000041",
+      "form": "10-Q"
+    },
+    "RKLB": {
+      "reported_on": "2026-11-10",
+      "period": "FY2026 Q3",
+      "eps": -0.078,
+      "eps_estimate": -0.06,
+      "revenue": 267834000.0,
+      "revenue_estimate": 257044312.0,
+      "accession": "0001819994-26-000074",
+      "form": "10-Q"
+    },
+    "RTX": {
+      "reported_on": "2026-10-20",
+      "period": "FY2026 Q3",
+      "eps": 2.26,
+      "eps_estimate": 1.78,
+      "revenue": 24965000000.0,
+      "revenue_estimate": 24086323048.0,
+      "accession": "0000101829-26-000031",
+      "form": "10-Q"
+    },
+    "SN": {
+      "reported_on": "2026-11-04",
+      "period": "FY2026 Q3",
+      "eps": 2.34,
+      "eps_estimate": 1.86,
+      "revenue": 1976427000.0,
+      "revenue_estimate": 1870495448.0,
+      "accession": "0001957132-26-000056",
+      "form": "10-Q"
+    },
+    "SNDK": {
+      "reported_on": "2026-10-30",
+      "period": "FY2027 Q1",
+      "eps": 49.51,
+      "eps_estimate": 46.36,
+      "revenue": 11031000000.0,
+      "revenue_estimate": 10698263584.0,
+      "accession": "0001628280-26-068601",
+      "form": "10-Q"
+    },
+    "SPCX": {
+      "reported_on": "2026-10-21",
+      "period": "FY2026 Q3",
+      "eps": 0.35,
+      "eps_estimate": 0.16,
+      "revenue": 14575000000.0,
+      "revenue_estimate": 12936045248.0,
+      "accession": "0001628280-26-066880",
+      "form": "10-Q"
+    },
+    "STM": {
+      "reported_on": "2026-10-29",
+      "period": "FY2026 Q3",
+      "eps": 0.37,
+      "eps_estimate": 0.41,
+      "revenue": 3757000000.0,
+      "revenue_estimate": 3719326328.0,
+      "accession": "0000932787-26-000086",
+      "form": "6-K"
+    },
+    "STRL": {
+      "reported_on": "2026-10-29",
+      "period": "FY2026 Q3",
+      "eps": 7.58,
+      "eps_estimate": 6.1,
+      "revenue": 1563927000.0,
+      "revenue_estimate": 1186439312.0,
+      "accession": "0000874238-26-000125",
+      "form": "10-Q"
+    },
+    "TEAM": {
+      "reported_on": "2026-11-06",
+      "period": "FY2027 Q1",
+      "eps": 1.65,
+      "eps_estimate": 1.19,
+      "revenue": 1772150000.0,
+      "revenue_estimate": 1713065120.0,
+      "accession": "0001650372-26-000054",
+      "form": "10-Q"
+    },
+    "TEM": {
+      "reported_on": "2026-11-02",
+      "period": "FY2026 Q3",
+      "eps": 0.07,
+      "eps_estimate": -0.13,
+      "revenue": 411537000.0,
+      "revenue_estimate": 409704280.0,
+      "accession": "0001193125-26-442624",
+      "form": "10-Q"
+    },
+    "TER": {
+      "reported_on": "2026-10-28",
+      "period": "FY2026 Q3",
+      "eps": 2.29,
+      "eps_estimate": 2.05,
+      "revenue": 1306000000.0,
+      "revenue_estimate": 1268142272.0,
+      "accession": "0001193125-26-441091",
+      "form": "10-Q"
+    },
+    "TMO": {
+      "reported_on": "2026-10-21",
+      "period": "FY2026 Q3",
+      "eps": 6.68,
+      "eps_estimate": 6.4,
+      "revenue": 12137000000.0,
+      "revenue_estimate": 11944443008.0,
+      "accession": "0000097745-26-000179",
+      "form": "10-Q"
+    },
+    "TSLA": {
+      "reported_on": "2026-10-22",
+      "period": "FY2026 Q3",
+      "eps": 0.48,
+      "eps_estimate": 0.4,
+      "revenue": 28046000000.0,
+      "revenue_estimate": 28044868304.0,
+      "accession": "0001628280-26-066775",
+      "form": "10-Q"
+    },
+    "TWST": {
+      "reported_on": "2026-11-12",
+      "period": "FY2026 Q4",
+      "eps": -0.32,
+      "eps_estimate": -0.25,
+      "revenue": 126644000.0,
+      "revenue_estimate": 123581744.0,
+      "accession": "0001581280-26-000053",
+      "form": "8-K"
+    },
+    "TXG": {
+      "reported_on": "2026-11-06",
+      "period": "FY2026 Q3",
+      "eps": -0.15,
+      "eps_estimate": -0.07,
+      "revenue": 150667000.0,
+      "revenue_estimate": 147719440.0,
+      "accession": "0001628280-26-071199",
+      "form": "10-Q"
+    },
+    "TXN": {
+      "reported_on": "2026-10-22",
+      "period": "FY2026 Q3",
+      "eps": 2.62,
+      "eps_estimate": 2.42,
+      "revenue": 6055000000.0,
+      "revenue_estimate": 5928272416.0,
+      "accession": "0000097476-26-000169",
+      "form": "10-Q"
+    },
+    "V": {
+      "reported_on": "2026-10-28",
+      "period": "FY2026 Q4",
+      "eps": 3.48,
+      "eps_estimate": 3.44,
+      "revenue": 12139000000.0,
+      "revenue_estimate": 12090212040.0,
+      "accession": "0001403161-26-000126",
+      "form": "8-K"
+    },
+    "VRT": {
+      "reported_on": "2026-10-28",
+      "period": "FY2026 Q3",
+      "eps": 2.21,
+      "eps_estimate": 1.82,
+      "revenue": 4313000000.0,
+      "revenue_estimate": 3761903680.0,
+      "accession": "0001628280-26-067893",
+      "form": "10-Q"
+    },
+    "VST": {
+      "reported_on": "2026-11-06",
+      "period": "FY2026 Q3",
+      "eps": 3.23,
+      "eps_estimate": 2.52,
+      "revenue": 6347000000.0,
+      "revenue_estimate": 6282324864.0,
+      "accession": "0001692819-26-000025",
+      "form": "10-Q"
+    }
+  }
+}
