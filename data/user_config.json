@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-11-27 04:29:35",
+  "updated_at": "2026-11-27 04:29:41",
   "groups": [
     {
       "group_name": "지수",
@@ -680,6 +680,12 @@
       "name": "",
       "group_name": "헬스케어,바이오",
       "sort_order": 17
+    },
+    {
+      "ticker": "VRTX",
+      "name": "",
+      "group_name": "헬스케어,바이오",
+      "sort_order": 18
     },
     {
       "ticker": "RTX",
