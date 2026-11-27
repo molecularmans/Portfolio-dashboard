@@ -2,7 +2,7 @@
   "schema_version": 1,
   "screens": {
     "D": {
-      "scan_day": "2026-11-25",
+      "scan_day": "2026-11-26",
       "tickers": [
         "QQQ",
         "SPY",
@@ -165,19 +165,19 @@
       ],
       "results": {
         "QQQ": {
-          "stage": "hold",
+          "stage": "unavailable",
           "date": "2026-11-25"
         },
         "SPY": {
-          "stage": "hold",
+          "stage": "unavailable",
           "date": "2026-11-25"
         },
         "BITO": {
-          "stage": "hold",
+          "stage": "unavailable",
           "date": "2026-11-25"
         },
         "SOXX": {
-          "stage": "hold",
+          "stage": "unavailable",
           "date": "2026-11-25"
         },
         "US10Y": {
@@ -189,43 +189,43 @@
           "date": null
         },
         "NTAP": {
-          "stage": "hold",
+          "stage": "unavailable",
           "date": "2026-11-25"
         },
         "ZETA": {
-          "stage": "hold",
+          "stage": "unavailable",
           "date": "2026-11-25"
         },
         "NSIT": {
-          "stage": "hold",
+          "stage": "unavailable",
           "date": "2026-11-25"
         },
         "CAKE": {
-          "stage": "hold",
+          "stage": "unavailable",
           "date": "2026-11-25"
         },
         "NVDA": {
-          "stage": "hold",
+          "stage": "unavailable",
           "date": "2026-11-25"
         },
         "AAPL": {
-          "stage": "hold",
+          "stage": "unavailable",
           "date": "2026-11-25"
         },
         "MSFT": {
-          "stage": "hold",
+          "stage": "unavailable",
           "date": "2026-11-25"
         },
         "GOOGL": {
-          "stage": "hold",
+          "stage": "unavailable",
           "date": "2026-11-25"
         },
         "AMZN": {
-          "stage": "hold",
+          "stage": "unavailable",
           "date": "2026-11-25"
         },
         "TSLA": {
-          "stage": "hold",
+          "stage": "unavailable",
           "date": "2026-11-25"
         },
         "ANT": {
@@ -233,407 +233,407 @@
           "date": null
         },
         "SPCX": {
-          "stage": "hold",
+          "stage": "unavailable",
           "date": "2026-11-25"
         },
         "META": {
-          "stage": "hold",
+          "stage": "unavailable",
           "date": "2026-11-25"
         },
         "CRDO": {
-          "stage": "hold",
+          "stage": "unavailable",
           "date": "2026-11-25"
         },
         "STM": {
-          "stage": "hold",
+          "stage": "unavailable",
           "date": "2026-11-25"
         },
         "TXN": {
-          "stage": "hold",
+          "stage": "unavailable",
           "date": "2026-11-25"
         },
         "ON": {
-          "stage": "hold",
+          "stage": "unavailable",
           "date": "2026-11-25"
         },
         "CBRS": {
-          "stage": "hold",
+          "stage": "unavailable",
           "date": "2026-11-25"
         },
         "AMD": {
-          "stage": "hold",
+          "stage": "unavailable",
           "date": "2026-11-25"
         },
         "MU": {
-          "stage": "hold",
+          "stage": "unavailable",
           "date": "2026-11-25"
         },
         "INTC": {
-          "stage": "hold",
+          "stage": "unavailable",
           "date": "2026-11-25"
         },
         "COHR": {
-          "stage": "hold",
+          "stage": "unavailable",
           "date": "2026-11-25"
         },
         "GFS": {
-          "stage": "hold",
+          "stage": "unavailable",
           "date": "2026-11-25"
         },
         "NVT": {
-          "stage": "hold",
+          "stage": "unavailable",
           "date": "2026-11-25"
         },
         "MRVL": {
-          "stage": "hold",
+          "stage": "unavailable",
           "date": "2026-11-25"
         },
         "ALAB": {
-          "stage": "hold",
+          "stage": "unavailable",
           "date": "2026-11-25"
         },
         "AVGO": {
-          "stage": "hold",
+          "stage": "unavailable",
           "date": "2026-11-25"
         },
         "ADI": {
-          "stage": "hold",
+          "stage": "unavailable",
           "date": "2026-11-25"
         },
         "ANET": {
-          "stage": "hold",
+          "stage": "unavailable",
           "date": "2026-11-25"
         },
         "AMAT": {
-          "stage": "hold",
+          "stage": "unavailable",
           "date": "2026-11-25"
         },
         "LRCX": {
-          "stage": "hold",
+          "stage": "unavailable",
           "date": "2026-11-25"
         },
         "KLAC": {
-          "stage": "hold",
+          "stage": "unavailable",
           "date": "2026-11-25"
         },
         "TER": {
-          "stage": "hold",
+          "stage": "unavailable",
           "date": "2026-11-25"
         },
         "FORM": {
-          "stage": "hold",
+          "stage": "unavailable",
           "date": "2026-11-25"
         },
         "ORCL": {
-          "stage": "hold",
+          "stage": "unavailable",
           "date": "2026-11-25"
         },
         "NBIS": {
-          "stage": "hold",
+          "stage": "unavailable",
           "date": "2026-11-25"
         },
         "CRWV": {
-          "stage": "hold",
+          "stage": "unavailable",
           "date": "2026-11-25"
         },
         "IREN": {
-          "stage": "hold",
+          "stage": "unavailable",
           "date": "2026-11-25"
         },
         "BE": {
-          "stage": "hold",
+          "stage": "unavailable",
           "date": "2026-11-25"
         },
         "INIO": {
-          "stage": "hold",
+          "stage": "unavailable",
           "date": "2026-11-25"
         },
         "ETN": {
-          "stage": "hold",
+          "stage": "unavailable",
           "date": "2026-11-25"
         },
         "EME": {
-          "stage": "hold",
+          "stage": "unavailable",
           "date": "2026-11-25"
         },
         "CEG": {
-          "stage": "hold",
+          "stage": "unavailable",
           "date": "2026-11-25"
         },
         "VST": {
-          "stage": "hold",
+          "stage": "unavailable",
           "date": "2026-11-25"
         },
         "TLN": {
-          "stage": "hold",
+          "stage": "unavailable",
           "date": "2026-11-25"
         },
         "CCJ": {
-          "stage": "hold",
+          "stage": "unavailable",
           "date": "2026-11-25"
         },
         "EROC": {
-          "stage": "hold",
+          "stage": "unavailable",
           "date": "2026-11-25"
         },
         "PWR": {
-          "stage": "hold",
+          "stage": "unavailable",
           "date": "2026-11-25"
         },
         "EXE": {
-          "stage": "hold",
+          "stage": "unavailable",
           "date": "2026-11-25"
         },
         "HPE": {
-          "stage": "hold",
+          "stage": "unavailable",
           "date": "2026-11-25"
         },
         "DELL": {
-          "stage": "hold",
+          "stage": "unavailable",
           "date": "2026-11-25"
         },
         "SMCI": {
-          "stage": "hold",
+          "stage": "unavailable",
           "date": "2026-11-25"
         },
         "IBM": {
-          "stage": "hold",
+          "stage": "unavailable",
           "date": "2026-11-25"
         },
         "P": {
-          "stage": "hold",
+          "stage": "unavailable",
           "date": "2026-11-25"
         },
         "SNDK": {
-          "stage": "hold",
+          "stage": "unavailable",
           "date": "2026-11-25"
         },
         "VRT": {
-          "stage": "hold",
+          "stage": "unavailable",
           "date": "2026-11-25"
         },
         "MOD": {
-          "stage": "hold",
+          "stage": "unavailable",
           "date": "2026-11-25"
         },
         "STRL": {
-          "stage": "hold",
+          "stage": "unavailable",
           "date": "2026-11-25"
         },
         "FIX": {
-          "stage": "hold",
+          "stage": "unavailable",
           "date": "2026-11-25"
         },
         "POWL": {
-          "stage": "hold",
+          "stage": "unavailable",
           "date": "2026-11-25"
         },
         "TEAM": {
-          "stage": "hold",
+          "stage": "unavailable",
           "date": "2026-11-25"
         },
         "INTA": {
-          "stage": "hold",
+          "stage": "unavailable",
           "date": "2026-11-25"
         },
         "APPN": {
-          "stage": "watch",
+          "stage": "unavailable",
           "date": "2026-11-25"
         },
         "NTSK": {
-          "stage": "hold",
+          "stage": "unavailable",
           "date": "2026-11-25"
         },
         "AMPL": {
-          "stage": "hold",
+          "stage": "unavailable",
           "date": "2026-11-25"
         },
         "YEXT": {
-          "stage": "hold",
+          "stage": "unavailable",
           "date": "2026-11-25"
         },
         "QLYS": {
-          "stage": "hold",
+          "stage": "unavailable",
           "date": "2026-11-25"
         },
         "CRM": {
-          "stage": "hold",
+          "stage": "unavailable",
           "date": "2026-11-25"
         },
         "PLTR": {
-          "stage": "hold",
+          "stage": "unavailable",
           "date": "2026-11-25"
         },
         "NOW": {
-          "stage": "hold",
+          "stage": "unavailable",
           "date": "2026-11-25"
         },
         "PANW": {
-          "stage": "hold",
+          "stage": "unavailable",
           "date": "2026-11-25"
         },
         "SNOW": {
-          "stage": "hold",
+          "stage": "unavailable",
           "date": "2026-11-25"
         },
         "CRWD": {
-          "stage": "hold",
+          "stage": "unavailable",
           "date": "2026-11-25"
         },
         "OKTA": {
-          "stage": "hold",
+          "stage": "unavailable",
           "date": "2026-11-25"
         },
         "NET": {
-          "stage": "hold",
+          "stage": "unavailable",
           "date": "2026-11-25"
         },
         "DDOG": {
-          "stage": "hold",
+          "stage": "unavailable",
           "date": "2026-11-25"
         },
         "INOD": {
-          "stage": "hold",
+          "stage": "unavailable",
           "date": "2026-11-25"
         },
         "LLY": {
-          "stage": "watch",
+          "stage": "unavailable",
           "date": "2026-11-25"
         },
         "XLV": {
-          "stage": "hold",
+          "stage": "unavailable",
           "date": "2026-11-25"
         },
         "XBI": {
-          "stage": "hold",
+          "stage": "unavailable",
           "date": "2026-11-25"
         },
         "MRNA": {
-          "stage": "hold",
+          "stage": "unavailable",
           "date": "2026-11-25"
         },
         "TEM": {
-          "stage": "hold",
+          "stage": "unavailable",
           "date": "2026-11-25"
         },
         "TMO": {
-          "stage": "setup",
+          "stage": "unavailable",
           "date": "2026-11-25"
         },
         "ILMN": {
-          "stage": "hold",
+          "stage": "unavailable",
           "date": "2026-11-25"
         },
         "NTRA": {
-          "stage": "hold",
+          "stage": "unavailable",
           "date": "2026-11-25"
         },
         "VEEV": {
-          "stage": "hold",
+          "stage": "unavailable",
           "date": "2026-11-25"
         },
         "MRK": {
-          "stage": "hold",
+          "stage": "unavailable",
           "date": "2026-11-25"
         },
         "GH": {
-          "stage": "hold",
+          "stage": "unavailable",
           "date": "2026-11-25"
         },
         "JNJ": {
-          "stage": "hold",
+          "stage": "unavailable",
           "date": "2026-11-25"
         },
         "TXG": {
-          "stage": "hold",
+          "stage": "unavailable",
           "date": "2026-11-25"
         },
         "TWST": {
-          "stage": "hold",
+          "stage": "unavailable",
           "date": "2026-11-25"
         },
         "DGX": {
-          "stage": "watch",
+          "stage": "unavailable",
           "date": "2026-11-25"
         },
         "RTX": {
-          "stage": "hold",
+          "stage": "unavailable",
           "date": "2026-11-25"
         },
         "BA": {
-          "stage": "hold",
+          "stage": "unavailable",
           "date": "2026-11-25"
         },
         "RKLB": {
-          "stage": "hold",
+          "stage": "unavailable",
           "date": "2026-11-25"
         },
         "GE": {
-          "stage": "hold",
+          "stage": "unavailable",
           "date": "2026-11-25"
         },
         "LMT": {
-          "stage": "hold",
+          "stage": "unavailable",
           "date": "2026-11-25"
         },
         "HWM": {
-          "stage": "hold",
+          "stage": "unavailable",
           "date": "2026-11-25"
         },
         "NOC": {
-          "stage": "hold",
+          "stage": "unavailable",
           "date": "2026-11-25"
         },
         "LHX": {
-          "stage": "hold",
+          "stage": "unavailable",
           "date": "2026-11-25"
         },
         "KTOS": {
-          "stage": "hold",
+          "stage": "unavailable",
           "date": "2026-11-25"
         },
         "AVAV": {
-          "stage": "hold",
+          "stage": "unavailable",
           "date": "2026-11-25"
         },
         "GLD": {
-          "stage": "hold",
+          "stage": "unavailable",
           "date": "2026-11-25"
         },
         "FCX": {
-          "stage": "hold",
+          "stage": "unavailable",
           "date": "2026-11-25"
         },
         "MP": {
-          "stage": "hold",
+          "stage": "unavailable",
           "date": "2026-11-25"
         },
         "HOOD": {
-          "stage": "hold",
+          "stage": "unavailable",
           "date": "2026-11-25"
         },
         "MA": {
-          "stage": "watch",
+          "stage": "unavailable",
           "date": "2026-11-25"
         },
         "BNY": {
-          "stage": "hold",
+          "stage": "unavailable",
           "date": "2026-11-25"
         },
         "GS": {
-          "stage": "hold",
+          "stage": "unavailable",
           "date": "2026-11-25"
         },
         "JPM": {
-          "stage": "hold",
+          "stage": "unavailable",
           "date": "2026-11-25"
         },
         "COIN": {
-          "stage": "hold",
+          "stage": "unavailable",
           "date": "2026-11-25"
         },
         "PURR": {
-          "stage": "hold",
+          "stage": "unavailable",
           "date": "2026-11-25"
         },
         "HYPEUSD": {
@@ -641,99 +641,99 @@
           "date": null
         },
         "V": {
-          "stage": "hold",
+          "stage": "unavailable",
           "date": "2026-11-25"
         },
         "OUST": {
-          "stage": "hold",
+          "stage": "unavailable",
           "date": "2026-11-25"
         },
         "CGNX": {
-          "stage": "hold",
+          "stage": "unavailable",
           "date": "2026-11-25"
         },
         "ZBRA": {
-          "stage": "hold",
+          "stage": "unavailable",
           "date": "2026-11-25"
         },
         "XHB": {
-          "stage": "hold",
+          "stage": "unavailable",
           "date": "2026-11-25"
         },
         "SN": {
-          "stage": "watch",
+          "stage": "unavailable",
           "date": "2026-11-25"
         },
         "ALLE": {
-          "stage": "hold",
+          "stage": "unavailable",
           "date": "2026-11-25"
         },
         "MAS": {
-          "stage": "watch",
+          "stage": "unavailable",
           "date": "2026-11-25"
         },
         "CVCO": {
-          "stage": "hold",
+          "stage": "unavailable",
           "date": "2026-11-25"
         },
         "LEN": {
-          "stage": "hold",
+          "stage": "unavailable",
           "date": "2026-11-25"
         },
         "DHI": {
-          "stage": "hold",
+          "stage": "unavailable",
           "date": "2026-11-25"
         },
         "NVR": {
-          "stage": "hold",
+          "stage": "unavailable",
           "date": "2026-11-25"
         },
         "EPAM": {
-          "stage": "hold",
+          "stage": "unavailable",
           "date": "2026-11-25"
         },
         "OC": {
-          "stage": "hold",
+          "stage": "unavailable",
           "date": "2026-11-25"
         },
         "VMRK": {
-          "stage": "hold",
+          "stage": "unavailable",
           "date": "2026-11-25"
         },
         "QXO": {
-          "stage": "hold",
+          "stage": "unavailable",
           "date": "2026-11-25"
         },
         "WMT": {
-          "stage": "hold",
+          "stage": "unavailable",
           "date": "2026-11-25"
         },
         "COST": {
-          "stage": "watch",
+          "stage": "unavailable",
           "date": "2026-11-25"
         },
         "TGT": {
-          "stage": "hold",
+          "stage": "unavailable",
           "date": "2026-11-25"
         },
         "HD": {
-          "stage": "hold",
+          "stage": "unavailable",
           "date": "2026-11-25"
         },
         "ROST": {
-          "stage": "hold",
+          "stage": "unavailable",
           "date": "2026-11-25"
         },
         "HSY": {
-          "stage": "hold",
+          "stage": "unavailable",
           "date": "2026-11-25"
         },
         "CLX": {
-          "stage": "hold",
+          "stage": "unavailable",
           "date": "2026-11-25"
         },
         "PHM": {
-          "stage": "hold",
+          "stage": "unavailable",
           "date": "2026-11-25"
         },
         "GM": {
@@ -741,63 +741,63 @@
           "date": null
         },
         "TJX": {
-          "stage": "hold",
+          "stage": "unavailable",
           "date": "2026-11-25"
         },
         "AZO": {
-          "stage": "hold",
+          "stage": "unavailable",
           "date": "2026-11-25"
         },
         "ORLY": {
-          "stage": "hold",
+          "stage": "unavailable",
           "date": "2026-11-25"
         },
         "WM": {
-          "stage": "hold",
+          "stage": "unavailable",
           "date": "2026-11-25"
         },
         "RKT": {
-          "stage": "hold",
+          "stage": "unavailable",
           "date": "2026-11-25"
         },
         "PFSI": {
-          "stage": "hold",
+          "stage": "unavailable",
           "date": "2026-11-25"
         },
         "UWMC": {
-          "stage": "hold",
+          "stage": "unavailable",
           "date": "2026-11-25"
         },
         "RITM": {
-          "stage": "hold",
+          "stage": "unavailable",
           "date": "2026-11-25"
         },
         "LDI": {
-          "stage": "hold",
+          "stage": "unavailable",
           "date": "2026-11-25"
         },
         "RWT": {
-          "stage": "hold",
+          "stage": "unavailable",
           "date": "2026-11-25"
         },
         "AGNC": {
-          "stage": "hold",
+          "stage": "unavailable",
           "date": "2026-11-25"
         },
         "NLY": {
-          "stage": "hold",
+          "stage": "unavailable",
           "date": "2026-11-25"
         },
         "MTG": {
-          "stage": "hold",
+          "stage": "unavailable",
           "date": "2026-11-25"
         },
         "NMIH": {
-          "stage": "hold",
+          "stage": "unavailable",
           "date": "2026-11-25"
         }
       },
-      "completed_at": "2026-11-26T15:34+09:00",
+      "completed_at": "2026-11-27T09:37+09:00",
       "engine_version": "v5"
     },
     "W": {
