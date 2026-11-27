@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-11-20 04:37:45",
+  "updated_at": "2026-11-27 04:27:06",
   "groups": [
     {
       "group_name": "지수",
@@ -662,6 +662,12 @@
       "name": "",
       "group_name": "헬스케어,바이오",
       "sort_order": 14
+    },
+    {
+      "ticker": "IBB",
+      "name": "",
+      "group_name": "헬스케어,바이오",
+      "sort_order": 15
     },
     {
       "ticker": "RTX",
