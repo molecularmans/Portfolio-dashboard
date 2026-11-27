@@ -27,9 +27,20 @@ def latest_us_session(now_minute):
     cal = xc.get_calendar("XNYS")
     now = pd.Timestamp(now_minute)
     day = cal.date_to_session(now.date(), direction="previous")
-    if cal.session_close(day) > now:
+    if cal.session_close(day) + pd.Timedelta(minutes=30) > now:
         day = cal.previous_session(day)
     return day.date().isoformat()
+
+
+@lru_cache(maxsize=8)
+def completed_us_week(cutoff):
+    import exchange_calendars as xc
+    cal = xc.get_calendar("XNYS")
+    session = pd.Timestamp(cutoff)
+    monday = session.date() - timedelta(days=session.weekday())
+    if cal.next_session(session).date() < monday + timedelta(days=7):
+        monday -= timedelta(days=7)
+    return monday
 
 
 def closing_prices(frame, cutoff):
@@ -142,7 +153,7 @@ def assess(ticker, cycle, market, fact, earnings, on, price_day=None):
     qend = fundamentals["quarter_end"]
     dates["실적"] = qend
     fiscal = (earnings or {}).get("period")
-    if fiscal and fact.get("fiscal_period") and fiscal != fact["fiscal_period"]:
+    if not fiscal or not fact.get("fiscal_period") or fiscal != fact["fiscal_period"] or not within(qend,on,135):
         missing.append("최신 발표 분기 재무제표 대조")
     for field, label in (("oi_delta","분기 영업이익 가속도"),("sales_delta","분기 매출 가속도")):
         val = fundamentals[field]
@@ -155,7 +166,7 @@ def assess(ticker, cycle, market, fact, earnings, on, price_day=None):
     hans = fundamentals["hans"]
     if hans is not None:
         numbers["Hans Delta(%p)"] = round(hans,2)
-        if hans < 0:
+        if hans <= 0:
             failed.append("사이클 영업이익 성장률 둔화")
     elif state == "candidate" and (weeks or 0) >= 104:
         missing.append("사이클 기준 영업이익 3개 시점")
@@ -165,6 +176,7 @@ def assess(ticker, cycle, market, fact, earnings, on, price_day=None):
     checked = doc.get("checked")
     dates["공시 점검"] = checked
     report_date = (earnings or {}).get("reported_on","")
+    report_date = report_date if within(report_date,on,5000) else None
     doc_current = within(checked,on,10)
     for key,label,positive,negative in (
         ("risk","SEC 위험 검토",{"screened"},{"flagged"}),
@@ -183,7 +195,7 @@ def assess(ticker, cycle, market, fact, earnings, on, price_day=None):
         else:
             missing.append(label)
     forward = doc.get("forward") or {}
-    if doc_current and within(forward.get("date"),on,120) and forward.get("url") and forward.get("period_end","") > (qend or on) and (
+    if doc_current and within(forward.get("date"),on,120) and forward.get("url") and within(qend,forward.get("period_end"),116) and not within(qend,forward.get("period_end"),64) and (
         not report_date or forward.get("date","") >= (date.fromisoformat(report_date)-timedelta(days=2)).isoformat()
     ) and fundamentals["oi_yoy"] is not None and isinstance(forward.get("oi_yoy"),(float,int)):
         fd = forward["oi_yoy"] - fundamentals["oi_yoy"]
@@ -195,7 +207,7 @@ def assess(ticker, cycle, market, fact, earnings, on, price_day=None):
     else:
         missing.append("다음 분기 영업이익 전망")
     rev = fact.get("revision",{})
-    if within(rev.get("as_of"),on,10) and rev.get("period_end","") >= on and rev.get("url") and rev.get("direction") in ("up","down","flat"):
+    if within(rev.get("as_of"),on,10) and within(qend,rev.get("period_end"),116) and qend and 65 <= (date.fromisoformat(rev["period_end"])-date.fromisoformat(qend)).days <= 116 and rev.get("url") and rev.get("direction") in ("up","down","flat"):
         dates["추정치"] = rev["as_of"]
         if rev["direction"] != "up":
             failed.append("차기 분기 EPS 추정치 하향·정체")

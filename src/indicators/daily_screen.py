@@ -8,6 +8,7 @@ from zoneinfo import ZoneInfo
 
 import pandas as pd
 
+from src.indicators.leader_research import latest_us_session
 from src.indicators.integrated_assessment import build_integrated_assessment
 from src.indicators.relative_performance import calculate_rp_history, current_rp_rating, load_rp_reference
 from src.indicators.smart_analysis_v5 import analyze_smart_chart_v5
@@ -43,11 +44,13 @@ def scan_day(now: datetime | None = None) -> str:
 
 
 def latest_closed_session_date(ticker: str, now: datetime | None = None) -> date:
-    """Conservative weekday cutoff; an exchange holiday remains unclassified."""
+    """Use the exchange's latest published close for US securities."""
     current = now or datetime.now(ZoneInfo("Asia/Seoul"))
     if current.tzinfo is None:
         current = current.replace(tzinfo=ZoneInfo("Asia/Seoul"))
     korea = ticker.isdigit() and len(ticker) == 6
+    if not korea:
+        return date.fromisoformat(latest_us_session(pd.Timestamp(current).tz_convert("UTC").floor("min").isoformat()))
     market_now = current.astimezone(ZoneInfo("Asia/Seoul" if korea else "America/New_York"))
     close_time = time(16, 0) if korea else time(16, 30)
     closed_day = market_now.date() if market_now.time() >= close_time else market_now.date() - timedelta(days=1)

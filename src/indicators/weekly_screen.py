@@ -7,6 +7,8 @@ from zoneinfo import ZoneInfo
 
 import pandas as pd
 
+from src.indicators.leader_research import completed_us_week, latest_us_session
+
 
 WEEKLY_STAGE_LABELS = {
     "ready": "주봉 돌파 조건 충족",
@@ -23,6 +25,8 @@ def completed_week_start(ticker: str, now: datetime | None = None) -> date:
     if current.tzinfo is None:
         current = current.replace(tzinfo=ZoneInfo("Asia/Seoul"))
     korea = ticker.isdigit() and len(ticker) == 6
+    if not korea:
+        return completed_us_week(latest_us_session(pd.Timestamp(current).tz_convert("UTC").floor("min").isoformat()))
     market_now = current.astimezone(ZoneInfo("Asia/Seoul" if korea else "America/New_York"))
     monday = market_now.date() - timedelta(days=market_now.weekday())
     if market_now.weekday() > 4 or (market_now.weekday() == 4 and market_now.time() >= (time(16) if korea else time(16, 30))):

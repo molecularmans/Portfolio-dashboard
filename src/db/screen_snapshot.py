@@ -144,7 +144,8 @@ class ScreenRuntime:
                         if cutoff and not looks_like_mock_ohlcv(df, ticker):
                             prices[ticker] = closing_prices(df, cutoff)
                         if timeframe == "W":
-                            results[ticker]["cycle"] = weekly_cycle(df, completed_week_start(ticker))
+                            results[ticker]["cycle"] = ({"state": "unavailable"} if looks_like_mock_ohlcv(df, ticker, "W")
+                                                        else weekly_cycle(df, completed_week_start(ticker)))
                     except Exception:
                         results[ticker] = {"stage": "unavailable", "date": None}
                     with self._lock:

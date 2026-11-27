@@ -105,6 +105,8 @@ def render_watchlist_leaders(tickers, daily, weekly):
         day = daily.get("results", {}).get(ticker, {})
         row["일봉 판정"] = STAGE_LABELS.get(day.get("stage"), "확인 필요") if day.get("date") == cutoff else "확인 필요"
         row["섹터 기준 ETF"] = fact.get("sector_etf")
+        if fact.get("cik"):
+            row["기업 재무 원문"] = "https://www.sec.gov/edgar/browse/?CIK=" + str(fact["cik"])
         review = fact.get("review", {})
         row["공시 원문"] = (review.get("risk") or {}).get("url")
         row["가이던스 원문"] = (review.get("guidance") or {}).get("url")
@@ -114,13 +116,17 @@ def render_watchlist_leaders(tickers, daily, weekly):
         leaders = [r for r in judgments if r["최종 등급"] in LABELS]
         pending = sum(r["최종 등급"] == "판정 보류" for r in judgments)
         st.write(f"**주도주 {len(leaders)}개** · 판정 보류 {pending}개 · 전체 {len(judgments)}개")
+        ready_leaders = [r["종목"] for r in leaders if r["일봉 판정"] == STAGE_LABELS["ready"]]
+        st.write(f"**주도주이면서 당일 진입 조건 충족 ({len(ready_leaders)})** · " + (", ".join(ready_leaders) or "없음"))
+        if not leaders and pending:
+            st.caption(f"확인된 주도주는 0개입니다. 자료가 부족한 {pending}개 종목은 보류로 표시합니다.")
         st.caption("완료 주봉·시장 대비 강도와 최근 기업 자료를 결합합니다. 조회일과 실적·공시 기준일은 다를 수 있습니다.")
         mode = st.radio("리서치 결과 보기", ["주도주·검토 대상", "전체 결과"], horizontal=True, key="research_scope")
         shown = [r for r in judgments if r["최종 등급"] not in ("조건 미충족", "장기 사이클", "대상 제외")] if mode == "주도주·검토 대상" else judgments
         order = {label: i for i, label in enumerate((*LABELS, "공시 위험 검토", "판정 보류"))}
         if shown:
             st.dataframe(pd.DataFrame(sorted(shown, key=lambda r: order.get(r["최종 등급"], 9))), hide_index=True,
-                         column_config={k: st.column_config.LinkColumn(k, display_text="원문") for k in ("공시 원문","가이던스 원문","추정치 출처")})
+                         column_config={k: st.column_config.LinkColumn(k, display_text="원문") for k in ("공시 원문","기업 재무 원문","가이던스 원문","추정치 출처")})
         else:
             st.caption("이번 판정에서 주도주 또는 검토 대상에 해당하는 종목이 없습니다.")
         st.caption("부상은 실적 가속과 선행 방향이 확인된 초기·잠정 후보입니다. 확정은 실제 Hans Delta와 수치형 Forward Delta가 필요합니다. 성숙은 40주 이상 정배열에서 이익은 성장하지만 가속도가 둔화한 경우입니다. 공시 자동 점검은 지정한 위험 신호 범위에 한합니다.")
