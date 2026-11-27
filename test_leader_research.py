@@ -1,9 +1,11 @@
 import unittest
+from collections import Counter
 from unittest.mock import patch
 
 import pandas as pd
 
 from scripts import update_leader_evidence as updater
+from src.ui.leader_view import research_rows
 from src.indicators.leader_research import assess, completed_us_week, latest_us_session, performance
 
 class ResearchTests(unittest.TestCase):
@@ -65,11 +67,37 @@ class ResearchTests(unittest.TestCase):
             updated=updater.forecast("EXAMPLE",self.on,"2026-09-30",first)
             self.assertEqual(updated["direction"],"up")
             self.assertIs(updater.forecast("EXAMPLE",self.on,"2026-12-31",updated),updated)
+    def test_monthly_revision_has_to_match_the_unreported_quarter(self):
+        html="<table><tr><th>Period</th><th>30 days ago</th><th>Now</th></tr><tr><td>Current quarter (Dec '26)</td><td>$2.03</td><td>$2.09</td></tr></table>"
+        sample=updater.revision_table(html,"https://example.test/forecast",self.on,"2026-09-30")
+        self.assertEqual((sample["period_end"],sample["direction"]),("2026-12-31","up"))
+        self.assertIsNone(updater.revision_table(html,"https://example.test/forecast",self.on,"2026-06-30"))
+    def test_render_dashboard_research_table(self):
+        from streamlit.testing.v1 import AppTest
+        app=AppTest.from_string("""
+from scripts.update_leader_evidence import load_file
+from src.ui.leader_view import render_watchlist_leaders
+screens=load_file("watchlist_screen.json")["screens"]
+render_watchlist_leaders(["AAPL","SPY"],screens["D"],screens["W"])
+""").run(timeout=35)
+        self.assertFalse(app.exception)
+        self.assertTrue(any(e.label=="최종 리서치 판정" for e in app.expander))
+        app.radio[0].set_value("전체 결과").run()
+        self.assertIn("최종 등급",app.dataframe[-1].value.columns)
     def test_demand_and_guidance_need_explicit_direction(self):
         row=updater.signals("Raises full year guidance. Demand is strengthening.","2026-11-12","https://example.test/report","2026-09-30")
         self.assertEqual((row["guidance"]["value"],row["demand"]["value"]),("up","up"))
         row=updater.signals("We reaffirm our guidance. Demand was stable.","2026-11-12","https://example.test/report","2026-09-30")
         self.assertEqual(row,{})
+    def test_dashboard_joins_snapshots_and_reports_coverage(self):
+        screens=updater.load_file("watchlist_screen.json")["screens"]
+        watch=[r["ticker"] for r in updater.load_file("user_config.json")["watchlist"]]
+        facts=updater.load_file("leader_research.json")["records"]
+        earnings=updater.load_file("watchlist_earnings.json")["records"]
+        rows=research_rows(watch,screens.get("D",{}),screens.get("W",{}),earnings,facts)
+        self.assertEqual([r["종목"] for r in rows],watch)
+        self.assertTrue(all("일봉 판정" in r and "판정 근거" in r for r in rows))
+        print("Dashboard research coverage:",dict(Counter(r["최종 등급"] for r in rows)))
     def test_snapshot_keeps_only_public_filing_links(self):
         facts=updater.load_file("leader_research.json")["records"]
         for f in facts.values():

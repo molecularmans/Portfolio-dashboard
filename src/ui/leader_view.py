@@ -38,6 +38,33 @@ def watchlist_leader_rows(tickers, daily, weekly, now=None):
     return rows
 
 
+def research_rows(tickers, daily, weekly, records, facts, now=None):
+    now = pd.Timestamp.now(tz="Asia/Seoul") if now is None else pd.Timestamp(now)
+    cutoff = latest_us_session(now.tz_convert("UTC").floor("min").isoformat())
+    expected_week = completed_week_start("SPY", now)
+    judgments = []
+    for ticker in tickers:
+        cycle = (weekly.get("results", {}).get(ticker, {}).get("cycle") or {}).copy()
+        if not expected_week.isoformat() <= (cycle.get("date") or "") <= (expected_week + timedelta(days=6)).isoformat():
+            cycle = {}
+        fact = facts.get(ticker, {})
+        market = daily.get("results", {}).get(ticker, {}).get("research_market") or {}
+        if market.get("date") != cutoff:
+            market = fact.get("market", {})
+        row = assess(ticker, cycle, market, fact, records.get(ticker), now.tz_convert("Asia/Seoul").date().isoformat(), cutoff)
+        day = daily.get("results", {}).get(ticker, {})
+        row["일봉 판정"] = STAGE_LABELS.get(day.get("stage"), "확인 필요") if day.get("date") == cutoff else "확인 필요"
+        row["섹터 기준 ETF"] = fact.get("sector_etf")
+        if fact.get("cik"):
+            row["기업 재무 원문"] = "https://www.sec.gov/edgar/browse/?CIK=" + str(fact["cik"])
+        review = fact.get("review", {})
+        row["공시 원문"] = (review.get("risk") or {}).get("url")
+        row["가이던스 원문"] = (review.get("guidance") or {}).get("url")
+        row["추정치 출처"] = (fact.get("revision") or {}).get("url")
+        judgments.append(row)
+    return judgments
+
+
 def render_watchlist_leaders(tickers, daily, weekly):
     st.markdown("**관심종목 주도주 판정**")
     st.caption("기술 후보는 관심종목의 KIS 완료 주봉 종가 기준입니다. 4주 > 13주 > 26주 > 52주이고 현재 정배열이 시작된 지 2년 6개월 이내인 종목을 표시합니다.")
@@ -89,29 +116,7 @@ def render_watchlist_leaders(tickers, daily, weekly):
             })
         else:
             st.caption("실적·공시 동기화 자료를 읽을 수 없습니다.")
-    facts = evidence()
-    cutoff = latest_us_session(pd.Timestamp.now(tz="UTC").floor("min").isoformat())
-    expected_week = completed_week_start("SPY")
-    judgments = []
-    for ticker in tickers:
-        cycle = (weekly.get("results", {}).get(ticker, {}).get("cycle") or {}).copy()
-        if not expected_week.isoformat() <= (cycle.get("date") or "") <= (expected_week + timedelta(days=6)).isoformat():
-            cycle = {}
-        fact = facts.get(ticker, {})
-        market = daily.get("results", {}).get(ticker, {}).get("research_market") or {}
-        if market.get("date") != cutoff:
-            market = fact.get("market", {})
-        row = assess(ticker, cycle, market, fact, records.get(ticker), pd.Timestamp.now(tz="Asia/Seoul").date().isoformat(), cutoff)
-        day = daily.get("results", {}).get(ticker, {})
-        row["일봉 판정"] = STAGE_LABELS.get(day.get("stage"), "확인 필요") if day.get("date") == cutoff else "확인 필요"
-        row["섹터 기준 ETF"] = fact.get("sector_etf")
-        if fact.get("cik"):
-            row["기업 재무 원문"] = "https://www.sec.gov/edgar/browse/?CIK=" + str(fact["cik"])
-        review = fact.get("review", {})
-        row["공시 원문"] = (review.get("risk") or {}).get("url")
-        row["가이던스 원문"] = (review.get("guidance") or {}).get("url")
-        row["추정치 출처"] = (fact.get("revision") or {}).get("url")
-        judgments.append(row)
+    judgments = research_rows(tickers, daily, weekly, records, evidence())
     with st.expander("최종 리서치 판정", expanded=True):
         leaders = [r for r in judgments if r["최종 등급"] in LABELS]
         pending = sum(r["최종 등급"] == "판정 보류" for r in judgments)

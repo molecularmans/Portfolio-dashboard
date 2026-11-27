@@ -207,7 +207,9 @@ def assess(ticker, cycle, market, fact, earnings, on, price_day=None):
     else:
         missing.append("다음 분기 영업이익 전망")
     rev = fact.get("revision",{})
-    if within(rev.get("as_of"),on,10) and within(qend,rev.get("period_end"),116) and qend and 65 <= (date.fromisoformat(rev["period_end"])-date.fromisoformat(qend)).days <= 116 and rev.get("url") and rev.get("direction") in ("up","down","flat"):
+    if (within(rev.get("as_of"),on,10) and within(qend,rev.get("period_end"),116)
+            and not within(qend,rev.get("period_end"),64) and rev.get("url")
+            and rev.get("direction") in ("up","down","flat")):
         dates["추정치"] = rev["as_of"]
         if rev["direction"] != "up":
             failed.append("차기 분기 EPS 추정치 하향·정체")

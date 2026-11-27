@@ -180,6 +180,40 @@ def review(rows, cik, on, reported, quarter_end, old):
                     result["release_accession"]=event["accessionNumber"]
     return result
 
+def revision_table(html, url, on, last_end):
+    if not isinstance(html,str) or not html:
+        return None
+    for table in BeautifulSoup(html, "html.parser").find_all("table"):
+        rows = table.find_all("tr")
+        if not rows:
+            continue
+        names = [c.get_text(" ",strip=True).lower() for c in rows[0].find_all(["td","th"])]
+        if not {"period","30 days ago","now"} <= set(names):
+            continue
+        for row in rows[1:]:
+            cells = [c.get_text(" ",strip=True) for c in row.find_all(["td","th"])]
+            if len(cells) != len(names):
+                continue
+            label = cells[names.index("period")].replace("’","'")
+            match = re.fullmatch(r"(?:Current|Next) quarter\s*\(([A-Za-z]{3})\s+'(\d\d)\)",label,re.I)
+            if not match:
+                continue
+            try:
+                month = datetime.strptime(" ".join(match.groups()),"%b %y").date()
+                end = month.replace(day=calendar.monthrange(month.year,month.month)[1])
+                if not 65 <= (end-date.fromisoformat(last_end)).days <= 116:
+                    continue
+                def value(key):
+                    x = cells[names.index(key)].replace("$","").replace(",","").replace("−","-")
+                    return float(re.sub(r"^\((.*)\)$",r"-\1",x))
+                before, current = value("30 days ago"), value("now")
+                if math.isfinite(before) and math.isfinite(current):
+                    return {"period_end":end.isoformat(),"as_of":on,"prior_30d":before,"current":current,
+                            "direction":"up" if current>before else "down" if current<before else "flat","url":url}
+            except ValueError:
+                continue
+    return None
+
 def forecast(ticker, on, last_end, prev):
     if not last_end:
         return prev
@@ -196,8 +230,10 @@ def forecast(ticker, on, last_end, prev):
                 samples.append((end.isoformat(),value))
         except (ValueError,TypeError,KeyError):
             continue
+    alt_url = f"https://www.quotelinks.com/forecast/{ticker.lower()}.html"
     if not samples:
-        return prev
+        table = revision_table(fetch(alt_url),alt_url,on,last_end)
+        return table or prev
     end, val=min(samples)
     history=dict(prev.get("history",{})) if end==prev.get("period_end") else {}
     history[on]=val
@@ -207,6 +243,10 @@ def forecast(ticker, on, last_end, prev):
     if reference:
         base=history[min(reference)]
         result["direction"]="up" if val>base else "down" if val<base else "flat"
+    else:
+        table = revision_table(fetch(alt_url),alt_url,on,last_end)
+        if table and table["period_end"] == end:
+            result = dict(table,history=history)
     return result
 
 def main():
