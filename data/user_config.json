@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-11-27 04:29:00",
+  "updated_at": "2026-11-27 04:29:35",
   "groups": [
     {
       "group_name": "지수",
@@ -674,6 +674,12 @@
       "name": "",
       "group_name": "헬스케어,바이오",
       "sort_order": 16
+    },
+    {
+      "ticker": "GILD",
+      "name": "",
+      "group_name": "헬스케어,바이오",
+      "sort_order": 17
     },
     {
       "ticker": "RTX",
