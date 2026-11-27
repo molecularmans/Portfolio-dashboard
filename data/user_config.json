@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-11-27 04:27:06",
+  "updated_at": "2026-11-27 04:29:00",
   "groups": [
     {
       "group_name": "지수",
@@ -668,6 +668,12 @@
       "name": "",
       "group_name": "헬스케어,바이오",
       "sort_order": 15
+    },
+    {
+      "ticker": "AMGN",
+      "name": "",
+      "group_name": "헬스케어,바이오",
+      "sort_order": 16
     },
     {
       "ticker": "RTX",
