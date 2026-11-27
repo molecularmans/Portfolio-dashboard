@@ -12,11 +12,13 @@ from typing import Callable
 from zoneinfo import ZoneInfo
 
 import requests
+import pandas as pd
 
 from src.api.kis_rest import looks_like_mock_ohlcv
 from src.db.github_sync import GitHubSync
 from src.indicators.daily_screen import evaluate_daily_ticker, scan_day
 from src.indicators.leader_screen import weekly_cycle
+from src.indicators.leader_research import closing_prices, evidence, latest_us_session, performance
 from src.indicators.weekly_screen import completed_week_start, evaluate_weekly_ticker
 
 
@@ -131,12 +133,16 @@ class ScreenRuntime:
                 if timeframe not in periods:
                     continue
                 results = {}
+                prices = {}
+                cutoff = latest_us_session(pd.Timestamp.now(tz="UTC").floor("min").isoformat()) if timeframe == "D" and client is not None else None
                 for ticker in tickers:
                     with self._lock:
                         self._job["ticker"] = f"{label} {ticker}"
                     try:
                         df = load_data(ticker, db, client, force_refresh=True, timeframe=label)
                         results[ticker] = evaluator(df, ticker)
+                        if cutoff and not looks_like_mock_ohlcv(df, ticker):
+                            prices[ticker] = closing_prices(df, cutoff)
                         if timeframe == "W":
                             results[ticker]["cycle"] = weekly_cycle(df, completed_week_start(ticker))
                     except Exception:
@@ -149,6 +155,27 @@ class ScreenRuntime:
                     "results": results,
                     "completed_at": datetime.now(ZoneInfo("Asia/Seoul")).isoformat(timespec="minutes"),
                 }
+                if cutoff:
+                    fact = evidence()
+                    benchmarks = {"SPY"} | {fact.get(t, {}).get("sector_etf") for t in tickers}
+                    for symbol in sorted(benchmarks - set(prices) - {None}):
+                        try:
+                            df = load_data(symbol, db, client, force_refresh=True, timeframe="일봉")
+                            if not looks_like_mock_ohlcv(df, symbol):
+                                prices[symbol] = closing_prices(df, cutoff)
+                        except Exception:
+                            continue
+                    spy = prices.get("SPY")
+                    if spy is not None and len(spy) and spy.index[-1] == cutoff:
+                        for ticker, close in prices.items():
+                            if ticker not in results:
+                                continue
+                            etf = fact.get(ticker, {}).get("sector_etf")
+                            sector = prices.get(etf)
+                            results[ticker]["research_market"] = {
+                                "date": cutoff, "stock": performance(close, spy),
+                                "sector": performance(sector, spy) if sector is not None else {}, "etf": etf,
+                            }
                 if timeframe == "D":
                     screen["engine_version"] = "v5"
                 if timeframe == "W":

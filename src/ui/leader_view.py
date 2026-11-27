@@ -7,7 +7,8 @@ import streamlit as st
 
 from src.indicators.daily_screen import latest_closed_session_date, STAGE_LABELS
 from src.indicators.earnings_evidence import earnings_row, read_snapshot
-from src.indicators.leader_screen import CYCLE_LABELS, read_final_leaders
+from src.indicators.leader_screen import CYCLE_LABELS
+from src.indicators.leader_research import LABELS, assess, evidence, latest_us_session
 from src.indicators.weekly_screen import completed_week_start
 
 
@@ -88,17 +89,38 @@ def render_watchlist_leaders(tickers, daily, weekly):
             })
         else:
             st.caption("실적·공시 동기화 자료를 읽을 수 없습니다.")
-    leaders, message = read_final_leaders()
-    with st.expander("최종 리서치 판정", expanded=bool(leaders)):
-        if message:
-            st.caption(message)
+    facts = evidence()
+    cutoff = latest_us_session(pd.Timestamp.now(tz="UTC").floor("min").isoformat())
+    expected_week = completed_week_start("SPY")
+    judgments = []
+    for ticker in tickers:
+        cycle = (weekly.get("results", {}).get(ticker, {}).get("cycle") or {}).copy()
+        if not expected_week.isoformat() <= (cycle.get("date") or "") <= (expected_week + timedelta(days=6)).isoformat():
+            cycle = {}
+        fact = facts.get(ticker, {})
+        market = daily.get("results", {}).get(ticker, {}).get("research_market") or {}
+        if market.get("date") != cutoff:
+            market = fact.get("market", {})
+        row = assess(ticker, cycle, market, fact, records.get(ticker), pd.Timestamp.now(tz="Asia/Seoul").date().isoformat(), cutoff)
+        day = daily.get("results", {}).get(ticker, {})
+        row["일봉 판정"] = STAGE_LABELS.get(day.get("stage"), "확인 필요") if day.get("date") == cutoff else "확인 필요"
+        row["섹터 기준 ETF"] = fact.get("sector_etf")
+        review = fact.get("review", {})
+        row["공시 원문"] = (review.get("risk") or {}).get("url")
+        row["가이던스 원문"] = (review.get("guidance") or {}).get("url")
+        row["추정치 출처"] = (fact.get("revision") or {}).get("url")
+        judgments.append(row)
+    with st.expander("최종 리서치 판정", expanded=True):
+        leaders = [r for r in judgments if r["최종 등급"] in LABELS]
+        pending = sum(r["최종 등급"] == "판정 보류" for r in judgments)
+        st.write(f"**주도주 {len(leaders)}개** · 판정 보류 {pending}개 · 전체 {len(judgments)}개")
+        st.caption("완료 주봉·시장 대비 강도와 최근 기업 자료를 결합합니다. 조회일과 실적·공시 기준일은 다를 수 있습니다.")
+        mode = st.radio("리서치 결과 보기", ["주도주·검토 대상", "전체 결과"], horizontal=True, key="research_scope")
+        shown = [r for r in judgments if r["최종 등급"] not in ("조건 미충족", "장기 사이클", "대상 제외")] if mode == "주도주·검토 대상" else judgments
+        order = {label: i for i, label in enumerate((*LABELS, "공시 위험 검토", "판정 보류"))}
+        if shown:
+            st.dataframe(pd.DataFrame(sorted(shown, key=lambda r: order.get(r["최종 등급"], 9))), hide_index=True,
+                         column_config={k: st.column_config.LinkColumn(k, display_text="원문") for k in ("공시 원문","가이던스 원문","추정치 출처")})
         else:
-            selected = [row for row in leaders if row["종목"] in tickers]
-            if selected:
-                for row in selected:
-                    day = daily.get("results", {}).get(row["종목"], {})
-                    current = latest_closed_session_date(row["종목"]).isoformat()
-                    row["일봉 판정"] = STAGE_LABELS.get(day.get("stage"), "확인 필요") if day.get("date") == current else "확인 필요"
-                st.dataframe(pd.DataFrame(selected), hide_index=True)
-            else:
-                st.caption("검증 결과에 현재 관심종목으로 등록된 주도주가 없습니다.")
+            st.caption("이번 판정에서 주도주 또는 검토 대상에 해당하는 종목이 없습니다.")
+        st.caption("부상은 실적 가속과 선행 방향이 확인된 초기·잠정 후보입니다. 확정은 실제 Hans Delta와 수치형 Forward Delta가 필요합니다. 성숙은 40주 이상 정배열에서 이익은 성장하지만 가속도가 둔화한 경우입니다. 공시 자동 점검은 지정한 위험 신호 범위에 한합니다.")
