@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "updated_at": "2026-11-26T15:24:24+09:00",
+  "updated_at": "2026-11-28T09:57:15+09:00",
   "records": {
     "AAPL": {
       "reported_on": "2026-11-03",
@@ -70,6 +70,16 @@
       "revenue": 13377000000,
       "revenue_estimate": 13097669680,
       "accession": "0000002488-26-000191",
+      "form": "10-Q"
+    },
+    "AMGN": {
+      "reported_on": "2026-11-04",
+      "period": "FY2026 Q3",
+      "eps": 6.45,
+      "eps_estimate": 5.77,
+      "revenue": 10365000000,
+      "revenue_estimate": 10044322608,
+      "accession": "0000318154-26-000155",
       "form": "10-Q"
     },
     "AMPL": {
@@ -150,6 +160,16 @@
       "revenue": 24188000000,
       "revenue_estimate": 24354973232,
       "accession": "0001628280-26-067508",
+      "form": "10-Q"
+    },
+    "BB": {
+      "reported_on": "2026-09-24",
+      "period": "FY2027 Q2",
+      "eps": 0.07,
+      "eps_estimate": 0.04,
+      "revenue": 163300000,
+      "revenue_estimate": 145027200,
+      "accession": "0001070235-26-000115",
       "form": "10-Q"
     },
     "BE": {
@@ -460,6 +480,16 @@
       "revenue": 360975000,
       "revenue_estimate": 350679328,
       "accession": "0001576280-26-000044",
+      "form": "10-Q"
+    },
+    "GILD": {
+      "reported_on": "2026-10-30",
+      "period": "FY2026 Q3",
+      "eps": 2.55,
+      "eps_estimate": 2.18,
+      "revenue": 8300000000,
+      "revenue_estimate": 7805013016,
+      "accession": "0000882095-26-000039",
       "form": "10-Q"
     },
     "GM": {
@@ -1400,6 +1430,16 @@
       "revenue": 4313000000,
       "revenue_estimate": 3761903680,
       "accession": "0001628280-26-067893",
+      "form": "10-Q"
+    },
+    "VRTX": {
+      "reported_on": "2026-11-03",
+      "period": "FY2026 Q3",
+      "eps": 4.76,
+      "eps_estimate": 4.7,
+      "revenue": 3441000000,
+      "revenue_estimate": 3427980640,
+      "accession": "0000875320-26-000291",
       "form": "10-Q"
     },
     "VST": {
